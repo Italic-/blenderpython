@@ -1,29 +1,3 @@
-import bpy
-import math
-import array
-import sys
-# import Mathutils
-
-from bpy.props import BoolProperty
-from bpy.props import FloatVectorProperty
-
-# Custom properties
-bpy.types.Scene.realsize_forceunwrap = BoolProperty(name="Force Unwrap", description="Forces the script to unwrap the mesh again", default=True)
-bpy.types.Scene.realsize_materialSize = FloatVectorProperty(name="Material Size", description="The world dimensions of a texture (metric)", default=(1.0, 1.0),
-                                                            min=0.00001,
-                                                            max=1000000000,
-                                                            soft_min=0,
-                                                            soft_max=10000,
-                                                            step=3,
-                                                            precision=2,
-                                                            options={'SKIP_SAVE'},
-                                                            subtype='NONE',
-                                                            size=2)
-
-UVMapName = "UVMapWorldSize"
-
-UVToolsObject = 0
-_Debug = True
 bl_info = {
     "name": "Realsize Unwrap",
     "author": "Gertjan Van den BRoek",
@@ -32,15 +6,42 @@ bl_info = {
     "location": "3D View, Toolbox",
     "description": "Creates an new UVmap OR updates an existing UVmap called 'UVMapWorldSize',this set of UV's is scaled to match the world size. The UV square is treated as a 1mx1m square",
     "warning": "Not 100% reliable, but 100% safe for your mesh",
-    "wiki_url": ""
-                "",
-    "tracker_url": ""
-                   "",
+    "wiki_url": "",
+    "tracker_url": "",
     "support": 'TESTING',
-    "category": "Object"}
+    "category": "Object"
+}
+
+import bpy
+import math
+import array
+import sys
+
+from bpy.props import BoolProperty
+from bpy.props import FloatVectorProperty
+
+# Custom properties
+bpy.types.Scene.realsize_forceunwrap = BoolProperty(
+    name="Force Unwrap", description="Forces the script to unwrap the mesh again", default=True
+)
+bpy.types.Scene.realsize_materialSize = FloatVectorProperty(
+    name="Material Size", description="The world dimensions of a texture (metric)", default=(1.0, 1.0),
+    min=0.00001,
+    max=1000000000,
+    soft_min=0,
+    soft_max=10000,
+    step=3,
+    precision=2,
+    options={'SKIP_SAVE'},
+    subtype='NONE',
+    size=2
+)
+
+UVMapName = "UVMapWorldSize"
+UVToolsObject = 0
+_Debug = True
 
 # Debug
-
 
 def printIDs(meshObj):
     print('----------ID------------')
