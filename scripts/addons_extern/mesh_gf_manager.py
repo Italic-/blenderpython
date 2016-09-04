@@ -9,13 +9,13 @@ prevs = False
 
 
 bl_info = {
-    "name": "GridFill Manager",                     
+    "name": "GridFill Manager",
     "author": "Alexander Nedovizin (script), Paul Kotelevets (idea)",
     "version": (0, 1, 5),
     "blender": (2, 6, 8),
     "description": "GridFill Manager",
     "category": "Mesh"
-}  
+}
 
 
 def check_context(obj):
@@ -23,11 +23,11 @@ def check_context(obj):
     if len(select_verts)==0:
         res=False
         return
-    
+
     res = True
-    bpy.ops.object.mode_set(mode='OBJECT') 
-    bpy.ops.object.mode_set(mode='EDIT') 
-    
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode='EDIT')
+
     sv = find_index_of_selected_vertex(obj)
     for v in sv:
         if not(v in select_verts) and v<obj.mnogo_v:
@@ -38,32 +38,32 @@ def check_context(obj):
 
 def update_shape(self,context):
     global select_verts, active_vert
-    
+
     ch_c = check_context(context.object)
-        
+
     if not ch_c:
         main(context, context.object.myRad, mode = True)
     else:
-      
+
         selecting_verts(context.object.data,select_verts)
         main(context, context.object.myRad, mode = True)
 
 
 
 bpy.types.Object.myRad = IntProperty(
-    name="Radius", 
+    name="Radius",
 	min = 0,
     default = 1,
     update = update_shape)
-    
+
 bpy.types.Object.mnogo_v= IntProperty(
-    name="Vertices", 
+    name="Vertices",
     default = -1)
 
 
 def bm_vert_active_get(ob, D=0):
     global active_vert, active_vert_prev
-  
+
     bm = bmesh.from_edit_mesh(ob.data)
     for elem in reversed(bm.select_history):
         if isinstance(elem, bmesh.types.BMVert):
@@ -72,55 +72,55 @@ def bm_vert_active_get(ob, D=0):
                 avs = get_prev_active_vert(ob.data, active_vert)
                 if avs==None:
                     return -2
-                
+
                 act_v = avs
                 active_vert_prev = active_vert
-                
+
         if D==2 and active_vert >= 0:
                 avs = get_next_active_vert(ob.data, active_vert)
                 if avs==None:
-                    return -2 
-                    
+                    return -2
+
                 act_v = avs
                 active_vert_prev = active_vert
-                
+
         return act_v
     return -2
-    
-    
-def find_index_of_selected_vertex(obj):  
-    selected_verts = [i.index for i in obj.data.vertices if i.select]  
-    verts_selected = len(selected_verts)  
-    if verts_selected <1:  
-        return None                            
-    else:  
-        return selected_verts  
 
 
-def find_connected_verts(me, found_index, not_list):  
+def find_index_of_selected_vertex(obj):
+    selected_verts = [i.index for i in obj.data.vertices if i.select]
+    verts_selected = len(selected_verts)
+    if verts_selected <1:
+        return None
+    else:
+        return selected_verts
+
+
+def find_connected_verts(me, found_index, not_list):
     global select_verts
-    edges = me.edges  
-    connecting_edges = [i for i in edges if found_index in i.vertices[:]]  
-    if len(connecting_edges) == 0: 
+    edges = me.edges
+    connecting_edges = [i for i in edges if found_index in i.vertices[:]]
+    if len(connecting_edges) == 0:
         return []
-    else:  
-        connected_verts = []  
-        for edge in connecting_edges:  
-            cvert = set(edge.vertices[:])   
-            cvert.remove(found_index)  
+    else:
+        connected_verts = []
+        for edge in connecting_edges:
+            cvert = set(edge.vertices[:])
+            cvert.remove(found_index)
             vert = cvert.pop()
             if not (vert in not_list) and me.vertices[vert].select and (vert in select_verts):
-                connected_verts.append(vert)  
-        
+                connected_verts.append(vert)
+
         if len(connected_verts)>2:
             print_error('Error: loop is not selected')
             return None
-        return connected_verts  
+        return connected_verts
 
 
 def get_prev_active_vert(me, found_index):
     global active_vert_prev, active_vert, prevs
- 
+
     verts = find_connected_verts(me, found_index, [])
     if verts[0] == active_vert_prev:
         if not prevs:
@@ -159,22 +159,22 @@ def get_loop(me, active_v, v_set, not_list=[], step=0):
     vlist = [active_v]
     ln = len(v_set)
     not_list.append(active_v)
-    
+
     step +=1
     list_v_1 = find_connected_verts(me, active_v, not_list)
     if list_v_1==None:
         return None
-    
-    if step==ln:     
-        return vlist 
-    
+
+    if step==ln:
+        return vlist
+
     if len(list_v_1)>0:
-        list_v_2 = get_loop(me, list_v_1[0], v_set, not_list, step) 
+        list_v_2 = get_loop(me, list_v_1[0], v_set, not_list, step)
         if list_v_2==None:
             return None
-        
+
         vlist += list_v_2
-        
+
     return vlist
 
 
@@ -183,7 +183,7 @@ def get_opposite(me,vert_index, v_set):
     loop = get_loop(me, vert_index, v_set, [])
     if loop==None:
         return None
-    
+
     ps = len(loop)//2
     ff = loop.index(vert_index)
 
@@ -193,9 +193,9 @@ def get_opposite(me,vert_index, v_set):
         df = ff+ps
 
     return loop[df]
-    
-    
-    
+
+
+
 def find_all_connected_verts(R, me, active_v, not_list=[], step=0):
     vlist = [active_v]
     not_list.append(active_v)
@@ -203,36 +203,36 @@ def find_all_connected_verts(R, me, active_v, not_list=[], step=0):
     list_v_1 = find_connected_verts(me, active_v, not_list)
     if list_v_1==None:
         return None
-    
-    if step==R+2:     
-        return vlist 
+
+    if step==R+2:
+        return vlist
 
     for v in list_v_1:
-        list_v_2 = find_all_connected_verts(R, me, v, not_list, step) 
+        list_v_2 = find_all_connected_verts(R, me, v, not_list, step)
         if list_v_2==None:
             return None
-        
+
         vlist += list_v_2
-        
+
     return vlist
-    
+
 
 def selecting_verts(me, mas):
-    bpy.ops.object.mode_set(mode='OBJECT') 
-    
+    bpy.ops.object.mode_set(mode='OBJECT')
+
     for idx in mas:
         me.vertices[idx].select = True
-    
-    bpy.ops.object.mode_set(mode='EDIT') 
-    
-    
+
+    bpy.ops.object.mode_set(mode='EDIT')
+
+
 def deselecting_verts(me, mas):
-    bpy.ops.object.mode_set(mode='OBJECT') 
-    
+    bpy.ops.object.mode_set(mode='OBJECT')
+
     for idx in mas:
         me.vertices[idx].select = False
-    
-    bpy.ops.object.mode_set(mode='EDIT') 
+
+    bpy.ops.object.mode_set(mode='EDIT')
 
 
 
@@ -243,13 +243,13 @@ def cls_mnogo(obj):
     active_vert_prev = -3
     prevs = False
     return
-    
 
-def main(context, Rad=1, Dist=0, mode=False):   
+
+def main(context, Rad=1, Dist=0, mode=False):
     global select_verts, active_vert, mnogo_v, active_vert_prev
 
-    bpy.ops.object.mode_set(mode='OBJECT') 
-    bpy.ops.object.mode_set(mode='EDIT') 
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode='EDIT')
 
     ob = bpy.context.object
     ch_c = check_context(ob)
@@ -263,10 +263,10 @@ def main(context, Rad=1, Dist=0, mode=False):
             cls_mnogo(ob)
             main(context,Rad,mode=False)
             return
-            
-        
-   
-    
+
+
+
+
 
     if mode:
         av = -1
@@ -280,49 +280,49 @@ def main(context, Rad=1, Dist=0, mode=False):
     if (active_vert < 0 or active_vert != av) and not mode:
         active_vert = bm_vert_active_get(ob,Dist)
         select_verts=[]
-    
+
     if active_vert==-2 and not mode:
         print_error('Active vert is not defined')
         return{'Error: 003'}
-    
+
     if select_verts==[]:
         select_verts = find_index_of_selected_vertex(ob)
-        
+
     sv_len = len(select_verts)
 
-    if sv_len<8: 
+    if sv_len<8:
         print_error('Error: need for equ or more then 8 verts')
         return{'Error: 001'}
-		
-    if (sv_len//8)<Rad: 
+
+    if (sv_len//8)<Rad:
         Rad = sv_len//8
-    
+
     if (sv_len%2)>0 and not mode:
         print_error('Error: must be an even number of vertices')
         return{'Error: 002'}
-    
+
     mesh = ob.data
     opposit_vert = get_opposite(mesh,active_vert, select_verts)
     if opposit_vert==None:
         return {'FINISHED'}
 
-    nl = [] 
-    new_sel_v_1 = find_all_connected_verts(Rad, mesh, active_vert, nl) 
+    nl = []
+    new_sel_v_1 = find_all_connected_verts(Rad, mesh, active_vert, nl)
     if new_sel_v_1==None:
         return {'FINISHED'}
     new_sel_v_2 = find_all_connected_verts(Rad, mesh, opposit_vert, nl)
     if new_sel_v_2==None:
         return {'FINISHED'}
-     
+
     bpy.ops.mesh.select_all(action='DESELECT')
-    bpy.ops.object.mode_set(mode='OBJECT') 
-    
+    bpy.ops.object.mode_set(mode='OBJECT')
+
     for idx in nl:
         mesh.vertices[idx].select = True
-    
-    bpy.ops.object.mode_set(mode='EDIT') 
+
+    bpy.ops.object.mode_set(mode='EDIT')
     ob.mnogo_v = len(mesh.vertices)
-    bpy.ops.mesh.fill_grid() 
+    bpy.ops.mesh.fill_grid()
 
     return {'FINISHED'}
 
@@ -332,31 +332,31 @@ class MessageOperator(bpy.types.Operator):
     bl_label = "Message"
     type = StringProperty()
     message = StringProperty()
- 
+
     def execute(self, context):
         self.report({'INFO'}, self.message)
         print(self.message)
         return {'FINISHED'}
- 
+
     def invoke(self, context, event):
         wm = context.window_manager
         return wm.invoke_popup(self, width=400, height=200)
- 
+
     def draw(self, context):
         self.layout.label(self.message, icon='BLENDER')
 
 
 def print_error(message):
-    bpy.ops.error.message('INVOKE_DEFAULT', 
+    bpy.ops.error.message('INVOKE_DEFAULT',
         type = "Message",
-        message = message)  
-        
+        message = message)
+
 
 class GFManagerOperator(bpy.types.Operator):
     """Tooltip"""
     bl_idname = "mesh.gfmanager_operator"
     bl_label = "GridFill Manager Operator"
-    bl_options = {'REGISTER', 'UNDO'} 
+    bl_options = {'REGISTER', 'UNDO'}
     rad = bpy.props.IntProperty(options={'HIDDEN'})
     typing = bpy.props.IntProperty(options={'HIDDEN'})
 
@@ -380,7 +380,7 @@ class GFManagerPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_context = "object"
-    
+
     @classmethod
     def poll(cls, context):
         return context.active_object is not None and context.mode == 'EDIT_MESH'
@@ -416,4 +416,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
