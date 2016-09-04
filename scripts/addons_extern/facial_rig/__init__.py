@@ -1,8 +1,3 @@
-#
-#
-#
-#
-
 bl_info = {
     "name": "Facial Rig",
     "description": "Automatic rigging from building-block components, interface for settings",
