@@ -40,7 +40,7 @@ Viewport Time Scrub | Frankie
 ### Add Mesh/Curve ###
 
 Name | Author
--- | --
+---- | ----
 Create Graphene/CNT | Brad Corso
 Create Wires | jasperge
 CreateMesh | Michel Anders (varkenvarken)
@@ -57,7 +57,7 @@ Curve Outline | Yann Bertrand (jimflim)
 ### Animation ###
 
 Name | Author
--- | --
+---- | ----
 Action Offset | Oscurart
 Anim Quick Tools | Joel Daniels
 Animated Text | LeoMoon Studios, Marcin Zielinski, Martin Wacker, Bassam Kurdali, Jared Felsman, meta-androcto
@@ -82,7 +82,7 @@ Unbake F-Curve | liero
 ### Camera ###
 
 Name | Author
--- | --
+---- | ----
 BLAM - The Blender camera calibration toolkit | Per Gantelius
 Camera Selector | Francesco Siddi
 Camera Switcher | Daniel Fairhead
@@ -98,7 +98,7 @@ Turnaround camera around object | Antonio Vazquez (antonioya)
 ### Python Development ###
 
 Name | Author
--- | --
+---- | ----
 Addon Development Tool | Nathan Craddock
 Edit Addon Source | scorpion81
 Leader Key | [Adam Wolski](miniukof@gmail.com)
@@ -112,7 +112,7 @@ Snippet System for Text Editor | CoDEmanX
 ### Import/Export ###
 
 Name | Author
--- | --
+---- | ----
 Blend Library1 | Vincent Gires
 Blender Valve Source Tools | Tom Edwards (translators, Grigory Revzin)
 Camera Json Exporter/Importer | Eugenio Pignataro (Oscurart)
@@ -130,7 +130,7 @@ Tracking to Natron | Jeffrey Hoover (italic)
 ### Lighting ###
 
 Name | Author
--- | --
+---- | ----
 Dynamic Sky | Pratik Solanki
 Lighting Manager | Jacques Lucke
 Lightprobe | Andrew Moffat
@@ -139,7 +139,7 @@ Lightprobe | Andrew Moffat
 ### Mesh ###
 
 Name | Author
--- | --
+---- | ----
 Align Selection To Gpencil Stroke | Bj�rnar Fr�yse
 Extrude Along Path | N/A
 GridFill Manager | Alexander Nedovizin, Paul Kotelevets
@@ -157,7 +157,7 @@ Weighted Normals Calculation | Simon Lusenc (50keda)
 ### Nodes ###
 
 Name | Author
--- | --
+---- | ----
 ColorRamp Dropper | Quentin Wenger (Matpi)
 Generic Note Node | Linus Yng
 Matalogue | Greg Zaal (pixaal)
@@ -167,7 +167,7 @@ Quick align | nexus-studio
 ### Object ###
 
 Name | Author
--- | --
+---- | ----
 Apply Transform MultiUser | Hidesato Ikeya
 Camera Image Plane | Torbjörn Westerlund
 Container | Paweł Łyczkowski
@@ -188,7 +188,7 @@ Surf | Crocadillian, Eclectiel, patmo141, chichiri
 ### Particle ###
 
 Name | Author
--- | --
+---- | ----
 Constellation | Oscurart
 Copy Particles to Rigid Bodies | Liero, Eli Spizzichino
 HairNet | Rhett Jackson
@@ -198,7 +198,7 @@ Particle Link | Luca Scheller
 ### Pie Menus ###
 
 Name | Author
--- | --
+---- | ----
 Proportional Edit Pies | italic
 Render Pie menu | TARDIS Maker
 Viewport Pie menu | TARDIS Maker, pitiwazou, italic
@@ -207,7 +207,7 @@ Viewport Pie menu | TARDIS Maker, pitiwazou, italic
 ### Render ###
 
 Name | Author
--- | --
+---- | ----
 Advanced Boomsmash | Luciano Mu�oz & Cristi�n Hasb�n
 Easy Light Map | Mehdi Seifi
 EasyFX | Nils Soderman (rymdnisse)
@@ -221,7 +221,7 @@ Swap L.O.D. | Aaron Symons
 ### Rigging ###
 
 Name | Author
--- | --
+---- | ----
 Armature Panel | Trentin Frederick (proxe)
 Attach bone | SolPie
 BlenRig 5 | Juan Pablo Bouza
@@ -248,7 +248,7 @@ Surface Normal Constraint | Stan Paillereau
 ### Sequencer ###
 
 Name | Author
--- | --
+---- | ----
 Kinoraw Tools | Carlos Padial, Turi Scandurra
 Mega Render | Carlos Padial, Ferhoyo
 Simple Subtitle Editor | James Ruan
@@ -261,7 +261,7 @@ VSE Transform tool | kgeogeo & DoubleZ
 ### Scene ###
 
 Name | Author
--- | --
+---- | ----
 Item Panel & Batch Naming | proxe
 Librarian | Greg Zaal (pixaal)
 Manage Image Paths | Greg Zaal (pixaal)
@@ -270,7 +270,7 @@ Manage Image Paths | Greg Zaal (pixaal)
 ### System ###
 
 Name | Author
--- | --
+---- | ----
 File Browser Search | Jakub Zolcik
 Is_key_Free | Antonio Vazquez (antonioya)
 Outliner Extend Keys | Yi Danyang
@@ -281,7 +281,7 @@ Time Tracker | Jakub Uhlik
 ### Text Editor ###
 
 Name | Author
--- | --
+---- | ----
 Dynamic Text Panel | DoubleZ
 Text Appeal | zeffii
 Text to File | sambler
@@ -291,7 +291,7 @@ Text to Mesh Updater |
 ### Tools ###
 
 Name | Author
--- | --
+---- | ----
 Blend Library | Vincent Gires
 Cutout Animation Tools | Andreas Esau (Ndee85)
 Datablock Tools | Vitor Balbio
@@ -303,6 +303,6 @@ Useless Tools | Greg Zaal (pixaal)
 ### UVs ###
 
 Name | Author
--- | --
+---- | ----
 Realsize Unwrap | Gertjan Van den BRoek
 UVDistribute | Quizkid
