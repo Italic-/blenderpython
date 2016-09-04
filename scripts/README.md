@@ -2,10 +2,11 @@
 
 Third-party addon collection by meta-androcto and italic
 
+
 ### Addons Factory ###
 
 Name | Author
--- | --
+---- | ----
  | Pontiac, Fourmadmen, varkenvarken, tuga3d, meta-androcto, metalliandy, dreampainter, cotejrp1, liero, Kayo Phoenix, sugiany, dommetysk, Phymec, Anthony D'Agostino, Pablo Vazquez, Richard Wilks, xyz presets by elfnor
 Ant Erosion | Michel Anders (varkenvarken)
 Book Gen | Oliver Weissbarth
@@ -16,10 +17,11 @@ Icicle + Snowflake | Eoin Brennan (Mayeoin Bread)
 Rocks | Paul Marshall (brikbot)
 Sliding Wall | Michel Anders (varkenvarken), Alain, Floric, Lell, Cedric Brandin (clarkx), Jacob Morris
 
+
 ### 3D View ###
 
 Name | Author
--- | --
+---- | ----
 Advanced Align Tools | Lell, Anfeo
 Bullet Viewport Constraints Tool | bashi
 Display Layers | Vincent Gires
@@ -33,6 +35,7 @@ Silhouette | Antonio Vazquez (antonioya)
 Simple Align | Gabriel Beaudin (gabhead)
 Viewport Roll | Jace Priester
 Viewport Time Scrub | Frankie
+
 
 ### Add Mesh/Curve ###
 
@@ -49,6 +52,7 @@ Terrain Generator | Nellie Robinson
 Ivy Generator (Extended) | testscreenings, PKHG, TrumanBlending, many authors
 Freehand Curve Drawing | Campbell Barton (ideasman42)
 Curve Outline | Yann Bertrand (jimflim)
+
 
 ### Animation ###
 
@@ -74,6 +78,7 @@ Sound Drivers | batFINGER
 Time Offset | liero
 Unbake F-Curve | liero
 
+
 ### Camera ###
 
 Name | Author
@@ -89,6 +94,7 @@ Save Cams | Couzar Michel
 Sniper | Jacques Lucke
 Turnaround camera around object | Antonio Vazquez (antonioya)
 
+
 ### Python Development ###
 
 Name | Author
@@ -101,6 +107,7 @@ Script Runner | Christopher Barrett
 Script Shortcut | Hudson Barkley (Snu)
 Script Watcher | Isaac Weaver
 Snippet System for Text Editor | CoDEmanX
+
 
 ### Import/Export ###
 
@@ -119,6 +126,7 @@ Objects exporter (obj) | jasperge
 Save Layers and Passes in Named Folders | Tamir Lousky, Luciano Mu�oz
 Tracking to Natron | Jeffrey Hoover (italic)
 
+
 ### Lighting ###
 
 Name | Author
@@ -126,6 +134,7 @@ Name | Author
 Dynamic Sky | Pratik Solanki
 Lighting Manager | Jacques Lucke
 Lightprobe | Andrew Moffat
+
 
 ### Mesh ###
 
@@ -144,6 +153,7 @@ Smart Edge Intersect Tool (cad VTX) | luxuy blendercn
 UE FBX Normals Tools | Andreas Wiehn (isathar)
 Weighted Normals Calculation | Simon Lusenc (50keda)
 
+
 ### Nodes ###
 
 Name | Author
@@ -152,6 +162,7 @@ ColorRamp Dropper | Quentin Wenger (Matpi)
 Generic Note Node | Linus Yng
 Matalogue | Greg Zaal (pixaal)
 Quick align | nexus-studio
+
 
 ### Object ###
 
@@ -173,6 +184,7 @@ Select Similar extended | Vilem Novak
 Select Similar for Bones | Valera Likhosherstov
 Surf | Crocadillian, Eclectiel, patmo141, chichiri
 
+
 ### Particle ###
 
 Name | Author
@@ -182,6 +194,7 @@ Copy Particles to Rigid Bodies | Liero, Eli Spizzichino
 HairNet | Rhett Jackson
 Particle Link | Luca Scheller
 
+
 ### Pie Menus ###
 
 Name | Author
@@ -189,6 +202,7 @@ Name | Author
 Proportional Edit Pies | italic
 Render Pie menu | TARDIS Maker
 Viewport Pie menu | TARDIS Maker, pitiwazou, italic
+
 
 ### Render ###
 
@@ -202,6 +216,7 @@ Progressive Animation Render | Greg Zaal
 Luxrender |
 Shadow Catcher | Steve Hargreaves (Roken)
 Swap L.O.D. | Aaron Symons
+
 
 ### Rigging ###
 
@@ -229,6 +244,7 @@ Share weight | SolPie
 Spline To Armature | Oscurart
 Surface Normal Constraint | Stan Paillereau
 
+
 ### Sequencer ###
 
 Name | Author
@@ -241,6 +257,7 @@ velvet_revolver | [szaszak](http://blendervelvets.org)
 VSE Quick Functions | Hudson Barkley (Snu)
 VSE Transform tool | kgeogeo & DoubleZ
 
+
 ### Scene ###
 
 Name | Author
@@ -248,6 +265,7 @@ Name | Author
 Item Panel & Batch Naming | proxe
 Librarian | Greg Zaal (pixaal)
 Manage Image Paths | Greg Zaal (pixaal)
+
 
 ### System ###
 
@@ -259,6 +277,7 @@ Outliner Extend Keys | Yi Danyang
 Show Shortcuts | Yardie (Greg Dickson)
 Time Tracker | Jakub Uhlik
 
+
 ### Text Editor ###
 
 Name | Author
@@ -267,6 +286,7 @@ Dynamic Text Panel | DoubleZ
 Text Appeal | zeffii
 Text to File | sambler
 Text to Mesh Updater |
+
 
 ### Tools ###
 
@@ -278,6 +298,7 @@ Datablock Tools | Vitor Balbio
 matpi Collection | Quentin Wenger (Matpi)
 UE Tools | LluisGarcia3D
 Useless Tools | Greg Zaal (pixaal)
+
 
 ### UVs ###
 
