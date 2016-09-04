@@ -2,7 +2,7 @@
 
 bl_info = {
     "name": "Proportional Edit Pies",
-    "author": "Italic_",
+    "author": "italic",
     "version": (1, 0, 0),
     "blender": (2, 77, 0),
     "description": "Uses pie menus for proportional edit toggling and falloff selection.",

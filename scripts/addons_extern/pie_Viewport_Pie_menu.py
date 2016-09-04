@@ -1,24 +1,24 @@
 """
-    Pie menu for selecting editors and viewport with split and join functions.
+Pie menu for selecting editors and viewport with split and join functions.
 
-    Default key binding is SHIFT+SPACE. Editors are categorized, such as anim,
-    utils and image editors. Split the editor with the split subpie. To join,
-    invoke the join operation over the editor you want to keep, then click on
-    an adjacent editor you wish to remove. The two editors must share an edge
-    like normal editor joining (triple lines in editor corners).
+Default key binding is SHIFT+SPACE. Editors are categorized, such as anim,
+utils and image editors. Split the editor with the split subpie. To join,
+invoke the join operation over the editor you want to keep, then click on
+an adjacent editor you wish to remove. The two editors must share an edge
+like normal editor joining (triple lines in editor corners).
 
-    Known issues:
-    Editors may become unstable if you invoke the join operation and click in
-    the original editor. If this occurs, merge another editor over the
-    troublesome editor and split off a new editor. This will return behavior
-    to normal.
+Known issues:
+Editors may become unstable if you invoke the join operation and click in
+the original editor. If this occurs, merge another editor over the
+troublesome editor and split off a new editor. This will return behavior
+to normal.
 
-    -- Italic_
+-- italic
 """
 
 bl_info = {
     "name": "Viewport Pie menu",
-    "author": "TARDIS Maker, pitiwazou, Italic_",
+    "author": "TARDIS Maker, pitiwazou, italic",
     "version": (1, 5, 0),
     "blender": (2, 76, 0),
     "description": "A pie menu for selecting editor or viewport type, "
@@ -32,15 +32,15 @@ from bpy.types import Menu, Operator
 from bpy.props import IntProperty
 
 """
-    Order of pie entries (filled sequentially):
-        Left
-        Right
-        Bottom
-        Top
-        Top Left
-        Top Right
-        Bottom Left
-        Bottom Right
+Order of pie entries (filled sequentially):
+    Left
+    Right
+    Bottom
+    Top
+    Top Left
+    Top Right
+    Bottom Left
+    Bottom Right
 """
 
 
