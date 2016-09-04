@@ -1,8 +1,9 @@
-# addons_extern
+# addons_extern #
 
 Third-party addon collection by meta-androcto and italic
 
-### Addons Factory
+### Addons Factory ###
+
 Name | Author
 -- | --
  | Pontiac, Fourmadmen, varkenvarken, tuga3d, meta-androcto, metalliandy, dreampainter, cotejrp1, liero, Kayo Phoenix, sugiany, dommetysk, Phymec, Anthony D'Agostino, Pablo Vazquez, Richard Wilks, xyz presets by elfnor
@@ -15,7 +16,8 @@ Icicle + Snowflake | Eoin Brennan (Mayeoin Bread)
 Rocks | Paul Marshall (brikbot)
 Sliding Wall | Michel Anders (varkenvarken), Alain, Floric, Lell, Cedric Brandin (clarkx), Jacob Morris
 
-### 3D View
+### 3D View ###
+
 Name | Author
 -- | --
 Advanced Align Tools | Lell, Anfeo
@@ -32,7 +34,8 @@ Simple Align | Gabriel Beaudin (gabhead)
 Viewport Roll | Jace Priester
 Viewport Time Scrub | Frankie
 
-### Add Mesh/Curve
+### Add Mesh/Curve ###
+
 Name | Author
 -- | --
 Create Graphene/CNT | Brad Corso
@@ -47,7 +50,8 @@ Ivy Generator (Extended) | testscreenings, PKHG, TrumanBlending, many authors
 Freehand Curve Drawing | Campbell Barton (ideasman42)
 Curve Outline | Yann Bertrand (jimflim)
 
-### Animation
+### Animation ###
+
 Name | Author
 -- | --
 Action Offset | Oscurart
@@ -70,7 +74,8 @@ Sound Drivers | batFINGER
 Time Offset | liero
 Unbake F-Curve | liero
 
-### Camera
+### Camera ###
+
 Name | Author
 -- | --
 BLAM - The Blender camera calibration toolkit | Per Gantelius
@@ -84,7 +89,8 @@ Save Cams | Couzar Michel
 Sniper | Jacques Lucke
 Turnaround camera around object | Antonio Vazquez (antonioya)
 
-### Python Development
+### Python Development ###
+
 Name | Author
 -- | --
 Addon Development Tool | Nathan Craddock
@@ -96,7 +102,8 @@ Script Shortcut | Hudson Barkley (Snu)
 Script Watcher | Isaac Weaver
 Snippet System for Text Editor | CoDEmanX
 
-### Import/Export
+### Import/Export ###
+
 Name | Author
 -- | --
 Blend Library1 | Vincent Gires
@@ -112,14 +119,16 @@ Objects exporter (obj) | jasperge
 Save Layers and Passes in Named Folders | Tamir Lousky, Luciano Mu�oz
 Tracking to Natron | Jeffrey Hoover (italic)
 
-### Lighting
+### Lighting ###
+
 Name | Author
 -- | --
 Dynamic Sky | Pratik Solanki
 Lighting Manager | Jacques Lucke
 Lightprobe | Andrew Moffat
 
-### Mesh
+### Mesh ###
+
 Name | Author
 -- | --
 Align Selection To Gpencil Stroke | Bj�rnar Fr�yse
@@ -135,7 +144,8 @@ Smart Edge Intersect Tool (cad VTX) | luxuy blendercn
 UE FBX Normals Tools | Andreas Wiehn (isathar)
 Weighted Normals Calculation | Simon Lusenc (50keda)
 
-### Nodes
+### Nodes ###
+
 Name | Author
 -- | --
 ColorRamp Dropper | Quentin Wenger (Matpi)
@@ -143,7 +153,8 @@ Generic Note Node | Linus Yng
 Matalogue | Greg Zaal (pixaal)
 Quick align | nexus-studio
 
-### Object
+### Object ###
+
 Name | Author
 -- | --
 Apply Transform MultiUser | Hidesato Ikeya
@@ -162,7 +173,8 @@ Select Similar extended | Vilem Novak
 Select Similar for Bones | Valera Likhosherstov
 Surf | Crocadillian, Eclectiel, patmo141, chichiri
 
-### Particle
+### Particle ###
+
 Name | Author
 -- | --
 Constellation | Oscurart
@@ -170,14 +182,16 @@ Copy Particles to Rigid Bodies | Liero, Eli Spizzichino
 HairNet | Rhett Jackson
 Particle Link | Luca Scheller
 
-### Pie Menus
+### Pie Menus ###
+
 Name | Author
 -- | --
 Proportional Edit Pies | italic
 Render Pie menu | TARDIS Maker
 Viewport Pie menu | TARDIS Maker, pitiwazou, italic
 
-### Render
+### Render ###
+
 Name | Author
 -- | --
 Advanced Boomsmash | Luciano Mu�oz & Cristi�n Hasb�n
@@ -189,7 +203,8 @@ Luxrender |
 Shadow Catcher | Steve Hargreaves (Roken)
 Swap L.O.D. | Aaron Symons
 
-### Rigging
+### Rigging ###
+
 Name | Author
 -- | --
 Armature Panel | Trentin Frederick (proxe)
@@ -214,7 +229,8 @@ Share weight | SolPie
 Spline To Armature | Oscurart
 Surface Normal Constraint | Stan Paillereau
 
-### Sequencer
+### Sequencer ###
+
 Name | Author
 -- | --
 Kinoraw Tools | Carlos Padial, Turi Scandurra
@@ -225,14 +241,16 @@ velvet_revolver | [szaszak](http://blendervelvets.org)
 VSE Quick Functions | Hudson Barkley (Snu)
 VSE Transform tool | kgeogeo & DoubleZ
 
-### Scene
+### Scene ###
+
 Name | Author
 -- | --
 Item Panel & Batch Naming | proxe
 Librarian | Greg Zaal (pixaal)
 Manage Image Paths | Greg Zaal (pixaal)
 
-### System
+### System ###
+
 Name | Author
 -- | --
 File Browser Search | Jakub Zolcik
@@ -241,7 +259,8 @@ Outliner Extend Keys | Yi Danyang
 Show Shortcuts | Yardie (Greg Dickson)
 Time Tracker | Jakub Uhlik
 
-### Text Editor
+### Text Editor ###
+
 Name | Author
 -- | --
 Dynamic Text Panel | DoubleZ
@@ -249,7 +268,8 @@ Text Appeal | zeffii
 Text to File | sambler
 Text to Mesh Updater |
 
-### Tools
+### Tools ###
+
 Name | Author
 -- | --
 Blend Library | Vincent Gires
@@ -259,7 +279,8 @@ matpi Collection | Quentin Wenger (Matpi)
 UE Tools | LluisGarcia3D
 Useless Tools | Greg Zaal (pixaal)
 
-### UVs
+### UVs ###
+
 Name | Author
 -- | --
 Realsize Unwrap | Gertjan Van den BRoek
