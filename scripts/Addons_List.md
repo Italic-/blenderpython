@@ -78,6 +78,7 @@ Marker Jumping | Greg Zaal
 Slow Parent Fun | liero
 Sound Drivers | batFINGER
 Time Offset | liero
+Timeline Key Mover | Joel Daniels
 Unbake F-Curve | liero
 
 
