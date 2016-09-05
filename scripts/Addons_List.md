@@ -45,13 +45,13 @@ Create Graphene/CNT | Brad Corso
 Create Wires | jasperge
 CreateMesh | Michel Anders (varkenvarken)
 CubeSter | Jacob Morris
+Curve Outline | Yann Bertrand (jimflim)
 Delaunay Voronoi | Domlysz
 Landscape | Roman Riesen
 Modular Trees | Herpin Maxime
 Terrain Generator | Nellie Robinson
 Ivy Generator (Extended) | testscreenings, PKHG, TrumanBlending, many authors
 Freehand Curve Drawing | Campbell Barton (ideasman42)
-Curve Outline | Yann Bertrand (jimflim)
 
 
 ### Animation ###
