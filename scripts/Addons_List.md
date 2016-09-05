@@ -68,6 +68,7 @@ BRIK - Blender Ragdoll Implementation Kit | Marcus Jenkins (FunkyWyrm)
 Change Keying Sets | sambler
 Commotion | Mikhail Rachinskiy
 Dynamic Parent | Roman Volodin, Eibriel
+F-Curve Editor Tools | Joel Daniels
 F-Curve Samples/Keyframes conversion | Quentin Wenger (Matpi)
 FCurve Tools | cotejrp1
 Ghost Frames | Joel Daniels
