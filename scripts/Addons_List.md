@@ -246,6 +246,14 @@ Spline To Armature | Oscurart
 Surface Normal Constraint | Stan Paillereau
 
 
+### Movie Clip Editor ###
+
+Name | Author
+---- | ----
+Clean Faulty Tracks | Sebastian Koenig, Andreas Schuster
+Highpass Filter | Björn Sonnenschein
+
+
 ### Sequencer ###
 
 Name | Author
