@@ -73,6 +73,7 @@ F-Curve Samples/Keyframes conversion | Quentin Wenger (Matpi)
 FCurve Tools | cotejrp1
 Ghost Frames | Joel Daniels
 Ghosting | liero
+Ivo Animation Toolbox | Ivo Grigull (Loolarge)
 Lightbox | Claudio Andaur (malefico)
 Marker Jumping | Greg Zaal
 Slow Parent Fun | liero
@@ -216,7 +217,6 @@ Easy Light Map | Mehdi Seifi
 EasyFX | Nils Soderman (rymdnisse)
 Precise Render Border Adjust | Lapineige
 Progressive Animation Render | Greg Zaal
-Luxrender |
 Shadow Catcher | Steve Hargreaves (Roken)
 Swap L.O.D. | Aaron Symons
 
