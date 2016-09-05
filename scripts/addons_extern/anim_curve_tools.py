@@ -17,7 +17,7 @@
 # (c) 2011 Phil Cote (cotejrp1)
 
 bl_info = {
-    'name': 'FCurve Tools',
+    'name': 'F-Curve Tools',
     'author': 'cotejrp1',
     'version': (0, 1),
     "blender": (2, 6, 4),
