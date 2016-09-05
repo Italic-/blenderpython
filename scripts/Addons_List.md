@@ -23,6 +23,7 @@ Sliding Wall | Michel Anders (varkenvarken), Alain, Floric, Lell, Cedric Brandin
 Name | Author
 ---- | ----
 Advanced Align Tools | Lell, Anfeo
+Alternate Unhide | Jonathan Williamson
 Bullet Viewport Constraints Tool | bashi
 Display Layers | Vincent Gires
 Display Tools | Jordi Vall-llovera Medina, Jhon Wallace
