@@ -77,9 +77,7 @@ class PieAreaViews(Menu):
 
         # DIAGONALS
         pie.operator("wm.call_menu_pie", text="Utils", icon='BUTS').name = "PieAreaViewsUtils"
-        pie = pie.row()
-        pie.label('')
-        pie = layout.menu_pie()
+        pie.separator()
         pie.operator("area.joinarea", text="Join", icon='X')
         pie.operator("wm.call_menu_pie", text="Split", icon='SPLITSCREEN').name = "pie.split_viewport"
 

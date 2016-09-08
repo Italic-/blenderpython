@@ -19,15 +19,6 @@ class ScrubTimelineKey(bpy.types.Operator):
     bl_label = "Scrub timeline"
     bl_options = {'REGISTER', 'UNDO'}
 
-    # def __init__(self):
-    #     print("Start")
-    #
-    # def __del__(self):
-    #     print("End")
-
-    # def execute(self, context):
-    #     return {'FINISHED'}
-
     def modal(self, context, event):
         self.valued = event.mouse_x / 10
         if event.type == 'MOUSEMOVE':  # move frames
