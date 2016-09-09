@@ -185,7 +185,11 @@ class poselibToolshelf(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     # bl_context = "posemode"
-    bl_category = 'Tools'
+    bl_category = 'Animation'
+
+    @classmethod
+    def poll(cls, context):
+        return (context.object.mode in ['POSE', 'OBJECT'])
 
     def draw(self, context):
 
