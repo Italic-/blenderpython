@@ -93,6 +93,9 @@ def op_rules(context):
     if ob is None:
         return False
 
+    if context.area.spaces.active.mode == "DRIVERS":
+        return False
+
     # there has to be one and only one curve selected
     sel_curves = [x for x in ob.animation_data.action.fcurves
                   if x.select]
