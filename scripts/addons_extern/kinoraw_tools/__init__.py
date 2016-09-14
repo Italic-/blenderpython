@@ -247,7 +247,7 @@ def register():
     bpy.types.CLIP_HT_header.append(ui.clip_header_func)
     bpy.types.CLIP_MT_clip.prepend(ui.clip_clip_menu_func)
     bpy.types.TIME_MT_frame.prepend(ui.time_frame_menu_func)
-    bpy.types.TIME_HT_header.append(ui.time_header_func)
+    # bpy.types.TIME_HT_header.append(ui.time_header_func)
 
     # Add keyboard shortcut configuration
     kc = bpy.context.window_manager.keyconfigs.addon
@@ -304,7 +304,7 @@ def unregister():
     bpy.types.CLIP_HT_header.remove(ui.clip_header_func)
     bpy.types.CLIP_MT_clip.remove(ui.clip_clip_menu_func)
     bpy.types.TIME_MT_frame.remove(ui.time_frame_menu_func)
-    bpy.types.TIME_HT_header.remove(ui.time_header_func)
+    # bpy.types.TIME_HT_header.remove(ui.time_header_func)
 
     #  Remove keyboard shortcut configuration
     kc = bpy.context.window_manager.keyconfigs.addon

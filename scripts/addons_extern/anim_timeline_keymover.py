@@ -289,7 +289,7 @@ class TIMELINE_HT_KeyMover(bpy.types.Header):
         scene = context.scene
         self.layout.separator()
         layout.operator("timeline.key_mover", text="Key Mover", icon="SPACE2")
-        layout.operator("timeline.key_copier", text="Key Copier", icon="COPYDOWN")
+        # layout.operator("timeline.key_copier", text="Key Copier", icon="COPYDOWN")
 
 
 def register():
