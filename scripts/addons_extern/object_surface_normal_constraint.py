@@ -176,7 +176,7 @@ def NormalCons(scene):
         # apply the rotation if there is no error on the constraint panel
         if (obj_active.track_axis[4] == obj_active.up_axis) or \
                 (target == '') or \
-                (obj_active.flagIO == False):
+                (obj_active.flagIO is False):
             error = 0.0
             nrot = mathutils.Quaternion((1.0, 0.0, 0.0, 0.0))
         else:
@@ -245,7 +245,7 @@ class NormalToConsPanel(bpy.types.Panel):
         # set variables
         layout = self.layout
         obj_active = context.active_object
-        if obj_active.flagIO == True:  # icon for the enable/disable eye button
+        if obj_active.flagIO is True:  # icon for the enable/disable eye button
             con = 'VISIBLE_IPO_ON'
         else:
             con = 'VISIBLE_IPO_OFF'
