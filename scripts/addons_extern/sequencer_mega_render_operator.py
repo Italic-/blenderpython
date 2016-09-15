@@ -81,7 +81,7 @@ class GenerateMegaRenderOperator(bpy.types.Operator):
     def execute(self, context):
 
         preferences = context.user_preferences
-        prefs = preferences.addons['mega_render_operator'].preferences
+        prefs = preferences.addons['sequencer_mega_render_operator'].preferences
 
         blenderpath = prefs.blenderpath
         scriptfilename = bpy.path.abspath(prefs.scriptfilename)
@@ -137,12 +137,12 @@ class LaunchMegaRenderOperator(bpy.types.Operator):
     @classmethod
     def poll(self, context):
         preferences = context.user_preferences
-        prefs = preferences.addons['mega_render_operator'].preferences
+        prefs = preferences.addons['sequencer_mega_render_operator'].preferences
         return os.path.isfile(bpy.path.abspath(prefs.scriptfilename))
 
     def execute(self, context):
         preferences = context.user_preferences
-        prefs = preferences.addons['mega_render_operator'].preferences
+        prefs = preferences.addons['sequencer_mega_render_operator'].preferences
         scriptfilename = bpy.path.abspath(prefs.scriptfilename)
         command = "sh " + scriptfilename
         print("ejecutando {}".format(scriptfilename))
@@ -167,9 +167,8 @@ class MegaRenderPanel(bpy.types.Panel):
         layout.label(text="", icon="FORCE_WIND")
 
     def draw(self, context):
-
         preferences = context.user_preferences
-        prefs = preferences.addons['mega_render_operator'].preferences
+        prefs = preferences.addons['sequencer_mega_render_operator'].preferences
         number_of_threads = prefs.number_of_threads
 
         layout = self.layout
@@ -182,7 +181,7 @@ class MegaRenderPanel(bpy.types.Panel):
 
 
 class MegaRenderAddon(bpy.types.AddonPreferences):
-    bl_idname = "mega_render_operator"
+    bl_idname = "sequencer_mega_render_operator"
     bl_option = {'REGISTER'}
 
     blenderpath = StringProperty(
