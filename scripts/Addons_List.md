@@ -105,7 +105,7 @@ Name | Author
 ---- | ----
 Addon Development Tool | Nathan Craddock
 Edit Addon Source | scorpion81
-Leader Key | [Adam Wolski](miniukof@gmail.com)
+Leader Key | [Adam Wolski](mailto:miniukof@gmail.com)
 Macro Menu | Vilem Novak
 Script Runner | Christopher Barrett
 Script Shortcut | Hudson Barkley (Snu)
@@ -236,10 +236,10 @@ Driver to Bone Constraint | Andreas Esau
 Face Bone Tool | khuuyj
 Facial Rig | Volodya Renderberg
 Normalize Deform Weight | Hidesato Ikeya
-PoseTools | [Patrick W. Crawford](support@theduckcow.com)
+PoseTools | [Patrick W. Crawford](mailto:support@theduckcow.com)
 Quat/Euler Rotation Mode Converter | Mario Mey, Mutant Bob
 Replace Driver Targets | koilz
-Right step | [Lenster](lenster-3d@ya.ru)
+Right step | [Lenster](mailto:lenster-3d@ya.ru)
 Rotation Armature | sambler
 ShapeKey Helpers | Ott, Jan
 Shapekey Slider Driver | Fernando Macias-Jimenez
