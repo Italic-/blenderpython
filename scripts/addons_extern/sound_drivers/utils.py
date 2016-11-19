@@ -9,12 +9,28 @@ import sys
 
 from sound_drivers.presets import note_from_freq
 
-bpy_collections = ["scenes", "objects", "meshes", "materials", "textures",
-                   "speakers", "worlds", "curves", "armatures", "particles", "lattices",
-                   "shape_keys", "lamps", "cameras", "node_groups", "movie_clips", "metaballs"]
 
-icons = {'SCENE_DATA': ["scenes", "Scene"],
-         'OBJECT_DATA': ["objects", "Object"],
+bpy_collections = ["scenes", "objects", "meshes", "materials", "textures",
+        "speakers", "worlds", "curves", "armatures", "particles", "lattices",
+        "shape_keys", "lamps", "cameras", "node_groups", "movie_clips", "metaballs"]
+
+'''
+# much nicer breaks Restricted Context TODO
+bpy_collections = [k.identifier
+                   for k in bpy.data.bl_rna.properties
+                   if k.type == 'COLLECTION']
+'''
+
+def get_collection_from_idobject(obj):
+    for col in bpy_collections:
+        collection = getattr(bpy.data, col, None)
+        if collection and obj.id_data in collection.values():
+            return col
+    return ""
+
+
+icons = {'SCENE_DATA': ["scenes", "Scene", 'SCENE'],
+         'OBJECT_DATA': ["objects", "Object", 'OBJECT'],
          'MESH_DATA': ["meshes"],
          'OUTLINER_OB_MESH': ["MESH"],
          'MATERIAL': ["materials"],
@@ -47,18 +63,20 @@ icons = {'SCENE_DATA': ["scenes", "Scene"],
          'LAMP_HEMI': ["HEMI"],
          'LAMP_POINT': ["POINT"],
          'LAMP_AREA': ["AREA"],
+         'MODIFIER': ["Modifier"],
+         'CONSTRAINT': ["Constraint"],
          'CAMERA_DATA': ["cameras"]}
 
 
 def splittime(secs, prec=2):
-    t = float(secs)
-    minutes = t // 60
-    t %= 60
-    seconds = floor(t)
-    t = round(t - seconds, prec)
-    p = 10 ** prec
-    fraction = floor(p * (t))
-    return (minutes, seconds, fraction % p)
+        t = float(secs)
+        minutes = t // 60
+        t %= 60
+        seconds = floor(t)
+        t = round(t - seconds, prec)
+        p = 10 ** prec
+        fraction = floor(p * (t))
+        return (minutes, seconds, fraction % p)
 
 
 def get_icon(desc):
@@ -91,7 +109,7 @@ def format_data_path(row, path, icon_only=False, padding=0):
              ('COLOR', r'color'),
              ('NODE', r'nodes(\S+).(\S+)'),
              ('SEQUENCE', r'sequence_editor(\S+).(\S+)'),
-             ]
+              ]
     path = rep_spaces(path)
     for icon, regexp in rexps:
         name = ""
@@ -117,11 +135,12 @@ def format_data_path(row, path, icon_only=False, padding=0):
 
 
 def icon_from_bpy_datapath(path):
+    #print("ICDP", path)
     icons = ['SCENE', 'OBJECT_DATA', 'OUTLINER_OB_MESH', 'MATERIAL',
-             'TEXTURE', 'SPEAKER',
-             'WORLD', 'OUTLINER_OB_CURVE', 'OUTLINER_OB_ARMATURE',
-             'PARTICLES', 'LATTICE_DATA',
-             'SHAPEKEY_DATA', 'LAMP', 'CAMERA_DATA']
+            'TEXTURE', 'SPEAKER',
+            'WORLD', 'OUTLINER_OB_CURVE', 'OUTLINER_OB_ARMATURE',
+            'PARTICLES', 'LATTICE_DATA',
+            'SHAPEKEY_DATA', 'LAMP', 'CAMERA_DATA']
 
     if not len(path):
         return 'BLANK1'
@@ -129,16 +148,16 @@ def icon_from_bpy_datapath(path):
     # bug fix on pose bone constraints
     if len(sp) < 3:
         return 'BLANK1'
-
-    sp = sp[2].split('[')
+    
+    sp =  sp[2].split('[')
 
     col = sp[-1].split('[')[0]
-    # collection name will be index
+    #collection name will be index
     if col not in bpy_collections\
-            or bpy_collections.index(col) >= len(icons):
+           or bpy_collections.index(col) >= len(icons):
         return 'BLANK1'
 
-    return icons[bpy_collections.index(col)]
+    return  icons[bpy_collections.index(col)]
 
 
 def getAction(speaker, search=False):
@@ -153,11 +172,11 @@ def getAction(speaker, search=False):
             return action
         if speaker.animation_data.use_nla:
             # XXXXX
-            # return speaker.animation_data.nla_tracks[0].strips[0].action
+            #return speaker.animation_data.nla_tracks[0].strips[0].action
             return None
     return action
 
-# FRAME change method to make the equalizer update live to panel
+#FRAME change method to make the equalizer update live to panel
 
 
 def getSpeaker(context, action=None):
@@ -166,8 +185,8 @@ def getSpeaker(context, action=None):
         for s in context.scene.soundspeakers:
             if s.animation_data.action == action\
                or action in [st.action
-                             for t in s.animation_data.nla_tracks
-                             for st in t.strips]:
+                        for t in s.animation_data.nla_tracks
+                        for st in t.strips]:
 
                 return s
     if space.type == 'PROPERTIES':
@@ -233,13 +252,13 @@ def get_driver_settings_xxx(fcurve):
                     and var.targets[0] is not None
                     and var.targets[0].id in speakers]
 
-    # TODO check lists fix expression remove dead vars
+    #TODO check lists fix expression remove dead vars
     return var_channels, args
 
 
 def get_channel_index(channel_name):
     channel_name = channel_name.strip('"[').strip(']"')
-    ch = [''.join(x[1])
+    ch = [''.join(x[1])\
           for x in itertools.groupby(channel_name, lambda x: x.isalpha())]
     return ch[0], int(ch[1])
 
@@ -274,7 +293,7 @@ def get_driver_settings(fcurve):
          ("<=", "LTE"),
          ("<", "LT"),
          (">", "GT")]
-    # kwargs
+    #kwargs
     s = s.strip("[%s]" % pe)
     s = s.strip(",")
     for c, r in d:
@@ -288,7 +307,7 @@ def get_driver_settings(fcurve):
 
 
 def driver_expr(expr, channels, args):
-    # make a new driver expression from the channels and args
+    #make a new driver expression from the channels and args
     s = expr
     ctxt = str(channels).replace("'", "").replace(" ", "")
     x = s.find("SoundDrive")
@@ -323,24 +342,24 @@ def driver_filter_draw(layout, context):
         row.template_ID(context.scene.objects, 'active')
     else:
         row.prop(settings, "filter_object", icon='OBJECT_DATA', toggle=True,
-                 text="")
+            text="")
         if settings.filter_object:
             row.prop(settings, "filter_context", toggle=True,
-                     text="CONTEXT")
+                text="CONTEXT")
     row.prop(settings, "filter_world", icon='WORLD', toggle=True,
-             text="")
+            text="")
     row.prop(settings, "filter_material", icon='MATERIAL', toggle=True,
-             text="")
+            text="")
     row.prop(settings, "filter_texture", icon='TEXTURE', toggle=True,
-             text="")
+            text="")
     row.prop(settings, "filter_monkey", icon='MONKEY', toggle=True,
-             text="")
+            text="")
     row.prop(settings, "filter_speaker", icon='SPEAKER', toggle=True,
-             text="")
+            text="")
 
 
 def f(freq):
-    # output a format in Hz or kHz
+    #output a format in Hz or kHz
     if freq < 10:
         mHz = freq * 1000
         return("%dmHz" % mHz)
@@ -361,7 +380,7 @@ def set_channel_idprop_rna(channel,
                            fc_range,
                            map_range,
                            is_music=False):
-    # speaker_rna : saved on the action action min and max
+    #speaker_rna : saved on the action action min and max
     min_, max_ = min(fc_range), max(fc_range)
     map_min, map_max = min(map_range), max(map_range)
 
@@ -370,10 +389,10 @@ def set_channel_idprop_rna(channel,
     if is_music:
         note = note_from_freq(low)
         desc = "%s (%s) (min:%.2f, max:%.2f)" %\
-            (note, f(low), min_, max_)
+                    (note, f(low), min_, max_)
     else:
         desc = "Frequency %s to %s (min:%.2f, max:%.2f)" %\
-            (f(low), f(high), min_, max_)
+                    (f(low),  f(high), min_, max_)
     speaker_rna[channel] = {"min": map_min,
                             "max": map_max,
                             "soft_min": map_min,
@@ -409,7 +428,6 @@ def selected_bbox(context):
     fmin = -sys.float_info.max
     fmax = sys.float_info.max
     sel = context.selected_objects
-
     if sel:
         bbox = [fmax, fmin, fmax, fmin, fmax, fmin]
         for ob in sel:
@@ -490,15 +508,14 @@ def copy_sound_action(speaker, newname):
 
 
 def nla_drop(obj, action, frame, name, multi=False):
-    print("nla_drop", name)
     if not multi:
-        # check if there is already a strip with this action
+        #check if there is already a strip with this action
         tracks = [s for t in obj.animation_data.nla_tracks
                   for s in t.strips
                   if s.action == action]
         if len(tracks):
             return None
-    # add nla track (name) with action at frame
+    #add nla track (name) with action at frame
     nla_track = obj.animation_data.nla_tracks.new()
     nla_track.name = name
     strip = nla_track.strips.new(name, frame, action)
@@ -530,7 +547,7 @@ def unique_name(channels, ch, j=1):
     '''
     #leaving in O & I
     chstr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    # removed numeric character, channel name A0 channel 0 => A00 yuck.
+    #removed numeric character, channel name A0 channel 0 => A00 yuck.
     #chstr = chstr if not j else "%s%s" % ("0123456789", chstr)
 
     gidx = chstr.find(ch[j])
@@ -570,42 +587,42 @@ def propfromtype(propdict, op):
 
         if prop_type.startswith("String"):
             propdict[key] = f(name=getattr(p, "name"),
-                              description=getattr(p, "description"),
-                              default=getattr(p, "default"))
+                            description=getattr(p, "description"),
+                            default=getattr(p, "default"))
 
         if isinstance(p, bpy.types.IntProperty):
             propdict[key] = IntProperty(name=getattr(p, "name"),
-                                        description=getattr(p, "description"),
-                                        min=getattr(p, "hard_min"),
-                                        soft_min=getattr(p, "soft_min"),
-                                        max=getattr(p, "hard_max"),
-                                        soft_max=getattr(p, "soft_max"),
+                            description=getattr(p, "description"),
+                            min=getattr(p, "hard_min"),
+                            soft_min=getattr(p, "soft_min"),
+                            max=getattr(p, "hard_max"),
+                            soft_max=getattr(p, "soft_max"),
 
-                                        default=getattr(p, "default"))
+                            default=getattr(p, "default"))
 
         if prop_type.startswith("Float"):
             if getattr(p, "array_length", 0) > 1:
                 default = default_array(getattr(p, "default_array"))
                 f = FloatVectorProperty
                 propdict[key] = f(name=getattr(p, "name"),
-                                  description=getattr(p, "description"),
-                                  min=getattr(p, "hard_min"),
-                                  soft_min=getattr(p, "soft_min"),
-                                  max=getattr(p, "hard_max"),
-                                  soft_max=getattr(p, "soft_max"),
-                                  subtype=getattr(p, 'subtype'),
-                                  size=getattr(p, "array_length"),
-                                  default=default)
+                                description=getattr(p, "description"),
+                                min=getattr(p, "hard_min"),
+                                soft_min=getattr(p, "soft_min"),
+                                max=getattr(p, "hard_max"),
+                                soft_max=getattr(p, "soft_max"),
+                                subtype=getattr(p, 'subtype'),
+                                size=getattr(p, "array_length"),
+                                default=default)
             else:
                 default = getattr(p, "default")
                 propdict[key] = f(name=getattr(p, "name"),
-                                  description=getattr(p, "description"),
-                                  min=getattr(p, "hard_min"),
-                                  soft_min=getattr(p, "soft_min"),
-                                  max=getattr(p, "hard_max"),
-                                  soft_max=getattr(p, "soft_max"),
-                                  subtype=getattr(p, 'subtype'),
-                                  default=default)
+                                description=getattr(p, "description"),
+                                min=getattr(p, "hard_min"),
+                                soft_min=getattr(p, "soft_min"),
+                                max=getattr(p, "hard_max"),
+                                soft_max=getattr(p, "soft_max"),
+                                subtype=getattr(p, 'subtype'),
+                                default=default)
 
         if prop_type.startswith("Bool"):
             if getattr(p, "array_length", 0) > 1:
@@ -616,16 +633,16 @@ def propfromtype(propdict, op):
                     subtype = 'LAYER'
 
                 propdict[key] = f(name=getattr(p, "name"),
-                                  description=getattr(p, "description"),
-                                  default=default,
-                                  size=getattr(p, "array_length"),
-                                  subtype=subtype)
+                        description=getattr(p, "description"),
+                        default=default,
+                        size=getattr(p, "array_length"),
+                        subtype=subtype)
             else:
                 default = getattr(p, "default")
                 propdict[key] = f(name=getattr(p, "name"),
-                                  description=getattr(p, "description"),
-                                  default=getattr(p, "default"),
-                                  )
+                                description=getattr(p, "description"),
+                                default=getattr(p, "default"),
+                                )
 
 
 def get_context_area(context, context_dict, area_type='GRAPH_EDITOR',
@@ -687,11 +704,9 @@ def copy_driver(from_driver, target_fcurve):
             v.targets[i].transform_space = target.transform_space
             v.targets[i].bone_target = target.bone_target
 
-
 def interp(value, f, t):
     m = (value - f[0]) / (f[1] - f[0])
     return t[0] + m * (t[1] - t[0])
-
 
 def remove_draw_pend(paneltype, prefix):
     '''
@@ -700,10 +715,9 @@ def remove_draw_pend(paneltype, prefix):
 
     draw_funcs = [f for f in paneltype._dyn_ui_initialize()
                   if f.__name__.startswith(prefix)]
-
+    
     for f in draw_funcs:
         paneltype.remove(f)
-
 
 def split_path(data_path):
     '''
@@ -711,12 +725,12 @@ def split_path(data_path):
     '''
     if not len(data_path):
         return []
-     # remove all collection names
+     # remove all collection names   
     match = re.findall(r'\[\"(.*?)\"\]\.', data_path)
 
     namedic = {}
     for i, m in enumerate(match):
-        key = "Collection___NAME________%d" % i  # surely not lol.
+        key = "Collection___NAME________%d" % i # surely not lol.
         data_path = data_path.replace(m, key, 1)
         namedic[key] = m
 
@@ -738,3 +752,12 @@ def split_path(data_path):
     # reverse list
     props.reverse()
     return props
+    
+def scale_actions(action1, action2):
+    if action1 is None or action2 is None:
+        return None
+    scale = action1.frame_range.length / action2.frame_range.length
+    print(scale)
+    for fcurve in action2.fcurves:
+        for kfp in fcurve.keyframe_points:
+            kfp.co.x *= scale

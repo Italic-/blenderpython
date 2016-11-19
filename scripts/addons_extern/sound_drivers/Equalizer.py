@@ -10,15 +10,15 @@ from mathutils import Vector, Color
 from sound_drivers.NLALipsync import SoundTools_LipSync_PT
 from sound_drivers.presets import AddPresetSoundToolOperator
 from bl_ui.properties_data_speaker  import DATA_PT_context_speaker, \
-    DATA_PT_speaker, DATA_PT_cone, DATA_PT_distance, \
-    DATA_PT_custom_props_speaker
+                DATA_PT_speaker, DATA_PT_cone, DATA_PT_distance, \
+                DATA_PT_custom_props_speaker
 
 from sound_drivers.utils import get_driver_settings,\
-    icon_from_bpy_datapath, getSpeaker, getAction,\
-    set_channel_idprop_rna, f, get_channel_index
+                icon_from_bpy_datapath, getSpeaker, getAction,\
+                set_channel_idprop_rna, f, get_channel_index
 
 from sound_drivers.filter_playback import setup_buffer, play_buffer,\
-    mix_buffer
+                mix_buffer
 # add drivers to the namespace
 
 
@@ -78,19 +78,20 @@ def local_grabber(index, locs, dm):
     dns = bpy.app.driver_namespace
     dm = dns.get("DriverManager")
     '''
-    # print("localgrabber")
+    #print("localgrabber", locs)
     if dm is None:
         return 0.0
     ed = dm.find(index)
 
     if ed is not None:
+        #print("found and settling", index, ed)
         setattr(ed, "locs", locs)
-        # print(ed.driven_object)
+        #print(ed.driven_object)
     return 0.0
 
 
 def SoundDrive(channels, **kwargs):
-    # print("SDLOCS:",locals())
+    #print("SDLOCS:",locals())
     if isinstance(channels, float):
         channel = channels
     elif isinstance(channels, list):
@@ -144,7 +145,7 @@ def SoundActionMenuRow(row, speaker, action, has_sound):
         col = row.column()
         col.alignment = 'LEFT'
         col.menu("soundtest.menu", text="", icon='SOUND')
-    # col.alignment="LEFT"
+    #col.alignment="LEFT"
     if action:
         col = row.column()
         col.prop(action, "name", emboss=True, text="")
@@ -174,7 +175,7 @@ class DataButtonsPanel():
     @classmethod
     def poll(cls, context):
         return getattr(context, "speaker", None) is not None\
-            and getSpeaker(context) is not None
+               and getSpeaker(context) is not None
 
 
 class OLDSoundVisualiserPanel(DataButtonsPanel, bpy.types.Panel):
@@ -212,7 +213,7 @@ class OLDSoundVisualiserPanel(DataButtonsPanel, bpy.types.Panel):
             row = layout.row(align=True)
             sub = row.row()
             sub.alignment = 'LEFT'
-            # use solo icon to show speaker has context
+            #use solo icon to show speaker has context
             if speaker.is_context_speaker:
                 sub.prop(speaker, "is_context_speaker",
                          icon='SOLO_ON', text="", emboss=False)
@@ -341,7 +342,6 @@ def showFilterBox(layout, context, speaker, action):
             '''
             for i in range(start, end + 1):
                 cn = "channel%02d" % i
-                # box.split(percentage=0.50)
                 if not i % COLS:
                     row = box.row()
                 col = row.column()
@@ -376,9 +376,9 @@ def action_normalise_set(self, context):
         return None
     speaker_rna = self.get('rna')
     speaker_rna = eval(speaker_rna)
+    print(speaker_rna.keys())
 
     def add_normal_envelope(fcurve, type):
-        #print("RNA", self.speaker_rna)
         '''
         mods = [m for m in fcurve.modifiers if m.type == 'ENVELOPE']
         # remove mods (shouldn't be any)
@@ -402,7 +402,7 @@ def action_normalise_set(self, context):
             channel = f.data_path.strip('[""]')
             touched = False
             while len(f.modifiers) < 2:
-                # add muted envelope modifiers
+            # add muted envelope modifiers
                 add_normal_envelope(f, type='ENVELOPE')
                 touched = True
             for i, m in enumerate(f.modifiers):
@@ -410,10 +410,11 @@ def action_normalise_set(self, context):
                 if self.normalise == 'NONE':
                     continue
                 m.reference_value = 0.0
+                print(speaker_rna[channel])
                 m.default_min = self["min"]\
-                    if i == 0 else speaker_rna[channel]["min"]
+                                if not i else speaker_rna[channel]["min"]
                 m.default_max = self["max"]\
-                    if i == 0 else speaker_rna[channel]["max"]
+                                if not i else speaker_rna[channel]["max"]
 
             low = speaker_rna[channel]["low"]
             high = speaker_rna[channel]["high"]
@@ -422,7 +423,7 @@ def action_normalise_set(self, context):
             map_range = Vector((self['min'], self['max']))
             if self.normalise == 'NONE':
                 fc_range = Vector((speaker_rna[channel]['a'],
-                                   speaker_rna[channel]['b']))
+                                  speaker_rna[channel]['b']))
                 '''
                 speaker['_RNA_UI'][channel] = speaker_rna[channel]
                 speaker['_RNA_UI']['a'] = self['min']
@@ -435,7 +436,7 @@ def action_normalise_set(self, context):
                     m = f.modifiers[0]
                     b = Vector(self.normalise_range).magnitude
                     fc_range = Vector((speaker_rna[channel]['a'],
-                                       speaker_rna[channel]['b']))
+                                      speaker_rna[channel]['b']))
                     a = map_range.magnitude
                     fc_range *= b / a
                     map_range = Vector(self.normalise_range)
@@ -481,8 +482,8 @@ def action_normalise_set(self, context):
     if True or not self.get('mods', False):
         set_modifiers(type='EVELOPE')
 
-    # check_range(self)
-    # normalise_action(speaker)
+    #check_range(self)
+    #normalise_action(speaker)
     bpy.ops.graph.view_all_with_bgl_graph()
     return None
 
@@ -502,49 +503,10 @@ def defaultPanels(regflag):
         bpy.utils.unregister_class(DATA_PT_custom_props_speaker)
 
 
-def play_live(self, context):
-    speakers = ModalTimerOperator.speakers
-    if self.play:
-        if self not in speakers:
-            speakers.append(self)
-    return None
-
-
-class ModalTimerOperator(bpy.types.Operator):
-    bl_idname = "wm.modal_timer_operator"
-    bl_label = "Modal Timer Operator"
-
-    _timer = None
-    speakers = []
-
-    def modal(self, context, event):
-        if event.type == 'ESC':
-            return self.cancel(context)
-
-        if event.type == 'TIMER':
-            for speaker in ModalTimerOperator.speakers:
-                speaker.vismode = speaker.vismode
-        return {'PASS_THROUGH'}
-
-    def execute(self, context):
-        wm = context.window_manager
-        wm.modal_handler_add(self)
-        ModalTimerOperator.speakers = [speaker
-                                       for speaker in bpy.data.speakers
-                                       if speaker.play == True]
-
-        self._timer = wm.event_timer_add(0.1, context.window)
-        return {'RUNNING_MODAL'}
-
-    def cancel(self, context):
-        context.window_manager.event_timer_remove(self._timer)
-        return {'CANCELLED'}
-
-
 class SoundToolSettings(PropertyGroup):
     show_vis = BoolProperty(default=True, description="Show Visualiser")
     use_filter = BoolProperty(default=False,
-                              description="Filter Drivers")
+                                 description="Filter Drivers")
     filter_object = BoolProperty(default=True,
                                  description="Filter Drivers by Objects")
     filter_context = BoolProperty(default=True,
@@ -558,7 +520,7 @@ class SoundToolSettings(PropertyGroup):
     filter_world = BoolProperty(default=True,
                                 description="Filter Drivers by World")
     filter_speaker = BoolProperty(default=True,
-                                  description="Filter Drivers by Speaker")
+                                description="Filter Drivers by Speaker")
     context_speaker = StringProperty(default="None")
 
 
@@ -594,26 +556,36 @@ def dummy(self, context):
     # check for modifiers
     mods = [mod for mod in self.modifiers if not mod.mute and mod.is_valid]
     if len(mods):
-        # evaluate at frame
+        #evaluate at frame
         v = [self.evaluate(p.co[0]) for p in col]
     else:
-        # use the value at frame
+        #use the value at frame
         v = [p.co[1] for p in col]
 
-    # print(v)
+    #print(v)
     _min = min(v)
     _max = max(v)
     return ((_min, _max), (v.index(_min), v.index(_max)))
 
 
-def panel_items(self, context):
+def vismode_panel_items(self, context):
     # if is_baking then only show bake panel
     #print("PANEL ITEMS", self, context.scene)
+    userprefs = context.user_preferences.addons[__package__].preferences
+    midiprefs = userprefs.addons["midi"].preferences
+    midi_support = userprefs.addons["midi"].enabled
     if bpy.types.BakeSoundPanel.baking:
         return [("BAKE", "BAKE", "Bake Sound to FCurves", 'FCURVE', 64)]
-
+    
     pv = [("SPEAKER", "SPEAKER", "Edit Speaker properties", 'SPEAKER', 1),
           ("SOUND", "SOUND", "Edit sound properties", 'SOUND', 2)]
+
+    if midi_support and midiprefs.midi_support:
+        from sound_drivers.icons import get_icon
+        icon = get_icon("main", "midi")
+
+        pv.append(
+          ("MIDI", "MIDI", "Associate a midi file", icon.icon_id, 128))
     if self.sound is not None:
         pv.extend([("BAKE", "BAKE", "Bake Sound to FCurves", 'FCURVE', 64)])
     if not getattr(self, "animation_data", None):
@@ -624,8 +596,8 @@ def panel_items(self, context):
                         "VISUAL",
                         "Show sound visualiser",
                         'SEQ_HISTOGRAM', 16),
-                       ("ACTION", "ACTION", "Sound Action Properties", 'ACTION', 4),
-                       ("OUT", "OUT", "Filter Output", 'FILTER', 32)])
+              ("ACTION", "ACTION", "Sound Action Properties", 'ACTION', 4),
+              ("OUT", "OUT", "Filter Output", 'FILTER', 32)])
 
         if len(self.animation_data.nla_tracks) > 1:
             pv.extend([("NLA", "NLA", "NLA SoundTracks", 'NLA', 8)])
@@ -644,74 +616,73 @@ def panel_items(self, context):
 def register():
     defaultPanels(False)
     bpy.types.Scene.SoundToolsGUISettings =\
-        BoolVectorProperty(name="GUI_Booleans",
-                           size=32,
-                           default=(False for i in range(0, 32)))
+                BoolVectorProperty(name="GUI_Booleans",
+                                   size=32,
+                                   default=(False for i in range(0, 32)))
 
     bpy.types.Action.normalise = EnumProperty(items=(
-        ('NONE', "None", "No Normalisation (As Baked)", 'BLANK', 0),
-        ('CHANNEL', "Channel", "Normalise each CHANNEL", 'BLANK', 1),
-        ('ACTION', "Action",
-         "Normalise to Maximumum Channel Value in ACTION", 'ACTION', 2)
-    ),
-        name="Normalise",
-        default="NONE",
-        description="Normalise to MIN MAX of Channel or Action",
-        update=action_normalise_set,
-        options={'HIDDEN'},
-    )
+                ('NONE', "None", "No Normalisation (As Baked)", 'BLANK', 0),
+                ('CHANNEL', "Channel", "Normalise each CHANNEL", 'BLANK', 1),
+                ('ACTION', "Action",
+                 "Normalise to Maximumum Channel Value in ACTION", 'ACTION', 2)
+                ),
+                name="Normalise",
+                default="NONE",
+                description="Normalise to MIN MAX of Channel or Action",
+                update=action_normalise_set,
+                options={'HIDDEN'},
+                )
 
     bpy.types.Action.normalise_range = FloatVectorProperty(default=(0, 1),
-                                                           size=2,
-                                                           description="Remap Action RANGE",
-                                                           update=action_normalise_set)
+                                 size=2,
+                                 description="Remap Action RANGE",
+                                 update=action_normalise_set)
 
-    bpy.types.Speaker.vismode = EnumProperty(items=panel_items,
-                                             name="SoundDriver",
-                                             description="Panel Filters",
-                                             options={'HIDDEN', 'ENUM_FLAG'})
+    bpy.types.Speaker.vismode = EnumProperty(items=vismode_panel_items,
+                                name="SoundDriver",
+                                description="Panel Filters",
+                                options={'HIDDEN', 'ENUM_FLAG'})
+
 
     bpy.types.Action.vismode = EnumProperty(items=(
-        ("SLIDER", "Sliders", "Display as Property Sliders"),
-        ("VERTICAL", "Whitey",
-         "Horizontal Icons (Vanishes on high channel count"),
-        ("FCURVE", "Fcurve Colors",
-         "Horizontal Display of Fcurve colors")
-    ),
-        name="Visual Type",
-        default="SLIDER",
-        description="Visualisation Type",
-        options={'HIDDEN'},
-    )
+                ("SLIDER", "Sliders", "Display as Property Sliders"),
+                ("VERTICAL", "Whitey",\
+                 "Horizontal Icons (Vanishes on high channel count"),
+                ("FCURVE", "Fcurve Colors",
+                 "Horizontal Display of Fcurve colors")
+                ),
+                name="Visual Type",
+                default="SLIDER",
+                description="Visualisation Type",
+                options={'HIDDEN'},
+                )
 
     bpy.utils.register_class(SoundChannels)
-    # BUGGY on SPEAKER object
+    #BUGGY on SPEAKER object
     bpy.types.Scene.sound_channels = CollectionProperty(type=SoundChannels)
 
     bpy.types.Scene.play = BoolProperty("Play",
-                                        default=True,
-                                        description="Play Live")
-    # update=dummy)
+                default=True,
+                description="Play Live")
+                #update=dummy)
 
     bpy.utils.register_class(SoundToolSettings)
     bpy.types.Scene.speaker_tool_settings = \
-        PointerProperty(type=SoundToolSettings)
+            PointerProperty(type=SoundToolSettings)
 
     bpy.types.Action.show_freq = BoolProperty(default=True)
-    # bpy.utils.register_class(ModalTimerOperator)
     bpy.utils.register_class(OLDSoundVisualiserPanel)
     bpy.app.handlers.load_post.append(InitSoundTools)
-    if ("GetLocals" not in bpy.app.driver_namespace
+    if ("GetLocals" not in bpy.app.driver_namespace 
             or "SoundDrive" not in bpy.app.driver_namespace):
         InitSoundTools(None)
 
 
 def unregister():
-    # del(bpy.types.FCurve.minmax)
+    #del(bpy.types.FCurve.minmax)
     defaultPanels(True)
     bpy.utils.unregister_class(SoundChannels)
     bpy.utils.unregister_class(OLDSoundVisualiserPanel)
-    # bpy.utils.unregister_class(ModalTimerOperator)
     bpy.utils.unregister_class(SoundToolSettings)
 
     bpy.app.handlers.load_post.remove(InitSoundTools)

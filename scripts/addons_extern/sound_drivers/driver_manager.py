@@ -1,4 +1,20 @@
+bl_info = {
+    "name": "Driver Manager",
+    "author": "batFINGER",
+    #"location": "",
+    "description": "Manage Drivers across blend.",
+    "warning": "Still in Testing",
+    "wiki_url": "http://wiki.blender.org/index.php/\
+                User:BatFINGER/Addons/Sound_Drivers",
+    "version": (1, 1),
+    "blender": (2, 7, 6),
+    "tracker_url": "",
+    "icon": 'DRIVER',
+    "support": 'TESTING',
+    "category": "Animation"}
 import bpy
+from bpy.types import AddonPreferences
+from bpy.props import IntProperty
 from sound_drivers.utils import (bpy_collections,
                                  get_icon,
                                  format_data_path,
@@ -8,16 +24,73 @@ from sound_drivers.utils import (bpy_collections,
                                  getSpeaker,
                                  remove_draw_pend,
                                  split_path
-                                 )
+                                )
 from sound_drivers import debug
+from sound_drivers.icons import icon_value
 from mathutils import Vector, Color, Euler, Quaternion
 from math import sqrt, degrees
 
+class DriverManagerAddonPreferences(AddonPreferences):
+    ''' Driver Manager Prefs '''
+    bl_idname = __name__
+
+    driver_manager_update_speed = IntProperty(
+                                  name="Driver Manager Update Speed",
+                                  min=1,
+                                  max=100,
+                                  description="Update timer, lower value = faster updates, higher value slow self update use refresh",
+                                  default=10)
+
+
+    def draw_all_drivers(self, context):
+        layout = self.layout
+        dm = context.driver_manager
+        dic = dm.get_filter_dic()
+        for collection in dic:
+            layout.label(collection)
+            collectionbox = layout.box()
+            for object in dic[collection]:
+                objectrow = collectionbox.row()
+                objectrow.label(object)
+                
+                #objectrow.label(strdic[collection][object])
+                driverscol = collectionbox.column()
+                #for dp in dic[collection][object]:
+                    #driverscol.label(dp)
+                dm.draw_layout(collectionbox.column(), context, dic[collection][object])
+    def draw(self, context):
+        def icon(test):
+            if test:
+                icon = 'FILE_TICK'
+            else:
+                icon = 'ERROR'
+            return icon
+
+        layout = self.layout
+        test = getattr(context, "driver_manager", None)
+        row = layout.row()
+        row.label("DriverManager Started", icon=icon(test))
+        row = layout.row()
+        if not test:
+            row.operator("drivermanager.update")
+        else:
+            row.prop(self, "driver_manager_update_speed", slider=True)
+            row = layout.row()
+            dm = context.driver_manager
+            row.label("There are %d drivers in blend" % len(dm.all_drivers_list))
+            self.draw_all_drivers(context)
+
+#icon_value = bpy.types.UILayout.icon 
+
+# need to seperate driver from sounddriver.
+class Driver:
+    pass
 
 class SoundDriver():
     _index = 0
     _min = 0
     _edit_driver_gui = None
+
 
     def get_is_baked(self):
         if self.fcurve is None:
@@ -35,11 +108,10 @@ class SoundDriver():
 
     is_color = False
     # REFACTO NEW
-
     def get_value(self):
         prop = getattr(self.driven_object, self.prop, None)
         if self.is_vector:
-            return prop[self.array_index]
+            return  prop[self.array_index]
 
         return prop
 
@@ -51,7 +123,7 @@ class SoundDriver():
         sp = scene.speaker
         action = getAction(sp)
 
-        # REFACTO FIX THIS
+        # REFACTO FIX THIS 
         if not len(context.scene.soundspeakers):
             box = layout.box()
             box.label("NO DRIVER SPEAKERS")
@@ -68,6 +140,7 @@ class SoundDriver():
             box.label("NO CONTEXT SPEAKER")
             box.menu("speaker.select_contextspeaker")
             return None
+
 
         if sp is None or action is None:
             return None
@@ -87,7 +160,7 @@ class SoundDriver():
             if ed is None:
                 layout.label("NO GUI")
                 return
-            # if True:
+            #if True:
 
             speaker_box = layout.box()
             speaker_box.label("Context Speaker")
@@ -120,12 +193,14 @@ class SoundDriver():
 
             box = layout.box()
 
+            
             row = box.row()
             row.label("SoundDriver", icon='SOUND')
-            # REFACTO CORRECTO
+            #REFACTO CORRECTO
+
             row = box.row()
             a = bpy.data.actions.get(ed.action)
-            # row.label(a.get("channel_name","AA"))
+            #row.label(a.get("channel_name","AA"))
             row.prop(ed, "channel")
             '''
             op = row.operator("driver.sound_action")
@@ -140,21 +215,27 @@ class SoundDriver():
             #cn = a['channel_name']
             cn = ed.channel
             channels = a['Channels']
+            channels = len(a.fcurves)
             cols = min(int(sqrt(channels)), 16)
             #cf = row.column_flow(columns=cols, align=True)
 
             chs = [(i, "%s%d" % (cn, i)) for i in range(channels)]
             chs = [(i, fc.data_path.strip('["]')) for i, fc in enumerate(a.fcurves)]
             for i, ch in chs:
+
+                channel = ed.channels.get(ch)
+                #print("\nchannel", channel, "\nch", ch, "\ncn", cn, "\nchannels", channels, "\ned.channels", ed.channels)
+                if ch.startswith(cn):
+                    channel_number = int(ch.strip(cn))
+                else:
+                    continue # TODO fix
+                    channel_number = int(ch[2:])
                 if not i % cols:
                     row = box.row()
                 #col = cf.row()
                 col = row.column()
                 #col.scale_y = 0.5
                 # col.label(ch.name)
-                channel = ed.channels.get(ch)
-                channel_number = int(ch.strip(cn))
-
                 if channel is not None:
                     col.prop(channel, 'value', text=str(channel_number), toggle=True)
                 else:
@@ -162,7 +243,7 @@ class SoundDriver():
                     op.channel = ch
                     op.dindex = self.index
 
-                if False:  # FIXME add flag to show props here
+                if False: # FIXME add flag to show props here
                     r = col.row()
                     r.scale_y = 0.4
 
@@ -182,7 +263,7 @@ class SoundDriver():
         box = layout
         d = self
         if getattr(d, "is_open", False):
-            # return None
+            #return None
             ed = True
             row = box.row(align=True)
             leftcol = row.column()
@@ -210,10 +291,10 @@ class SoundDriver():
             op = leftcol.operator("editdriver.bake2fcurves",
                                   text="", icon=icon)
             op.dindex = d.index
-
+            
             if len(context.selected_objects) > 1:
                 op = leftcol.operator("driver.copy_to_selected_objects",
-                                      text="", icon='PASTEDOWN')
+                             text="", icon='PASTEDOWN')
                 op.dindex = d.index
 
             rightcol = row.column()
@@ -226,7 +307,7 @@ class SoundDriver():
             '''
             ebox.enabled = not getattr(d, "edit_driver_baking", False)
 
-            if True:  # TODO fix this no longer gui_type
+            if True: # TODO fix this no longer gui_type
                 UserPrefs = context.user_preferences
                 if not UserPrefs.system.use_scripts_auto_execute:
                     ebox.label("AUTO SCRIPTS NOT ENABLED", icon='ERROR')
@@ -237,9 +318,10 @@ class SoundDriver():
                     gui = self.driver_gui(context.scene)
                     if gui is None:
                         return None
-                    if True:  # if 'DRIVER' in gui.gui_types: REFACTO
+                    if True : #  if 'DRIVER' in gui.gui_types: REFACTO
                         driver_box = ebox.column()
                         d.edit(driver_box, context)
+
 
     def driver_gui(self, scene):
         col = getattr(scene.driver_objects, self.collection_name)
@@ -256,7 +338,7 @@ class SoundDriver():
         col = getattr(scene.driver_objects, self.collection_name, None)
         ed = col.get(self.object_name, None)
         if ed is None:
-            create = True
+            create=True
             ed = col.add()
             ed.name = self.object_name
 
@@ -272,13 +354,13 @@ class SoundDriver():
             # add a driver to the value
             driver_gui.driver_remove('value')
             test_driver = driver_gui.driver_add('value')
-            copy_driver(self, test_driver)  # REFACTO
+            copy_driver(self, test_driver) # REFACTO
             test_driver.driver.type = 'SCRIPTED'
             test_driver.driver.expression = 'GetLocals(%d, locals(), DriverManager)' % self.index
-            setattr(self, "gui_driver", test_driver)  # REFACTO
+            setattr(self, "gui_driver", test_driver) # REFACTO
             #setattr(self, "gui", driver_gui)
             cs = scene.speaker
-            # a = getAction(cs) # REFACTO
+            #a = getAction(cs) # REFACTO
             a = bpy.data.actions.get(driver_gui.action)
 
             for arg in args:
@@ -296,7 +378,7 @@ class SoundDriver():
                         setattr(driver_gui, k, v)
 
             # set up channels
-            # REFACTO ___OUT
+            # REFACTO ___OUT 
             dummy, args = get_driver_settings(self.fcurve)
 
             if a is not None and cs is not None:
@@ -327,10 +409,12 @@ class SoundDriver():
                         channel.value = False
                     '''
 
+        
         self._setting_channels = False
         return None
 
-    # REFACTO OUT
+
+    #REFACTO OUT
     #edit_driver = property(get_edit_driver_gui)
 
     def check_driver(self, scene):
@@ -549,9 +633,9 @@ class SoundDriver():
             input_ = l[1]
             node = l[0]
 
-        node = self.driven_object.path_resolve(node)  # REFACTO
-        row = layout.row()  # REFACTO
-        row.label(node.rna_type.identifier + str(l))  # REFACTO
+        node = self.driven_object.path_resolve(node) # REFACTO
+        row = layout.row() # REFACTO
+        row.label(node.rna_type.identifier + str(l)) # REFACTO
         if length == 2:
             layout.prop(node, l[1])
             return None
@@ -618,7 +702,7 @@ class SoundDriver():
             op = row.operator("editdriver.add_modifier")
 
         op.dindex = self.index
-        # op.type = 'GENERATOR' #  it's the default
+            # op.type = 'GENERATOR' #  it's the default
 
     def baking_draw(self, layout, scale_y=0.5):
         d = self
@@ -644,6 +728,7 @@ class SoundDriver():
         split.label(text="")
         #split.prop(bpy.context.scene.driver_gui.edit_drivers[0], 'value', slider=True, text="")
 
+
     def __init__(self, driver, collection_name,
                  object_name, data_path, array_index):
         scene_name = None
@@ -668,7 +753,9 @@ class SoundDriver():
         self.is_texture = data_path.startswith("textures")
         #driver_fcurve = self.fcurve
         driver_fcurve = driver
+        # todo make axis "RGB" and use d.array_index
         is_vector = False
+        axis = ""
         text = ""
         if scene_name is not None:
             #do = eval(scene_name)
@@ -757,8 +844,8 @@ class SoundDriver():
             driver.color[array_index] = 1
             '''
             self.is_color = True
-            rgb = "RGB"[array_index]
-            text = "%s %s" % (rgb, do.bl_rna.properties[prop].name)
+            axis = "RGB"[array_index]
+            text = "%s %s" % (axis, do.bl_rna.properties[prop].name)
             mo = mo[array_index]
 
         elif type(mo).__name__ == "bpy_prop_array":
@@ -780,11 +867,17 @@ class SoundDriver():
                 text = "PROBLEM"
 
         self.driven_object = do
+        self.icon_value = icon_value(do) if do else 0
         self.default_value = repr(mo)
         self.is_vector = is_vector
         self.is_idprop = is_idprop
         self.prop = prop
         self.text = text
+        self.axis = axis
+
+    @property
+    def propname(self):
+        return self.driven_object.bl_rna.properties[self.prop].name
 
     def edit(self, layout, context):
 
@@ -800,7 +893,7 @@ class SoundDriver():
             row = layout.row()
             row.label("BAKED")
             row.label(self.fcurve.id_data.animation_data.action.name, icon='ACTION')
-            # return None
+            #return None
         driver = self.fcurve.driver
         row = layout.row(align=True)
         if self.is_baked:
@@ -824,8 +917,8 @@ class SoundDriver():
             #row.prop(driver, "expression", text="")
             row = box.column(align=True)
             #row.operator("drivermanager.input_text", text=driver.expression, icon="SCRIPT")
-            box.alignment = 'LEFT'
-            # row.label(driver.expression)
+            box.alignment  = 'LEFT'
+            #row.label(driver.expression)
             op = row.operator("drivermanager.input_text", text=driver.expression, icon="SCRIPT", emboss=False)
             op.dindex = self.index
             row.scale_x = row.scale_y = 0.5
@@ -840,6 +933,7 @@ class SoundDriver():
             self.edit_draw(box, context)
 
         varbox = box.column()
+
 
         row = varbox.row()
         row.label("Driver Variables")
@@ -857,7 +951,7 @@ class SoundDriver():
             row.label("", icon='BLANK1')
             row.label(target.id.name, icon_value=row.icon(target.id))
             #row.prop(target.id, "name", text="")
-            # row.label(target.id.name)
+            #row.label(target.id.name)
             if target.data_path.startswith("node_tree"):
                 row.label("(node_tree)", icon='NODETREE')
 
@@ -875,6 +969,7 @@ class SoundDriver():
                 op = sub.operator("dm.edit_driver_var", text="%s" % var.name.ljust(6), emboss=True)
                 op.varname = var.name
                 op.dindex = self.index
+
 
                 if var.type == 'SINGLE_PROP':
                     dp = target.data_path
@@ -927,14 +1022,14 @@ class SoundDriver():
                         else:
                             try:
                                 # need a nicer path splitting routine
-                                path = split_path(target.data_path)
+                                path =  split_path(target.data_path)
                                 mo = target.id.path_resolve(target.data_path)
                                 if len(path) > 1:
                                     mo = target.id.path_resolve(".".join(path[:-1]))
 
                                     col2.prop(mo,
-                                              path[-1],
-                                              slider=True)
+                                          path[-1],
+                                          slider=True)
                                 else:
                                     col2.prop(target.id, target.data_path)
                             except:
@@ -1073,7 +1168,7 @@ class SoundDriver():
 class DriverManager():
     _edit_driver = None
     _filterdic = {}
-    ticker = 0
+    ticker = 10000
     _all_drivers_list = []
 
     def index(self, driver):
@@ -1100,10 +1195,11 @@ class DriverManager():
             self.get_all_drivers_list()
 
     def check_added_drivers(self, obj, context=bpy.context):
-        prefs = context.user_preferences.addons['sound_drivers'].preferences
-        us = prefs.driver_manager_update_speed
+        prefs = context.user_preferences.addons[__package__].preferences
+        dmprefs = prefs.addons["driver_manager"].preferences
+        us = dmprefs.driver_manager_update_speed
         self.ticker += 1
-        if self.ticker <= us:  # REFACTO FOR UPDATE SPEED
+        if self.ticker <= us: # REFACTO FOR UPDATE SPEED
             return False
         self.ticker = 0
         if obj is None:
@@ -1184,27 +1280,32 @@ class DriverManager():
 
                     for d in drivers:
                         if d not in self._dels:
-
+                                
                             self.updates += 1
                             dp = d.data_path
                             ix = d.array_index
                             # quick hack try and enable dead drivers
                             #d.driver.is_valid = True
                             debug.print("Driver",
-                                        collname,
-                                        ob.name,
-                                        dp, ix, "valid:%s" % str(d.driver.is_valid)
-                                        )
+                                  collname,
+                                  ob.name,
+                                  dp, ix, "valid:%s" % str(d.driver.is_valid)
+                                  )
                             if scene is not None:
                                 obname = "%s__#__%s" % (scene.name, ob.name)
                             else:
                                 obname = ob.name
-                            if d.data_path.startswith("driver_"):  # REFACTO driver_gui to driver_objects:
+                            if  d.data_path.startswith("driver_"): # REFACTO driver_gui to driver_objects:
                                 self._dummies.append(SoundDriver(d, collname, obname, dp, ix))
 
                             else:
                                 self._all_drivers_list.append(
                                     SoundDriver(d, collname, obname, dp, ix))
+
+        # index them
+        for i, d in enumerate(self._all_drivers_list):
+            d.index = i
+
 
         return self._all_drivers_list
         '''
@@ -1215,7 +1316,99 @@ class DriverManager():
                                      "array_index"))
         '''
 
-    #xxxx = property(get_all_drivers_list)
+    def get_context_object_dic(self, object):
+        '''
+        Get Dictionary for all drivers of object
+        object: Blender Object
+        return: dictionary of drivers
+        '''
+        return {}
+
+    def get_object_drivers(self, obj):
+        '''
+        Get List of all drivers of object obj.
+        '''
+        return [d for d in self._all_drivers_list if d.fcurve.id_data == obj.id_data]
+
+    def get_driven_object_driver_dic(self, drivers):
+        '''
+        returns a dictionary using rna_type.base.names
+        '''
+
+        #drivers = dm.get_object_drivers(obj)
+
+        dic = {}
+        icon_dic = {}
+        for d in drivers:
+            if d.driven_object.rna_type.base is None:
+                base_name = d.driven_object.rna_type.name
+            else:
+                base_name = d.driven_object.rna_type.base.name
+            '''
+            if base_name == 'ID':
+                # it's an ID object 
+                base_name = obj.type
+            '''
+            base = dic.setdefault(base_name, {})
+            objects = base.setdefault(d.driven_object.name, {})
+            icon_dic[d.driven_object.name] = icon_value(d.driven_object)
+            dp = objects.setdefault(d.propname, {})
+            ai = dp.setdefault(str(d.array_index), d.index)
+        print("ICON DIC", icon_dic)
+        return dic, icon_dic
+
+    def draw_pie_menu(self, obj, pie):
+        drivers = self.get_object_drivers(obj)
+        dic, icon_dic = self.get_driven_object_driver_dic(drivers)
+        for type, driven_objects in dic.items():
+            print(type, driven_objects)
+            #box = pie.box()
+            for name, datapaths in driven_objects.items():
+                box = pie.box()
+                box = box.row()
+                print(name, datapaths)
+                box.label(name, icon_value=icon_dic.get(name))
+                col = box
+                for dp, drivs in datapaths.items():
+
+                    row = box.row(align=True)
+                    col = row.column()
+                    col.label(dp)
+                    row = col.row(align=True)
+
+                    #col.label(dp)
+                    for axis, dindex in drivs.items():
+                        print(axis, dindex)
+                        #row = col.column(align=True)
+                        #row.scale_y = 0.6
+                        #row = col
+                        d = self.find(dindex)
+                        #d.draw_slider(row)
+                        #op = row.operator("driver.popup_driver", text=d.text, emboss=False)
+                        text = d.axis if d.axis else d.prop
+                        op = row.operator("driver.popup_driver", text=text, emboss=True)
+                        op.dindex = dindex
+
+        return
+        for dp, dr in dic.items():
+            #p = pie.menu_pie()
+            col = pie.column()
+            box = col.box()
+            box.label(dp, icon='DRIVER')
+            for index, dindex in dr.items():
+                driver = dm.find(dindex)
+                if driver.driven_object != obj:
+                    box.label(driver.driven_object.name)
+                #driver.edit(box, context)
+                row = box.row()
+                row.scale_y = row.scale_x = 0.5
+                driver.draw_slider(row)
+                #driver.draw_default(box)
+                #driver.driver_edit_draw(box, context)
+                #dm.driver_draw(driver, box)
+                op = row.operator("driver.popup_driver", text="EDIT")
+                op.dindex = dindex
+                # op.toggle = True
 
     def get_filter_dic(self):
         self._filterdic.clear()
@@ -1224,7 +1417,7 @@ class DriverManager():
             coll = self._filterdic.setdefault(d.collection_name, {})
             obj = coll.setdefault(d.object_name, {})
             dp = obj.setdefault(d.data_path, {})
-            # FIXME FIXME with a string index can pump into ID props
+            #FIXME FIXME with a string index can pump into ID props
             ai = dp.setdefault(str(d.array_index), self._all_drivers_list.index(d))
             #ai = dp.setdefault(d.array_index, self._all_drivers_list.index(d))
         return self._filterdic
@@ -1244,10 +1437,10 @@ class DriverManager():
         self._all_drivers_list.clear()
         for d in self._dummies:
             if d.fcurve:
-                # XXXX
-                print(d.driven_object, d.prop)
+                #XXXX
+                #print(d.driven_object, d.prop)
                 if not d.driven_object.driver_remove(d.prop):
-                    # try  # possibly going to need try / catch here.
+                    #try  # possibly going to need try / catch here.
                     d.fcurve.driver_remove(d.data_path)
                 # and the collection too
 
@@ -1292,10 +1485,12 @@ class DriverManager():
         #layout.operator("driver_manager.settings", emboss=False)
         #row.menu("OBJECT_MT_custom_menu", text="Tools")
 
+
     def set_edit_driver_gui(self, context, create=False):
         '''Return the edit_driver_gui'''
         debug.print("WRONG SET EDIT DRIVER !!!!")
         return None
+
 
     def edit_draw(self, layout, context):
         ''' DRAWS THE SPEAKER TOOLS GUI'''
@@ -1307,6 +1502,7 @@ class DriverManager():
         return None
         self.check_deleted_drivers()
 
+
         ob = context.object
         mesh = context.mesh
         space = context.space_data
@@ -1315,6 +1511,8 @@ class DriverManager():
             layout.template_ID(ob, "data")
         elif mesh:
             layout.template_ID(space, "pin_id")
+
+
 
         collection = 'None'
         object = 'None'
@@ -1348,9 +1546,7 @@ class DriverManager():
         pass
 
     def get_collection_dic(self, collection):
-        dm = self
-        dic = dm.filter_dic
-        return dic.get(collection, {})
+        return self.filter_dic.get(collection, {})
 
     def get_object_dic(self, collection, object):
         dm = self
@@ -1380,9 +1576,9 @@ class DriverManager():
                     continue
                 row = col.row()
                 edop = row.operator("driver.edit",
-                                    emboss=False,
-                                    icon='TRIA_RIGHT',
-                                    text="")
+                                      emboss=False,
+                                      icon='TRIA_RIGHT',
+                                      text="")
 
                 edop.toggle = True
                 edop.dindex = d.index
@@ -1393,12 +1589,12 @@ class DriverManager():
                 self.driver_draw(d, sub)
                 #dm.draw_layout(col, context, [d])
                 if getattr(d, "is_open", False):
-                    # col.label("OPEN")
+                    #col.label("OPEN")
                     #dm.draw_layout(col, context, [d])
                     d.driver_edit_draw(col.row(), context)
 
         return None
-
+    
     def panel_draw_menu(self, panel, context, title="Menu"):
         layout = panel.layout
         row = layout.row()
@@ -1410,7 +1606,7 @@ class DriverManager():
         row.menu('drivermanager.menu', text=title, icon='DRIVER')
 
     def panel_posebone_constraint_draw(self, panel, context):
-
+        
         self.check_deleted_drivers()
         active_pose_bone = context.active_pose_bone
         space = context.space_data
@@ -1419,7 +1615,7 @@ class DriverManager():
 
         constraints = context.pose_bone.constraints.values()
 
-        # get all the drivers that have a do in constaints
+        #get all the drivers that have a do in constaints
         drivers = [d for d in self.all_drivers_list if d.driven_object in constraints]
 
         dic = {}
@@ -1429,21 +1625,20 @@ class DriverManager():
             if o is None or o.driven_object is None:
                 continue
             obj = o.fcurve.id_data
-            m = dic.setdefault('%s["%s"]' % ("constraints", getattr(o.driven_object, "name", "NoName")), {})
+            m = dic.setdefault('%s["%s"]' % ("constraints", getattr(o.driven_object, "name", "NoName")), {}) 
             m[i] = o.index
 
         #debug.print("PD", collection, ob, obj, search, dic)
         if len(dic):
             self.panel_draw_menu(panel, context, title="pose_bone_constraint")
             self.draw_layout(panel.layout, context, dic)
-        # self.check_added_drivers(obj)
-        # self.check_added_drivers(context.object)
+        #self.check_added_drivers(obj)
+        #self.check_added_drivers(context.object)
 
     def panel_draw(self, panel, context):
-        if panel.search == "pose_bone_constraint":
+        if getattr(panel, "search", "") == "pose_bone_constraint":
             self.panel_posebone_constraint_draw(panel, context)
             return None
-
         def node_name(str):
             name = str.replace('nodes["', '')
             name = name[:name.find(']') - 1]
@@ -1451,10 +1646,10 @@ class DriverManager():
 
         self.check_deleted_drivers()
         collection = getattr(panel, "collection", "NONE")
-        panel_context = getattr(panel, "context", "None")
-        search = getattr(panel, "search", "")
+        panel_context = getattr(panel, "context", "object")
+        search = getattr(panel,"search", "")
 
-        obj = getattr(context, panel_context)
+        obj = getattr(context, panel_context, None)
         if collection == "particles":
             obj = getattr(obj, "settings", None)
 
@@ -1483,7 +1678,7 @@ class DriverManager():
             return
 
         dm = self
-
+        
         layout = panel.layout
         #collection, ob, obj = self.draw_spitter(context)
         ob = obj.name
@@ -1494,7 +1689,7 @@ class DriverManager():
             if search == "texture_slots":
                 obs = [d for d in self.all_drivers_list if getattr(d.driven_object, "name", "") == ob]
             else:
-                obs = [self.find(i) for k, v in dic.items() if k.startswith(search) for i in v.values()]
+                obs = [self.find(i) for k,v in dic.items()  if k.startswith(search)  for i in v.values()]
             dic = {}
             x = {}
             for i, o in enumerate(obs):
@@ -1503,10 +1698,10 @@ class DriverManager():
                     continue
                 obj = o.fcurve.id_data
                 if search == "texture_slots":
-                    m = dic.setdefault(o.prop, {})
+                    m = dic.setdefault(o.prop, {}) 
                     m[o.array_index] = o.index
                 else:
-                    m = dic.setdefault('%s["%s"]' % (search, getattr(o.driven_object, "name", "NoName")), {})
+                    m = dic.setdefault('%s["%s"]' % (search, getattr(o.driven_object, "name", "NoName")), {}) 
                     m[i] = o.index
 
         #debug.print("PD", collection, ob, obj, search, dic)
@@ -1514,11 +1709,11 @@ class DriverManager():
             self.panel_draw_menu(panel, context, title=search_string)
             self.draw_layout(layout, context, dic)
         self.check_added_drivers(obj)
-        # self.check_added_drivers(context.object)
+        #self.check_added_drivers(context.object)
 
     def _PanelInvader(self, remove_only=False):
         def SD__draw(panel, context):
-            # panel.layout.label("TEST")
+            #panel.layout.label("TEST")
             self.panel_draw(panel, context)
 
         default_dic = {"panels": [],
@@ -1528,109 +1723,109 @@ class DriverManager():
                        "search": "",
                        }
         panel_dic = {
-            "worlds": {
-                "collection": "worlds",
-                "panels": ["WORLD_PT_world"],
-                "context": "world",
-                "draw": "prepend",  # will prepend
-            },
+                     "worlds": {
+                                "collection": "worlds",
+                                "panels":["WORLD_PT_world"],
+                                "context": "world",
+                                "draw": "prepend", # will prepend
+                               },
+                
+                     "scenes": {
+                                "collection": "scenes",
+                                "panels":["SCENE_PT_scene"],
+                                "context": "scene",
+                                "draw": "prepend", # will prepend
+                               },
+                     "objects":{
+                                "collection": "objects",
+                                "panels":["OBJECT_PT_context_object"],
+                                "context": "object",
+                               },
+                     "meshes": {
+                                "collection": "meshes",
+                                "panels":["DATA_PT_context_mesh"],
+                                "context": "mesh",
+                               },
+                     "shape_keys": {
+                                "collection": "shape_keys",
+                                "panels":["DATA_PT_shape_keys"],
+                                "context": "mesh",
+                                "draw": "prepend", # will prepend
+                               },
+                     "armatures": {
+                                "collection": "armatures",
+                                "panels":["DATA_PT_context_arm"],
+                                "context": "armature",
+                               },
+                     "bone_constaints": {
+                                "collection": "objects",
+                                "panels":["BONE_PT_context_bone"],
+                                "context": "object",
+                                "search": "pose.bones",
+                                },
+                     "pose_bones": {
+                                "collection": "objects",
+                                "panels":["BONE_PT_constraints"],
+                                "context": "pose_bone",
+                                "search": "pose_bone_constraint",
+                                "draw": "prepend", # will prepend
+                               },
+                     "metaballs": {
+                                "collection": "metaballs",
+                                "panels":["DATA_PT_context_metaball"],
+                                "context": "meta_ball",
+                               },
+                     "lattices": {
+                                "collection": "lattices",
+                                "panels":["DATA_PT_context_lattice"],
+                                "context": "lattice",
+                               },
+                     "lamps": {
+                                "collection": "lamps",
+                                "panels":["DATA_PT_context_lamp"],
+                                "context": "lamp",
+                               },
+                     "cameras": {
+                                "collection": "cameras",
+                                "panels":["DATA_PT_context_camera"],
+                                "context": "camera",
+                               },
+                     "materials": {
+                                "collection": "materials",
+                                "panels":["MATERIAL_PT_context_material", "Cycles_PT_context_material"],
+                                "context": "material",
+                                "draw": "prepend", # will prepend
+                               },
+                     "textures": {
+                                "collection": "textures",
+                                "panels":["TEXTURE_PT_context_texture"],
+                                "context":"texture",
+                                "draw": "prepend",
+                                "search": "texture_slots",
+                                },
 
-            "scenes": {
-                "collection": "scenes",
-                "panels": ["SCENE_PT_scene"],
-                "context": "scene",
-                "draw": "prepend",  # will prepend
-            },
-            "objects": {
-                "collection": "objects",
-                "panels": ["OBJECT_PT_context_object"],
-                "context": "object",
-            },
-            "meshes": {
-                "collection": "meshes",
-                "panels": ["DATA_PT_context_mesh"],
-                "context": "mesh",
-            },
-            "shape_keys": {
-                "collection": "shape_keys",
-                "panels": ["DATA_PT_shape_keys"],
-                "context": "mesh",
-                "draw": "prepend",  # will prepend
-            },
-            "armatures": {
-                "collection": "armatures",
-                "panels": ["DATA_PT_context_arm"],
-                "context": "armature",
-            },
-            "bone_constaints": {
-                "collection": "objects",
-                "panels": ["BONE_PT_context_bone"],
-                "context": "object",
-                "search": "pose.bones",
-            },
-            "pose_bones": {
-                "collection": "objects",
-                "panels": ["BONE_PT_constraints"],
-                "context": "pose_bone",
-                "search": "pose_bone_constraint",
-                "draw": "prepend",  # will prepend
-            },
-            "metaballs": {
-                "collection": "metaballs",
-                "panels": ["DATA_PT_context_metaball"],
-                "context": "meta_ball",
-            },
-            "lattices": {
-                "collection": "lattices",
-                "panels": ["DATA_PT_context_lattice"],
-                "context": "lattice",
-            },
-            "lamps": {
-                "collection": "lamps",
-                "panels": ["DATA_PT_context_lamp"],
-                "context": "lamp",
-            },
-            "cameras": {
-                "collection": "cameras",
-                "panels": ["DATA_PT_context_camera"],
-                "context": "camera",
-            },
-            "materials": {
-                "collection": "materials",
-                "panels": ["MATERIAL_PT_context_material", "Cycles_PT_context_material"],
-                "context": "material",
-                "draw": "prepend",  # will prepend
-            },
-            "textures": {
-                "collection": "textures",
-                "panels": ["TEXTURE_PT_context_texture"],
-                "context": "texture",
-                "draw": "prepend",
-                "search": "texture_slots",
-            },
+                     "constraints": {
+                                "collection": "objects",
+                                "panels":["OBJECT_PT_constraints"],
+                                "search": "constraint",
+                                "draw": "prepend",
+                                },
 
-            "constraints": {
-                "collection": "objects",
-                "panels": ["OBJECT_PT_constraints"],
-                "search": "constraint",
-                "draw": "prepend",
-            },
+                     "modifiers": {
+                                "collection": "objects",
+                                "panels":["DATA_PT_modifiers"],
+                                "search": "modifiers",
+                                "draw": "prepend",
+                                },
+                     "particles": {
+                                "collection": "particles",
+                                "panels":["PARTICLE_PT_context_particles"],
+                                "context": "particle_system",
+                                #"search": "modifiers",
+                                "draw": "prepend",
+                                },
 
-            "modifiers": {
-                "collection": "objects",
-                "panels": ["DATA_PT_modifiers"],
-                "search": "modifiers",
-                "draw": "prepend",
-            },
-            "particles": {
-                "collection": "particles",
-                "panels": ["PARTICLE_PT_context_particles"],
-                "context": "particle_system",
-                #"search": "modifiers",
-                "draw": "prepend",
-            },
-
-        }
+                      }
         '''
                   
                   "",
@@ -1726,3 +1921,4 @@ class DriverManager():
         sub = row.row()
         sub.alignment = 'RIGHT'
         format_data_path(sub, driver.data_path, True, padding=1)
+

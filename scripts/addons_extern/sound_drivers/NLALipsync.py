@@ -13,7 +13,7 @@ from sound_drivers.utils import getAction
 
 
 def boob(self, context):
-    # print(self.papagayo_phonemes)
+    #print(self.papagayo_phonemes)
     return None
 
 
@@ -33,7 +33,7 @@ def readPapagayoFile(context, filepath):
         raise NameError("Not a Papagayo Data file: " + fileName)
     print("Loading Papagayo file %s" % fileName)
     f = open(fileName, 'r')
-    # print(f.readlines())
+    #print(f.readlines())
     print(context.active_object)
     if context.space_data.use_pin_id:
         speaker = context.space_data.pin_id
@@ -41,7 +41,7 @@ def readPapagayoFile(context, filepath):
         speaker = context.object.data
     f.readline()  # skip the first line
 
-    # bpy.ops.nla.tracks_add()
+    #bpy.ops.nla.tracks_add()
 
     tracklist = context.object.animation_data.nla_tracks
     createtracks(context.object)
@@ -52,7 +52,7 @@ def readPapagayoFile(context, filepath):
         phon = line.split()[1]
         context.scene.frame_set(1)  # set the scene frame to the start frame
         speaker.animation_data.action.pose_markers.new(phon).frame = frame
-        # print(line,clip.xxx)
+        #print(line,clip.xxx)
         i += 1
     context.scene.frame_set(1)
 
@@ -151,14 +151,14 @@ def register():
         ('WQ', "WQ", "WQ"),
         ('L', "L", "L"),
         ('FV', "FV", "FV"),
-    ),
-        name="Phoneme",
-        description="Phoneme",
-        default='rest',
-        update=boob)
+        ),
+            name="Phoneme",
+            description="Phoneme",
+            default='rest',
+            update=boob)
     bpy.utils.register_class(OBJECT_OT_LoadLipSync)
     bpy.utils.register_class(SoundTools_LipSync_PT)
-    # bpy.utils.register_class()
+    #bpy.utils.register_class()
 
 
 def unregister():

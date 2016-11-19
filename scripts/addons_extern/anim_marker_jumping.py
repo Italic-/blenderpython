@@ -43,7 +43,7 @@ class MarkerPrev(bpy.types.Operator):
         return context.area.type in marker_areas and context.scene.timeline_markers
 
     def execute(self, context):
-        print("PREVIOUS!")
+        # print("PREVIOUS!")
         markers = context.scene.timeline_markers
         current_frame = context.scene.frame_current
         possible_markers = []
@@ -70,7 +70,7 @@ class MarkerNext(bpy.types.Operator):
         return context.area.type in marker_areas and context.scene.timeline_markers
 
     def execute(self, context):
-        print("NEXT!")
+        # print("NEXT!")
         markers = context.scene.timeline_markers
         current_frame = context.scene.frame_current
         possible_markers = []

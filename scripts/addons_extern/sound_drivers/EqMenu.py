@@ -4,20 +4,20 @@ from math import sqrt
 from mathutils import Vector, Color, Euler, Quaternion
 from random import random
 from bpy.props import \
-    StringProperty, IntProperty, EnumProperty, FloatProperty, \
-    BoolVectorProperty, BoolProperty
+        StringProperty, IntProperty, EnumProperty, FloatProperty, \
+        BoolVectorProperty, BoolProperty
 
 from bl_operators.wm import WM_OT_doc_view
 
 from sound_drivers.Equalizer import \
-    getAction, getSpeaker, SoundActionMenuRow
+         getAction, getSpeaker, SoundActionMenuRow
 
 from sound_drivers.utils import \
-    get_driver_settings, \
-    icon_from_bpy_datapath, format_data_path
+        get_driver_settings, \
+        icon_from_bpy_datapath, format_data_path
 
 from sound_drivers.filter_playback import setup_buffer, play_buffer,\
-    mix_buffer, sound_buffer, remove_filter_handlers, setup_filter_handlers
+     mix_buffer, sound_buffer, remove_filter_handlers, setup_filter_handlers
 # <pep8-80 compliant>
 
 
@@ -33,7 +33,7 @@ def main(self, context, edit_driver, speaker, action, channel_list):
 
     space = context.space_data
     search = True
-    if action is not None:
+    if action  is not None:
         channel = action["channel_name"]
     driver = edit_driver.fcurve
 
@@ -95,7 +95,7 @@ def speaker_filter_sound(self, context):
     filter_sound(self, self.animation_data.action, context)
     playing = screen.is_animation_playing
     if playing:
-        # this will stop it
+        #this will stop it
         bpy.ops.screen.animation_play()
     scene.frame_set(1)
 
@@ -114,7 +114,7 @@ def speaker_filter_sound(self, context):
     if not h:
         bpy.app.driver_namespace["ST_handle"] = play_buffer(b)
     if playing:
-        # this will restart it
+        #this will restart it
         bpy.ops.screen.animation_play()
     setup_filter_handlers()
     return None
@@ -145,7 +145,7 @@ def filter_sound(speaker, action, context):
             frame_end = scene.frame_end
         fs = max(action.frame_range.x, frame_start)
         # have to go back to start to enable effect
-        # scene.frame_set(fs)
+        #scene.frame_set(fs)
 
         '''
         for i in action["Channels"]
@@ -202,7 +202,7 @@ class ContextSpeakerMenu(bpy.types.Menu):
             row = layout.row()
             row.label(speaker.name, icon='SPEAKER')
             row = layout.row()
-            # row.separator()
+            #row.separator()
             sp = speaker_dict.setdefault(speaker.name, {})
             sounds = [s for s in bpy.data.sounds if s.name in wf]
             for sound in sounds:
@@ -222,19 +222,19 @@ class ContextSpeakerMenu(bpy.types.Menu):
 
 def register():
 
-    # bpy.utils.register_class(SimpleOperator)
+    #bpy.utils.register_class(SimpleOperator)
     bpy.types.Speaker.filter_sound = BoolProperty(default=False,
                                                   update=speaker_filter_sound)
     #bpy.types.Scene.sync_play =  BoolProperty(default=False, update=sync_play)
     bpy.utils.register_class(ContextSpeakerSelectMenu)
-    # bpy.utils.register_class(AddCustomSoundDriverToChannel)
+    #bpy.utils.register_class(AddCustomSoundDriverToChannel)
     bpy.utils.register_class(ContextSpeakerMenu)
-    # bpy.utils.register_class(SoundToolPanel)
+    ###bpy.utils.register_class(SoundToolPanel)
 
 
 def unregister():
-    # bpy.utils.unregister_class(SimpleOperator)
-    # bpy.utils.unregister_class(AddCustomSoundDriverToChannel)
+    #bpy.utils.unregister_class(SimpleOperator)
+    #bpy.utils.unregister_class(AddCustomSoundDriverToChannel)
     bpy.utils.unregister_class(ContextSpeakerMenu)
     bpy.utils.unregister_class(ContextSpeakerSelectMenu)
-    # bpy.utils.unregister_class(SoundToolPanel)
+    ###bpy.utils.unregister_class(SoundToolPanel)

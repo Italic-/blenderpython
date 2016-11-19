@@ -27,7 +27,7 @@ def playspeaker(name, volume=1.0, limit=[], highpass=None, lowpass=None):
     on = speaker.filter_sound
     if on:
         device = aud.device()
-        # load the factory
+        #load the factory
         dprint("-" * 80)
         dprint("playing %s" % speaker.sound.filepath)
         dprint("-" * 80)
@@ -42,12 +42,12 @@ def playspeaker(name, volume=1.0, limit=[], highpass=None, lowpass=None):
             f = f.highpass(highpass)
         if highpass is not None:
             f = f.highpass(highpass)
-        # apply the
+        #apply the
         device.play(f)
     else:
         dprint('speaker.on = False')
 
-# use console for test call
+#use console for test call
 '''
 Set the speaker to on to test..
 in console
@@ -89,7 +89,7 @@ def ST__FT_playback_status(scene):
             handle.pause()
         else:
             handle.resume()
-        # device.stopAll()
+        #device.stopAll()
         return None
 
 
@@ -108,7 +108,7 @@ def ST__FT_filter_playback(scene):
         if handle:
             dprint("PAUSE PAUSE PAUSE")
             handle.pause()
-        # device.stopAll()
+        #device.stopAll()
         return None
     cf = scene.frame_current
     if scene.use_preview_range:
@@ -149,7 +149,7 @@ def ST__FT_filter_playback(scene):
 
 def mix_buffer(context):
     dprint("mix BUff")
-    # make a buffer from the channel mix
+    #make a buffer from the channel mix
     # set up a buffer with the same dictionary structure as the
     device = aud.device()
     scene = context.scene
@@ -175,7 +175,7 @@ def mix_buffer(context):
             continue
         action = getAction(speaker)
         if not speaker.filter_sound \
-                or action_name != action.name:  # using the mute as a flag
+               or action_name != action.name:  # using the mute as a flag
             continue
 
         channel_name = action["channel_name"]
@@ -188,12 +188,12 @@ def mix_buffer(context):
                 if value.get(ch):  # channel selected for mix
                     f = mix.get(ch)
                     if g:
-                        # f = f.join(g) # join
+                        #f = f.join(g) # join
                         f = f.mix(g)
                     g = f
 
     if g:
-        # factory_buffered =
+        #factory_buffered =
         #aud.Factory.buffer(g.limit((fs-1) / fps, (fe-1) / fps))
         bpy.app.driver_namespace["ST_buffer"] = g
         factory_buffered = aud.Factory.buffer(g)
@@ -240,7 +240,7 @@ def setup_buffer(context):
         if action is None:
             continue
         if not speaker.filter_sound \
-                or action_name != action.name:  # using the mute as a flag
+               or action_name != action.name:  # using the mute as a flag
             continue
 
         channel_name = action["channel_name"]
@@ -297,11 +297,10 @@ def setup_filter_handlers():
 
 
 def register():
-    # setup_filter_handlers()
+    #setup_filter_handlers()
     bpy.app.driver_namespace["ST_setup_buffer"] = setup_buffer
-
 
 def unregister():
     pass
-    # setup_filter_handlers()
+    #setup_filter_handlers()
     #bpy.app.driver_namespace["ST_setup_buffer"] = setup_buffer

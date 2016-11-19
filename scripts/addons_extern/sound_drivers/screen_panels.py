@@ -1,7 +1,6 @@
 class box():
-
     def __init__(self, index, area, x, y, w, h, left, right, layout):
-        # if they share a horizontal edge
+        #if they share a horizontal edge 
         self.area = area
         self.index = index
         self.x = x
@@ -11,7 +10,6 @@ class box():
         self.left = left
         self.right = right
         self.layout = layout
-
     def __repr__(self):
         return "box %d %d %d %d" % (self.x, self.y, self.w, self.h)
 
@@ -19,8 +17,8 @@ class box():
 class ScreenLayoutPanel():
     bl_label = "Screen Layout"
 
-    sd_operator = "sounddrivers.view_action"  # an op that takes area_index
-    sd_operator_text = "BGL"  # an op that takes area_index
+    sd_operator = "sounddrivers.view_action" # an op that takes area_index
+    sd_operator_text = "BGL" # an op that takes area_index
 
     def build_tree(self, context):
         window = context.window
@@ -29,17 +27,17 @@ class ScreenLayoutPanel():
 
         for index, area in enumerate(screen.areas):
             areas.append(box(index,
-                             area,
-                             area.x,
-                             window.height - (area.y + area.height),
+                             area, 
+                             area.x, 
+                             window.height-(area.y + area.height), 
                              area.width,
                              area.height, None, None, 'BOX'))
 
         #areas = sorted(areas, key = lambda k:(k.y, k.x))
 
-        # make a tree
+        #make a tree
 
-        # searh for areas that share an edge
+        #searh for areas that share an edge
         while len(areas) > 1:
             #areas = sorted(areas, key = lambda k:(k.y , k.x))
             for area in areas:
@@ -51,11 +49,11 @@ class ScreenLayoutPanel():
                         left, right = a, area
                     else:
                         left, right = area, a
-                    n = box(area.index, None, left.x, left.y, left.w + right.w + 1, left.h, left, right, 'COL')
+                    n = box(area.index, None, left.x, left.y,left.w + right.w + 1, left.h, left, right, 'COL')
                     areas.pop(areas.index(area))
                     areas.pop(areas.index(a))
                     areas.append(n)
-            areas = sorted(areas, key=lambda k: (k.x, k.y))
+            areas = sorted(areas, key = lambda k:(k.x , k.y))
             for area in areas:
                 # share a horiz edge
                 sh = [a for a in areas if a != area and a.x == area.x and a.w == area.w]
@@ -72,7 +70,7 @@ class ScreenLayoutPanel():
                     areas.append(n)
         return areas[0]
 
-    # traverse the tree
+    #traverse the tree
     def traverse_binary_tree(self, context, node, layout, scale_factor=0.8):
         window = context.window
 
@@ -82,11 +80,12 @@ class ScreenLayoutPanel():
 
             right = col.row()
 
+
         elif node.layout == "COL":
             m = max([node.left.w, node.right.w])
-
+   
             right = layout.row()
-
+                
             left = right.column()
 
         else:
@@ -99,6 +98,7 @@ class ScreenLayoutPanel():
             box.context_pointer_set("space_data", node.area.spaces.active)
             self.draw_area_operator(context, box, node.index)
 
+
             #op = box.operator("graph.clean", text=self.sd_operator_text)
             #op = box.operator(self.sd_operator, text=self.sd_operator_text)
             #op.area_index = node.index
@@ -110,7 +110,7 @@ class ScreenLayoutPanel():
             self.traverse_binary_tree(context, node.right, right)
 
     def draw_area_buttons(self, context):
-        layout = self.layout
+        layout = self.layout       
         root = self.build_tree(context)
         layout.label(context.screen.name)
         self.traverse_binary_tree(context, root, layout)
