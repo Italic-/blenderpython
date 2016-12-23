@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Bevel Curve Tools",
     "author": "Yusuf Umar",
-    "version": (0, 1, 0),
+    "version": (0, 1, 1),
     "blender": (2, 74, 0),
     "location": "View 3D > Tool Shelf > Curve",
     "description": "Tool to help add and maintain beveled curve easier",
@@ -9,16 +9,14 @@ bl_info = {
     "category": "Add Curve",
 }
 
-import bpy
-import math
+import bpy, math
 from mathutils import Vector, Quaternion
 from bpy.props import FloatProperty, BoolProperty, IntProperty, EnumProperty
 
-
-def radius_falloff(points, power=1.0, tip='ONE'):
+def radius_falloff(points, power = 1.0, tip = 'ONE'):
     total_points = len(points)
     for i, point in enumerate(points):
-        dist = i / (total_points - 1)
+        dist = i/(total_points-1)
         if tip == 'ONE':
             radius_weight = 1.0 - pow(dist, power)
         elif tip == 'DUAL':
@@ -27,12 +25,11 @@ def radius_falloff(points, power=1.0, tip='ONE'):
                 radius_weight = 1.0 - pow(dist, power)
             else:
                 dist = dist * 2.0
-                radius_weight = pow(dist, 1 / power)
+                radius_weight = pow(dist, 1/power)
         elif tip == 'NO':
             radius_weight = 1.0
         #print(dist, radius_weight)
         point.radius = radius_weight
-
 
 def get_spline_points(spline):
     # Points for griffindor
@@ -43,23 +40,21 @@ def get_spline_points(spline):
 
     return points
 
-
 def get_point_position(curve_obj, index=0, spline_index=0):
     curve_mat = curve_obj.matrix_world
     curve = curve_obj.data
     points = get_spline_points(curve.splines[spline_index])
     return curve_mat * points[index].co.xyz
 
-
 def convert_curve_to_mesh(context, mode='NOMERGE'):
 
     scene = context.scene
 
     # Listing selected curve objects
-    selected_objs = [o for o in scene.objects if
-                     o.select == True and
-                     o.type == 'CURVE' and
-                     o.data.bevel_object]
+    selected_objs = [o for o in scene.objects if 
+            o.select == True and 
+            o.type == 'CURVE' and 
+            o.data.bevel_object]
 
     if mode == 'UNION' or mode == 'SEPARATE':
 
@@ -84,19 +79,19 @@ def convert_curve_to_mesh(context, mode='NOMERGE'):
                 bpy.ops.object.editmode_toggle()
 
         # Do listing selected curve objects again
-        selected_objs = [o for o in scene.objects if
-                         o.select == True and
-                         o.type == 'CURVE' and
-                         o.data.bevel_object]
+        selected_objs = [o for o in scene.objects if 
+                o.select == True and 
+                o.type == 'CURVE' and 
+                o.data.bevel_object]
 
     # Listing bevel objects of selected objects
     sel_bev_objs = [o.data.bevel_object for o in selected_objs]
 
     # Listing bevel objects of not selected objects
-    not_sel_bev_objs = [o.data.bevel_object for o in scene.objects if
-                        o.select == False and
-                        o.type == 'CURVE' and
-                        o.data.bevel_object]
+    not_sel_bev_objs = [o.data.bevel_object for o in scene.objects if 
+            o.select == False and 
+            o.type == 'CURVE' and 
+            o.data.bevel_object]
 
     # Listing bevel objecs to delete if not used anywhere
     bev_objs_to_del = list()
@@ -106,7 +101,7 @@ def convert_curve_to_mesh(context, mode='NOMERGE'):
 
     # convert curve to mesh
     bpy.ops.object.convert(target='MESH')
-
+    
     bpy.ops.object.select_all(action='DESELECT')
     for o in bev_objs_to_del:
         # bring to active layer
@@ -120,7 +115,7 @@ def convert_curve_to_mesh(context, mode='NOMERGE'):
 
     # Remove vertex duplication
     for o in selected_objs:
-        # print(o)
+        #print(o)
         scene.objects.active = o
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.mesh.select_all(action='SELECT')
@@ -136,19 +131,17 @@ def convert_curve_to_mesh(context, mode='NOMERGE'):
     # Smooth shade object
     bpy.ops.object.shade_smooth()
 
-
 def check_bevel_used_by_other_objects(scene, curve_obj):
 
     bevel_used = False
 
     for o in scene.objects:
         if (o.type == 'CURVE' and
-                o != curve_obj and
-                o.data.bevel_object == curve_obj.data.bevel_object):
+            o != curve_obj and
+            o.data.bevel_object == curve_obj.data.bevel_object):
             bevel_used = True
 
     return bevel_used
-
 
 def get_point_rotation(scene, curve_obj, index=0, spline_index=0):
 
@@ -178,7 +171,7 @@ def get_point_rotation(scene, curve_obj, index=0, spline_index=0):
     temp_obj.rotation_euler = curve_obj.rotation_euler
 
     # Convert temp curve to mesh
-    bpy.ops.object.select_all(action='DESELECT')  # deselect all first
+    bpy.ops.object.select_all(action='DESELECT') # deselect all first
     scene.objects.active = temp_obj
     temp_obj.select = True
     bpy.ops.object.convert(target='MESH')
@@ -186,21 +179,21 @@ def get_point_rotation(scene, curve_obj, index=0, spline_index=0):
     offset = 0
     micro_offset = 0
 
-    # cyclic check
+    #cyclic check
     for i, spline in enumerate(curve.splines):
         if i > spline_index:
             break
         #ps = get_spline_points(spline)
         if i > 0:
-            ps_count = len(get_spline_points(curve.splines[i - 1]))
-            offset += ps_count - 1
+            ps_count = len(get_spline_points(curve.splines[i-1]))
+            offset += ps_count-1
         if spline.use_cyclic_u:
             offset += 1
         elif i > 0:
             micro_offset += 1
 
     #offset += spline_index * curve.resolution_u
-    # print(offset)
+    #print(offset)
 
     # get x-axis and y-axis of the first handle
     handle_x = temp_obj.data.vertices[curve.resolution_u * (index + offset) * 3 + micro_offset * 3].co
@@ -214,7 +207,7 @@ def get_point_rotation(scene, curve_obj, index=0, spline_index=0):
     # delete temp objects
     temp_bevel_obj.select = True
     bpy.ops.object.delete()
-
+    
     # Match bevel x-axis to handle x-axis
     bevel_x = Vector((1.0, 0.0, 0.0))
     target_x = curve_mat.to_3x3() * target_x
@@ -230,7 +223,6 @@ def get_point_rotation(scene, curve_obj, index=0, spline_index=0):
     curve_obj.select = True
 
     return rot_2 * rot_1
-
 
 def get_proper_index_bevel_placement(curve_obj):
     """ Returns (spline index, point index) """
@@ -259,16 +251,16 @@ def get_proper_index_bevel_placement(curve_obj):
                     # get the biggest radius under 1.0
                     if point.radius > old_radius or old_radius > 1.0:
                         idx = (i, j)
-
-    # print(idx)
+    
+    #print(idx)
     return idx
-'''
+
 class BevelCurveToolPanel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Tools"
+    #bl_context = "objectmode"
     bl_label = "Bevel Curve Tools"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_category = "Curve"
     
     def draw(self, context):
         obj = context.active_object
@@ -280,7 +272,7 @@ class BevelCurveToolPanel(bpy.types.Panel):
             c.operator("curve.add_bevel_to_curve")
             c.operator("curve.edit_bevel_curve")
             c.operator("curve.hide_bevel_objects")
-        if obj and obj.type =='CURVE':
+            #if obj and obj.type =='CURVE':
             c.label(text="Convert:")
             c.operator("curve.convert_beveled_curve_to_meshes")
             c.operator("curve.convert_beveled_curve_to_separated_meshes")
@@ -290,10 +282,8 @@ class BevelCurveToolPanel(bpy.types.Panel):
             if obj.type == 'CURVE':
                 c.label(text="Properties:")
                 c.prop(obj.data, "resolution_u")
-        if context.mode =='EDIT_CURVE':
+        elif context.mode =='EDIT_CURVE':
             c.operator("curve.finish_edit_bevel")
-'''
-
 
 class FinishEditBevel(bpy.types.Operator):
     """Nice Useful Tooltip"""
@@ -308,11 +298,11 @@ class FinishEditBevel(bpy.types.Operator):
 
     def execute(self, context):
         bpy.ops.object.editmode_toggle()
-
+        
         bevel_obj = context.active_object
-
+        
         # Bring back bevel object to layer 19
-        # bpy.ops.curve.hide_bevel_objects()
+        #bpy.ops.curve.hide_bevel_objects()
         bevel_obj.layers[19] = True
         for i in range(19):
             bevel_obj.layers[i] = False
@@ -324,7 +314,6 @@ class FinishEditBevel(bpy.types.Operator):
                 context.scene.objects.active = obj
         return {'FINISHED'}
 
-
 class NewBeveledCurve(bpy.types.Operator):
     """Nice Useful Tooltip"""
     bl_idname = "curve.new_beveled_curve"
@@ -333,81 +322,81 @@ class NewBeveledCurve(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     shape = EnumProperty(
-        name="Shape",
-        description="Use predefined shape of bevel",
-        items=(
-            ('SQUARE', "Square", ""),
-            ('HALFCIRCLE', "Half-Circle", ""),
-            ('CIRCLE', "Circle", ""),
-            ('TRIANGLE', "Triangle", ""),
-        ),
-        default='TRIANGLE',
-    )
+            name = "Shape",
+            description="Use predefined shape of bevel", 
+            items=(
+                ('SQUARE', "Square", ""),
+                ('HALFCIRCLE', "Half-Circle", ""),
+                ('CIRCLE', "Circle", ""),
+                ('TRIANGLE', "Triangle", ""),
+                ), 
+            default='TRIANGLE',
+            )
 
     subsurf = BoolProperty(
-        name="Use SubSurf Modifier",
-        default=False,
-    )
+            name="Use SubSurf Modifier",
+            default=False,
+            )
 
     radius = FloatProperty(
-        name="Size (Curve)",
-        description="Size of the curve",
-        min=0.1, max=10.0,
-        default=1.0,
-        step=0.3,
-        precision=3
-    )
+            name="Size (Curve)",
+            description="Size of the curve",
+            min=0.1, max=10.0,
+            default=1.0,
+            step=0.3,
+            precision=3
+            )
 
     scale_x = FloatProperty(
-        name="Scale X (Bevel Object)",
-        description="X scaling",
-        min=0.1, max=10.0,
-        default=1.0,
-        step=0.3,
-        precision=3
-    )
+            name="Scale X (Bevel Object)",
+            description="X scaling",
+            min=0.1, max=10.0,
+            default=1.0,
+            step=0.3,
+            precision=3
+            )
 
     scale_y = FloatProperty(
-        name="Scale Y (Bevel Object)",
-        description="Y scaling",
-        min=0.1, max=10.0,
-        default=1.0,
-        step=0.3,
-        precision=3
-    )
+            name="Scale Y (Bevel Object)",
+            description="Y scaling",
+            min=0.1, max=10.0,
+            default=1.0,
+            step=0.3,
+            precision=3
+            )
 
     rotation = FloatProperty(
-        name="Rotate",
-        description="Tilt rotation",
-        unit='ROTATION',
-        min=0.0, max=math.pi * 2.0,
-        default=0.0,
-    )
+            name="Rotate",
+            description="Tilt rotation",
+            unit='ROTATION',
+            min=0.0, max=math.pi*2.0,
+            default=0.0,
+            )
 
     falloff = EnumProperty(
-        name="Radius Falloff",
-        description="Falloff of beveled curve",
-        items=(
-            ('DUALTIP', "Dual Tip", ""),
-            ('ONETIP', "One Tip", ""),
-            ('NOTIP', "No Tip", ""),
-        ),
-        default='ONETIP',
-    )
+            name = "Radius Falloff",
+            description="Falloff of beveled curve", 
+            items=(
+                ('DUALTIP', "Dual Tip", ""),
+                ('ONETIP', "One Tip", ""),
+                ('NOTIP', "No Tip", ""),
+                ), 
+            default='ONETIP',
+            )
 
     @classmethod
     def poll(cls, context):
         return context.mode == 'OBJECT'
 
     def execute(self, context):
-        bpy.ops.curve.primitive_bezier_curve_add(radius=self.radius)
+        bpy.ops.curve.primitive_bezier_curve_add(radius = self.radius)
         bpy.ops.curve.add_bevel_to_curve(
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            rotation=self.rotation,
-            shape=self.shape,
-            falloff=self.falloff,
-            subsurf=self.subsurf)
+            scale_x = self.scale_x,
+            scale_y = self.scale_y,
+            rotation = self.rotation,
+            shape = self.shape,
+            falloff = self.falloff,
+            subsurf = self.subsurf)
         return {'FINISHED'}
 
 '''
@@ -434,7 +423,6 @@ class ConvertCurveToMeshWithOptions(bpy.types.Operator):
         return {'FINISHED'}
 '''
 
-
 class ConvertCurveToSeparatedMesh(bpy.types.Operator):
     """Nice Useful Tooltip"""
     bl_idname = "curve.convert_beveled_curve_to_separated_meshes"
@@ -451,7 +439,6 @@ class ConvertCurveToSeparatedMesh(bpy.types.Operator):
     def execute(self, context):
         convert_curve_to_mesh(context, 'SEPARATE')
         return {'FINISHED'}
-
 
 class ConvertCurveToMergedMesh(bpy.types.Operator):
     """Nice Useful Tooltip"""
@@ -470,7 +457,6 @@ class ConvertCurveToMergedMesh(bpy.types.Operator):
         convert_curve_to_mesh(context, 'MERGE')
         return {'FINISHED'}
 
-
 class ConvertCurveToUnionMesh(bpy.types.Operator):
     """Nice Useful Tooltip"""
     bl_idname = "curve.convert_beveled_curve_to_union_mesh"
@@ -485,9 +471,11 @@ class ConvertCurveToUnionMesh(bpy.types.Operator):
         return context.mode == 'OBJECT' and obj and obj.type == 'CURVE' and obj.data.bevel_object
 
     def execute(self, context):
+        if 'boolean' not in dir(bpy.ops):
+            self.report({'ERROR'}, "You need to install Sculpt Tools addon to use this feature.")
+            return {'CANCELLED'}  
         convert_curve_to_mesh(context, 'UNION')
         return {'FINISHED'}
-
 
 class ConvertCurveToMesh(bpy.types.Operator):
     """Nice Useful Tooltip"""
@@ -505,7 +493,6 @@ class ConvertCurveToMesh(bpy.types.Operator):
     def execute(self, context):
         convert_curve_to_mesh(context, 'NOMERGE')
         return {'FINISHED'}
-
 
 class HideBevelObjects(bpy.types.Operator):
     """Nice Useful Tooltip"""
@@ -527,9 +514,9 @@ class HideBevelObjects(bpy.types.Operator):
         for obj in scn.objects:
             if obj.type == 'CURVE' and obj.data.bevel_object and obj.data.bevel_object not in bevel_objs:
                 bevel_objs.append(obj.data.bevel_object)
-            if '_bevel' in obj.name and obj not in bevel_objs:
+            if '_bevel' in obj.name and  obj not in bevel_objs:
                 bevel_objs.append(obj)
-
+        
         for obj in bevel_objs:
             # Change object's layer to only layer 19
             obj.layers[19] = True
@@ -537,9 +524,8 @@ class HideBevelObjects(bpy.types.Operator):
                 obj.layers[i] = False
             # Hide objects
             #obj.hide = True
-
+        
         return {'FINISHED'}
-
 
 class EditBevelCurve(bpy.types.Operator):
     """Nice Useful Tooltip"""
@@ -593,7 +579,6 @@ class EditBevelCurve(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class AddBevelToCurve(bpy.types.Operator):
     """Nice Useful Tooltip"""
     bl_idname = "curve.add_bevel_to_curve"
@@ -602,60 +587,60 @@ class AddBevelToCurve(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     shape = EnumProperty(
-        name="Shape",
-        description="Use predefined shape of bevel",
-        items=(
-            ('SQUARE', "Square", ""),
-            ('HALFCIRCLE', "Half-Circle", ""),
-            ('CIRCLE', "Circle", ""),
-            ('TRIANGLE', "Triangle", ""),
-        ),
-        default='TRIANGLE',
-    )
+            name = "Shape",
+            description="Use predefined shape of bevel", 
+            items=(
+                ('SQUARE', "Square", ""),
+                ('HALFCIRCLE', "Half-Circle", ""),
+                ('CIRCLE', "Circle", ""),
+                ('TRIANGLE', "Triangle", ""),
+                ), 
+            default='TRIANGLE',
+            )
 
     subsurf = BoolProperty(
-        name="Use SubSurf Modifier",
-        default=False,
-    )
+            name="Use SubSurf Modifier",
+            default=False,
+            )
 
     scale_x = FloatProperty(
-        name="Scale X (Bevel Object)",
-        description="X scaling",
-        min=0.1, max=10.0,
-        default=1.0,
-        step=0.3,
-        precision=3
-    )
+            name="Scale X (Bevel Object)",
+            description="X scaling",
+            min=0.1, max=10.0,
+            default=1.0,
+            step=0.3,
+            precision=3
+            )
 
     scale_y = FloatProperty(
-        name="Scale Y (Bevel Object)",
-        description="Y scaling",
-        min=0.1, max=10.0,
-        default=1.0,
-        step=0.3,
-        precision=3
-    )
+            name="Scale Y (Bevel Object)",
+            description="Y scaling",
+            min=0.1, max=10.0,
+            default=1.0,
+            step=0.3,
+            precision=3
+            )
 
     rotation = FloatProperty(
-        name="Rotate",
-        description="Tilt rotation",
-        unit='ROTATION',
-        min=0.0, max=math.pi * 2.0,
-        default=0.0,
-    )
+            name="Rotate",
+            description="Tilt rotation",
+            unit='ROTATION',
+            min=0.0, max=math.pi*2.0,
+            default=0.0,
+            )
 
     falloff = EnumProperty(
-        name="Radius Falloff",
-        description="Falloff of beveled curve",
-        items=(
-            ('DUALTIP', "Dual Tip", ""),
-            ('ONETIP', "One Tip", ""),
-            ('NOTIP', "No Tip", ""),
-        ),
-        default='ONETIP',
-    )
+            name = "Radius Falloff",
+            description="Falloff of beveled curve", 
+            items=(
+                ('DUALTIP', "Dual Tip", ""),
+                ('ONETIP', "One Tip", ""),
+                ('NOTIP', "No Tip", ""),
+                ), 
+            default='ONETIP',
+            )
 
-    # falloff_power = FloatProperty(
+    #falloff_power = FloatProperty(
     #        name="Falloff Power",
     #        description="Power of the falloff",
     #        min=1.0, max=10.0,
@@ -664,7 +649,7 @@ class AddBevelToCurve(bpy.types.Operator):
     #        precision=2
     #        )
 
-    # resolution = IntProperty(
+    #resolution = IntProperty(
     #        name="Resolution U",
     #        description="Resolution between points",
     #        min=1, max=64,
@@ -704,12 +689,12 @@ class AddBevelToCurve(bpy.types.Operator):
 
         if len(points) < 2:
             self.report({'ERROR'}, "Just one point wouldn't do it")
-            return {'CANCELLED'}
-
+            return {'CANCELLED'}  
+        
         if len(points) == 2 and self.falloff == 'DUALTIP':
             bpy.ops.object.mode_set(mode='EDIT')
             bpy.ops.curve.select_all(action='SELECT')
-            bpy.ops.curve.subdivide()  # number_cuts=3)
+            bpy.ops.curve.subdivide() #number_cuts=3)
             bpy.ops.object.editmode_toggle()
             # spline data changes, so it must be retreived again
             splines = curve_obj.data.splines
@@ -736,14 +721,15 @@ class AddBevelToCurve(bpy.types.Operator):
             elif self.falloff == 'NOTIP':
                 radius_falloff(ps, tip='NO')
 
+
         # delete old bevel object if it's already there
         if curve.bevel_object:
 
             # Check if other object using this bevel object
             bevel_used = check_bevel_used_by_other_objects(scn, curve_obj)
-
+            
             if not bevel_used:
-                # delete old bevel object
+                #delete old bevel object
                 bevel_obj = curve.bevel_object
                 bpy.ops.object.select_all(action='DESELECT')
                 bevel_obj.select = True
@@ -756,26 +742,26 @@ class AddBevelToCurve(bpy.types.Operator):
 
         # point coords
         triangle_coords = [
-            (-0.055, 0.0), (-0.06, 0.01),
-            (-0.005, 0.1), (0.005, 0.1),
-            (0.06, 0.01), (0.055, 0.0)]
+                (-0.055, 0.0), (-0.06, 0.01),
+                (-0.005, 0.1), (0.005, 0.1),
+                (0.06, 0.01), (0.055, 0.0)]
 
         halfcircle_coords = [
-            (-0.06, 0.0), (-0.06, 0.01),
-            (-0.045, 0.07), (0.0, 0.1), (0.045, 0.07),
-            (0.06, 0.01), (0.06, 0.0)]
+                (-0.06, 0.0), (-0.06, 0.01),
+                (-0.045, 0.07), (0.0, 0.1), (0.045, 0.07),
+                (0.06, 0.01), (0.06, 0.0)]
 
         circle_coords = [
-            (-0.036, 0.014), (-0.05, 0.05),
-            (-0.036, 0.086), (0.0, 0.1), (0.036, 0.086),
-            (0.05, 0.05), (0.036, 0.014)]
+                (-0.036, 0.014), (-0.05, 0.05),
+                (-0.036, 0.086), (0.0, 0.1), (0.036, 0.086),
+                (0.05, 0.05), (0.036, 0.014)]
 
         square_coords = [
-            (0.0, 0.04), (0.01, 0.05),
-            (0.09, 0.05), (0.1, 0.04),
-            (0.1, 0.0),
-            (0.1, -0.04), (0.09, -0.05),
-            (0.01, -0.05), (0.0, -0.04)]
+                (0.0, 0.04), (0.01, 0.05), 
+                (0.09, 0.05), (0.1, 0.04), 
+                (0.1, 0.0),
+                (0.1, -0.04), (0.09, -0.05), 
+                (0.01, -0.05), (0.0, -0.04)]
 
         if self.shape == 'TRIANGLE':
             coords = triangle_coords
@@ -806,9 +792,9 @@ class AddBevelToCurve(bpy.types.Operator):
         # add bevel to curve
         curve.bevel_object = bevel_obj
         curve.use_fill_caps = True
-
+        
         # Scale the points
-        # for spline in bevel_curve.splines:
+        #for spline in bevel_curve.splines:
         ps = get_spline_points(bevel_curve.splines[0])
         sum_x = 0.0
         sum_y = 0.0
@@ -820,19 +806,19 @@ class AddBevelToCurve(bpy.types.Operator):
         offset_y = sum_y / len(ps)
 
         for p in ps:
-            # offset to center the origins
+            # offset to center the origins 
             p.co.x -= offset_x
             p.co.y -= offset_y
 
             # then scale
             p.co.x *= self.scale_x
             p.co.y *= self.scale_y
-
+            
         if self.falloff == 'DUALTIP':
-            midindex = int((len(points) - 1) / 2)
+            midindex = int((len(points)-1)/2)
             bevel_rotation = get_point_rotation(scn, curve_obj, index=midindex)
             bevel_position = get_point_position(curve_obj, index=midindex)
-        else:
+        else: 
             bevel_rotation = get_point_rotation(scn, curve_obj)
             bevel_position = get_point_position(curve_obj)
 
@@ -853,7 +839,7 @@ class AddBevelToCurve(bpy.types.Operator):
         for m in modifiers:
             if m.type == 'SUBSURF':
                 subsurf_found = True
-
+        
         if self.subsurf == False:
             if subsurf_found == True:
                 for m in modifiers:
@@ -866,13 +852,11 @@ class AddBevelToCurve(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 def register():
-    bpy.utils.register_module(__name__)
-
+	bpy.utils.register_module(__name__)
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
+	bpy.utils.unregister_module(__name__)
 
 if __name__ == "__main__":
     register()

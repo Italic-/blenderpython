@@ -752,7 +752,7 @@ class ObjectPainter(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_context = "objectmode"
-    bl_category = "Object Painter"
+    bl_category = "Create"
 
     def draw(self, context):
         layout = self.layout

@@ -32,7 +32,44 @@ from bpy_extras.io_utils import ExportHelper, ImportHelper
 import json
 from bpy.app.handlers import persistent
 
-
+def hide_base_sprite(obj):
+    if "coa_sprite" in obj:
+        context = bpy.context
+        obj = context.active_object
+        orig_mode = obj.mode
+        bpy.ops.object.mode_set(mode="OBJECT")
+        bpy.ops.object.mode_set(mode="EDIT")
+        me = obj.data
+        bm = bmesh.from_edit_mesh(me)
+        bm.verts.ensure_lookup_table()
+        
+        vertex_idxs = []
+        if "coa_base_sprite" in obj.vertex_groups:
+            v_group_idx = obj.vertex_groups["coa_base_sprite"].index
+            for i,vert in enumerate(obj.data.vertices):
+                for g in vert.groups:
+                    if g.group == v_group_idx:
+                        vertex_idxs.append(i)
+                    
+        for idx in vertex_idxs:
+            vert = bm.verts[idx]
+            vert.hide = True
+            vert.select = False
+            for edge in vert.link_edges:
+                edge.hide = True
+                edge.select = False
+            for face in vert.link_faces:
+                face.hide = obj.coa_hide_base_sprite
+                face.select = False
+                
+        if "coa_base_sprite" in obj.modifiers:
+            mod = obj.modifiers["coa_base_sprite"]
+            mod.show_viewport = obj.coa_hide_base_sprite
+            mod.show_render = obj.coa_hide_base_sprite
+            
+        bmesh.update_edit_mesh(me)               
+        bpy.ops.object.mode_set(mode=orig_mode)                      
+    
 def get_uv_from_vert(uv_layer, v):
     for l in v.link_loops:
         if v.select:
@@ -52,7 +89,7 @@ def update_uv_unwrap(context):
         if uv_vert != None:
             pass
 
-    bmesh.update_edit_mesh(me)        
+    bmesh.update_edit_mesh(me)      
     
 
 
@@ -145,7 +182,7 @@ def check_name(name_array,name):
     else:
         return name
 
-def create_action(context,item=None):
+def create_action(context,item=None,obj=None):
     sprite_object = get_sprite_object(context.active_object)
     
     if len(sprite_object.coa_anim_collections) < 3:
@@ -153,8 +190,11 @@ def create_action(context,item=None):
     
     if item == None:
         item = sprite_object.coa_anim_collections[sprite_object.coa_anim_collections_index]
-    obj = context.active_object
+    if obj == None:
+        obj = context.active_object
+        
     action_name = item.name + "_" + obj.name
+    print(action_name)
     
     if action_name not in bpy.data.actions:
         action = bpy.data.actions.new(action_name)
@@ -171,8 +211,9 @@ def set_action(context,item=None):
     sprite_object = get_sprite_object(context.active_object)
     if item == None:
         item = sprite_object.coa_anim_collections[sprite_object.coa_anim_collections_index]
-
-    for child in get_children(context,sprite_object,ob_list=[]):
+    
+    children = get_children(context,sprite_object,ob_list=[])
+    for child in children:
         if child.animation_data != None:
             child.animation_data.action = None
             
@@ -397,7 +438,7 @@ def set_uv_default_coords(context,obj):
     if len(uv_coords) < len(obj.coa_uv_default_state):
         for i in range(len(obj.coa_uv_default_state) - len(uv_coords)):
             obj.coa_uv_default_state.remove(0)
-    
+
     ### set default uv coords
     frame_size = Vector((1 / obj.coa_tiles_x,1 / obj.coa_tiles_y))
     pos_x = frame_size.x * (obj.coa_sprite_frame % obj.coa_tiles_x)
@@ -406,12 +447,11 @@ def set_uv_default_coords(context,obj):
     offset = Vector((0,1-(1/obj.coa_tiles_y)))
     
     
-    for i,coord in enumerate(uv_coords):
-        
+    for i,coord in enumerate(uv_coords):    
         uv_vec_x = (coord.uv[0] - frame[0]) * obj.coa_tiles_x 
         uv_vec_y = (coord.uv[1] - offset[1] - frame[1]) * obj.coa_tiles_y
         uv_vec = Vector((uv_vec_x,uv_vec_y)) 
-        obj.coa_uv_default_state[i].uv = uv_vec
+        obj.coa_uv_default_state[i].uv = uv_vec   
                         
 def update_uv(context,obj):
     if "coa_sprite" in obj and obj.mode == "OBJECT":        
@@ -439,7 +479,12 @@ def update_verts(context,obj):
         
         mode_prev = obj.mode
         
+        
+        hide = bool(obj.coa_hide_base_sprite)
+        obj.coa_hide_base_sprite = False
         obj.coa_dimensions_old = Vector(obj.dimensions)
+        obj.coa_hide_base_sprite = hide    
+        
         
         spritesheet = obj.material_slots[0].material.texture_slots[0].texture.image
         assign_tex_to_uv(spritesheet,obj.data.uv_textures[0])

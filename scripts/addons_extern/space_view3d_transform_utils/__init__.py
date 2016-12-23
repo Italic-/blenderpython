@@ -111,6 +111,8 @@ For EDIT_ARMATURE mode: implement aggregation of other settings from EditBone?
 * Pick transform? (respecting axis locks)
 * Grase pencil summaries?
 
+see also: https://vimeo.com/user2228784/videos
+
 see also: http://modo.docs.thefoundry.co.uk/modo/601/help/pages/modotoolbox/ActionCenters.html
 
 See Modo's Absolute Scaling
@@ -128,39 +130,38 @@ documentation (Ivan suggests to use his taser model for illustrations)
 (Ivan suggests to post on forum after he makes video tutorial)
 """
 
-
 @addon.Preferences.Include
 class ThisAddonPreferences:
     use_panel_left = True | prop("Show in T-panel", name="T (left panel)")
     use_panel_right = False | prop("Show in N-panel", name="N (right panel)")
     epsilon = 1e-6 | prop("Number equality threshold", name="Epsilon", min=0.0, max=1.0, step=1, precision=8)
-
+    
     gridcolors = batch_transform.GridColorsPG | prop()
     gridstep_small = 5 | prop(min=1, max=100)
     gridstep_big = 1 | prop(min=1, max=100)
-
+    
     workplane_color = Color((0.25, 0.35, 0.5)) | prop(alpha=0.25)
     workplane_lines_color = Color((1, 1, 1)) | prop(alpha=0.5)
     workplane_lines10_color = Color((1, 1, 1)) | prop(alpha=1.0)
     workplane_stipple = 2 | prop(min=1, max=256)
-
+    
     auto_align_objects = True | prop("Automatically switch between World and View alignment of new objects")
-
+    
     project_cursor_3d = False | prop("Project 3D cursor on workplane when aligning view to workplane")
-
+    
     def draw(self, context):
         layout = NestedLayout(self.layout)
-
+        
         with layout.row()(alignment='LEFT'):
             layout.prop(self, "use_panel_left")
             layout.prop(self, "use_panel_right")
-            with layout.row():  # (alignment='EXPAND'):
+            with layout.row():#(alignment='EXPAND'):
                 layout.prop(self, "epsilon", text="Tolerance ")
-
+        
         with layout.row()(alignment='LEFT'):
             layout.prop(self, "gridstep_small", text="Grid step (small)")
             layout.prop(self, "gridstep_big", text="Grid step (big)")
-
+        
         with layout.row()(alignment='LEFT'):
             layout.prop(self.gridcolors, "x", text="X")
             layout.prop(self.gridcolors, "y", text="Y")
@@ -168,22 +169,20 @@ class ThisAddonPreferences:
             layout.prop(self.gridcolors, "xy", text="XY")
             layout.prop(self.gridcolors, "xz", text="XZ")
             layout.prop(self.gridcolors, "yz", text="YZ")
-
+        
         with layout.row()(alignment='LEFT'):
             layout.prop(self, "workplane_color", text="Workplane")
             layout.prop(self, "workplane_lines_color", text="Lines")
             layout.prop(self, "workplane_lines10_color", text="Lines-10")
             layout.prop(self, "workplane_stipple", text="Stipple")
-
+        
         with layout.row()(alignment='LEFT'):
             layout.prop(self, "auto_align_objects", text="Auto switch 'Editing\Align To'")
             layout.prop(self, "project_cursor_3d", text="Project 3D cursor on workplane")
 
-
 def register():
     addon.use_zbuffer = True
     addon.register()
-
 
 def unregister():
     addon.unregister()

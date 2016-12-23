@@ -80,7 +80,7 @@ class CutoutAnimationInfo(bpy.types.Panel):
     bl_label = "Cutout Animation Social"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Cutout Animation"
+    bl_category = "Animation"
     
     @classmethod
     def poll(cls, context):
@@ -144,7 +144,7 @@ class CutoutAnimationObjectProperties(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_label = "Object Properties"
-    bl_category = "Cutout Animation"
+    bl_category = "Animation"
     
     @classmethod
     def poll(cls, context):
@@ -227,6 +227,9 @@ class CutoutAnimationObjectProperties(bpy.types.Panel):
             obj = context.active_object
             if obj != None and obj.mode == "WEIGHT_PAINT":
                 bpy.ops.object.mode_set(mode="OBJECT")
+    
+    def hide_base_sprite(self,context):
+        hide_base_sprite(self)            
         
     bpy.types.Object.coa_dimensions_old = FloatVectorProperty()
     bpy.types.Object.coa_sprite_dimension = FloatVectorProperty()
@@ -241,6 +244,7 @@ class CutoutAnimationObjectProperties(bpy.types.Panel):
     bpy.types.Object.coa_show_bones = BoolProperty()
     bpy.types.Object.coa_filter_names = StringProperty()
     bpy.types.Object.coa_favorite = BoolProperty()
+    bpy.types.Object.coa_hide_base_sprite = BoolProperty(default=True,update=hide_base_sprite)
     bpy.types.Object.coa_animation_loop = BoolProperty(default=False,description="Sets the Timeline frame to 0 when it reaches the end of the animation. Also works for changing frame with cursor keys.")
     bpy.types.Bone.coa_favorite = BoolProperty()
     bpy.types.Object.coa_edit_weights = BoolProperty(default=False,update=exit_edit_weights)
@@ -287,7 +291,7 @@ class CutoutAnimationObjectProperties(bpy.types.Panel):
                     row.label(text="", icon="BONE_DATA")
                     row.separator()
                     row.prop(context.active_bone,'name',text="")
-                    if context.active_object.mode != "EDIT":
+                    if context.active_object.mode != "EDIT" and get_addon_prefs(context).json_export:
                         box = layout.box()
                         row = box.row(align=True)
                         if sprite_object.coa_show_export_box:
@@ -301,6 +305,11 @@ class CutoutAnimationObjectProperties(bpy.types.Panel):
             if obj != None and obj.type == "MESH" and obj.mode == "OBJECT":
                 row = layout.row(align=True)
                 row.label(text="Sprite Properties:")
+                
+            if obj != None and obj.type == "MESH" and "coa_sprite" in obj and "coa_base_sprite" in obj.modifiers:
+                row = layout.row(align=True)
+                row.prop(obj,'coa_hide_base_sprite',text="Hide Base Sprite")
+            
             if obj != None and obj.type == "MESH" and obj.mode == "OBJECT":
                 
                 row = layout.row(align=True)
@@ -327,6 +336,9 @@ class CutoutAnimationObjectProperties(bpy.types.Panel):
                 #row.template_icon_view(obj, "coa_sprite_frame_previews")
             
             if obj != None and obj.type == "MESH" and obj.mode == "OBJECT":
+                
+                    
+                
                 row = layout.row(align=True)
                 row.prop(obj,'coa_z_value',text="Z Depth")
                 op = row.operator("my_operator.add_keyframe",text="",icon="SPACE2")
@@ -363,7 +375,7 @@ class CutoutAnimationTools(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_label = "Cutout Animation Tools"
-    bl_category = "Cutout Animation"
+    bl_category = "Animation"
     
     def snapping(self,context):
         if bpy.context.scene.coa_surface_snap:
@@ -414,6 +426,9 @@ class CutoutAnimationTools(bpy.types.Panel):
             row = layout.row(align=True)
             op = row.operator("wm.coa_create_ortho_cam",text="Reset Camera Resolution",icon="OUTLINER_DATA_CAMERA")
             op.create = False
+            
+            row = layout.row(align=True)
+            row.operator("coa_tools.align_camera",text="Align 2D Camera",icon="ALIGN")
         
         if context.active_object == None or (context.active_object != None and context.active_object.mode not in ["EDIT","WEIGHT_PAINT"]):
             row = layout.row(align=True)
@@ -513,6 +528,7 @@ class CutoutAnimationTools(bpy.types.Panel):
                 row2.prop(scene,"coa_lock_to_bounds",text="Draw only within Bounds",icon="LOCKVIEW_ON")
             else:
                 row2.prop(scene,"coa_lock_to_bounds",text="Draw everywhere",icon="LOCKVIEW_OFF")
+                
 
 ### Custom template_list look
 class UIListAnimationCollections(bpy.types.UIList):
@@ -645,7 +661,7 @@ class CutoutAnimationCollections(bpy.types.Panel):
     bl_label = "Cutout Animation Collections"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Cutout Animation"
+    bl_category = "Animation"
     
     
     def set_actions(self,context):
@@ -663,6 +679,18 @@ class CutoutAnimationCollections(bpy.types.Panel):
                 set_z_value(context,obj,obj.coa_z_value)
                 set_modulate_color(obj,context,obj.coa_modulate_color)
         
+        ### set export name
+        if scene.coa_nla_mode == "ACTION":
+            action_name = sprite_object.coa_anim_collections[sprite_object.coa_anim_collections_index].name    
+            if action_name in ["Restpose","NO ACTION"]:
+                action_name = ""
+            else:
+                action_name += "_"
+            path = context.scene.render.filepath.replace("\\","/")
+            dirpath = path[:path.rfind("/")]
+            final_path = dirpath + "/" + action_name
+            context.scene.render.filepath = final_path
+
     
     def set_nla_mode(self,context):
         sprite_object = get_sprite_object(context.active_object)
@@ -739,5 +767,8 @@ class CutoutAnimationCollections(bpy.types.Panel):
                 row = layout.row(align=True)
                 row.prop(sprite_object.coa_anim_collections[sprite_object.coa_anim_collections_index],"frame_end",text="Animation Length")
                 #row.prop(sprite_object.coa_anim_collections[sprite_object.coa_anim_collections_index],"frame_end",text="End")    
+            
+            row = layout.row(align=True)
+            row.operator("coa_tools.batch_render",text="Batch Render",icon="RENDER_ANIMATION")        
 
 preview_collections = {}

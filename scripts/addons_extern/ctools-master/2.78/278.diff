@@ -1,0 +1,121 @@
+--- scripts/modules/bpy/utils/__init__.py
++++ scripts/modules/bpy/utils/__init__.py
+@@ -325,6 +325,33 @@
+             if path not in scripts and _os.path.isdir(path):
+                 scripts.append(path)
+ 
++    def user_paths(name):
++        paths = []
++        dirpath = _os.path.join(resource_path('USER'), 'config')
++        path = _os.path.join(dirpath, name + '.pth')
++        if _os.path.isfile(path):
++            cwd = _os.getcwd()
++            _os.chdir(dirpath)
++            try:
++                with open(path) as f:
++                    for line in f.readlines():
++                        line = line.rstrip('\n')
++                        if line:
++                            if line.startswith('#'):
++                                continue
++                            p = _os.path.abspath(_os.path.expanduser(line))
++                            if _os.path.isdir(p):
++                                if p not in paths:
++                                    paths.append(p)
++            except:
++                pass
++            _os.chdir(cwd)
++        return paths
++
++    for p in user_paths('scripts'):
++        if p not in scripts:
++            scripts.append(p)
++
+     if subdir is None:
+         return scripts
+ 
+@@ -334,6 +361,10 @@
+         if _os.path.isdir(path_subdir):
+             scripts_subdir.append(path_subdir)
+ 
++    for p in user_paths(subdir):
++        if p not in scripts_subdir:
++            scripts_subdir.append(p)
++
+     return scripts_subdir
+ 
+
+--- scripts/modules/addon_utils.py
++++ scripts/modules/addon_utils.py
+@@ -29,6 +29,7 @@
+ )
+
+ import bpy as _bpy
++from _addon_register_info import AddonRegisterInfo
+ _user_preferences = _bpy.context.user_preferences
+
+ error_duplicates = False
+@@ -346,6 +347,7 @@
+
+         # 3) try run the modules register function
+         try:
++            AddonRegisterInfo.wrap_module(mod)
+             mod.register()
+         except Exception as ex:
+             print("Exception in module register(): %r" %
+@@ -434,6 +436,7 @@
+                 mod = sys.modules.get(mod_name)
+                 if mod:
+                     importlib.reload(mod)
++                    AddonRegisterInfo.wrap_module(mod)
+
+             if is_enabled == is_loaded:
+                 pass
+--- scripts/startup/bl_ui/space_userpref.py
++++ scripts/startup/bl_ui/space_userpref.py
+@@ -1284,6 +1284,7 @@
+ 
+     def draw(self, context):
+         import os
++        import re
+         import addon_utils
+ 
+         layout = self.layout
+@@ -1324,7 +1325,7 @@
+                             )
+ 
+         filter = context.window_manager.addon_filter
+-        search = context.window_manager.addon_search.lower()
++        search = context.window_manager.addon_search
+         support = context.window_manager.addon_support
+ 
+         # initialized on demand
+@@ -1346,11 +1347,24 @@
+                 (filter == "User" and (mod.__file__.startswith((scripts_addons_folder, userpref_addons_folder))))
+                 ):
+ 
+-                if search and search not in info["name"].lower():
+-                    if info["author"]:
+-                        if search not in info["author"].lower():
++                if search:
++                    match = True
++                    for word in search.split(' '):
++                        if not word:
+                             continue
+-                    else:
++                        if word.startswith(os.path.sep):
++                            if not re.search(word, mod.__file__):
++                                match = False
++                                break
++                        elif word.lower() in info["name"].lower():
++                            pass
++                        elif (info["author"] and
++                              word.lower() in info["author"].lower()):
++                            pass
++                        else:
++                            match = False
++                            break
++                    if not match:
+                         continue
+ 
+                 # Addon UI Code

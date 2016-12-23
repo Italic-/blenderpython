@@ -116,6 +116,7 @@ class MI_Linear_Deformer(bpy.types.Operator):
             self.report({'WARNING'}, "View3D not found, cannot run operator")
             return {'CANCELLED'}
 
+
     def modal(self, context, event):
         context.area.tag_redraw()
 
@@ -218,7 +219,7 @@ class MI_Linear_Deformer(bpy.types.Operator):
                     if self.tool_mode in {'BEND_SPIRAL', 'BEND_ALL'}:
                         self.bend_scale_len = (Vector(m_coords) - start_2d).length
 
-                # return {'RUNNING_MODAL'}
+                #return {'RUNNING_MODAL'}
 
             elif event.type in {'Z', 'X'} and self.lw_tool:
                 if event.type == 'Z' and event.ctrl:
@@ -237,7 +238,7 @@ class MI_Linear_Deformer(bpy.types.Operator):
                             elif self.lw_tool_axis == 'X_Left':
                                 l_widget.setup_lw_tool(rv3d, self.lw_tool, active_obj, pre_verts, 'X_Right', 1.0)
 
-                                # revert direction
+                                ## revert direction
                                 #stp = self.lw_tool.start_point.position.copy()
                                 #self.lw_tool.start_point.position = self.lw_tool.end_point.position
                                 #self.lw_tool.end_point.position = stp
@@ -260,7 +261,7 @@ class MI_Linear_Deformer(bpy.types.Operator):
                             elif self.lw_tool_axis == 'Z_Top':
                                 l_widget.setup_lw_tool(rv3d, self.lw_tool, active_obj, pre_verts, 'Z_Bottom', 1.0)
 
-                                # revert direction
+                                ## revert direction
                                 #stp = self.lw_tool.start_point.position.copy()
                                 #self.lw_tool.start_point.position = self.lw_tool.end_point.position
                                 #self.lw_tool.end_point.position = stp
@@ -280,6 +281,7 @@ class MI_Linear_Deformer(bpy.types.Operator):
                 start_copy = self.lw_tool.start_point.position.copy()
                 self.lw_tool.start_point.position = self.lw_tool.end_point.position
                 self.lw_tool.end_point.position = start_copy
+                
 
         # TOOL WORK!
         if self.tool_mode == 'MOVE_POINT':
@@ -332,12 +334,12 @@ class MI_Linear_Deformer(bpy.types.Operator):
                                 scale_vec = (tool_end - tool_orig)
                             else:
                                 # TAPE
-                                scale_vec = vert_data[2] - (tool_orig + (tool_dir * vert_data[1] * (tool_vec).length))
+                                scale_vec = vert_data[2] - ( tool_orig + (tool_dir * vert_data[1] * (tool_vec).length) )
                                 scale_value = min(1.0, vert_data[1])
 
-                            bm.verts[vert_data[0]].co = vert_data[2] + (scale_vec * (scale_value * apply_value))
+                            bm.verts[vert_data[0]].co = vert_data[2] + ( scale_vec * (scale_value * apply_value))
 
-                        # bm.normal_update()
+                        #bm.normal_update()
                         bmesh.update_edit_mesh(active_obj.data)
 
             self.do_update = False
@@ -366,7 +368,7 @@ class MI_Linear_Deformer(bpy.types.Operator):
                     move_value = vert_data[1]
                     bm.verts[vert_data[0]].co = vert_data[2] + (move_vec * move_value)
 
-                # bm.normal_update()
+                #bm.normal_update()
                 bmesh.update_edit_mesh(active_obj.data)
                 self.do_update = False
 
@@ -395,7 +397,7 @@ class MI_Linear_Deformer(bpy.types.Operator):
                 if rot_angle != 0.0:
                     # check for left or right direction to rotate
                     vec_check_1 = Vector((new_vec_dir[0], new_vec_dir[1], 0))
-                    vec_check_2 = Vector((new_vec_dir[0] - self.deform_vec_pos[0], new_vec_dir[1] - self.deform_vec_pos[1], 0))
+                    vec_check_2 = Vector((new_vec_dir[0]-self.deform_vec_pos[0], new_vec_dir[1]-self.deform_vec_pos[1], 0))
                     checker_side_dir = vec_check_1.cross(vec_check_2).normalized()[2]
                     if checker_side_dir > 0.0:
                         rot_angle = -rot_angle
@@ -415,25 +417,25 @@ class MI_Linear_Deformer(bpy.types.Operator):
                     spiral_value = 0.0  # only for BEND_SPIRAL
                     bend_scale_value = 1.0  # only for BEND_ALL
 
-                    if self.tool_mode == 'BEND_ALL' or self.tool_mode == 'BEND_SPIRAL':
+                    if self.tool_mode == 'BEND_ALL' or self.tool_mode ==  'BEND_SPIRAL':
                         bend_side_dir = (((end_3d - start_3d).normalized()).cross(rot_dir)).normalized()
                         faloff_len = end_3d - start_3d
 
                         if self.tool_mode == 'BEND_SPIRAL':
                             val_scale = None
                             if rot_angle > 0.0:
-                                val_scale = (1.0 - ((m_coords - start_2d).length / self.bend_scale_len))
+                                val_scale = ( 1.0 - ( (m_coords - start_2d).length / self.bend_scale_len) )
                             else:
-                                val_scale = (((m_coords - start_2d).length / self.bend_scale_len))
+                                val_scale = (  ( (m_coords - start_2d).length / self.bend_scale_len) )
 
-                            spiral_value = 1.0 - (faloff_len.length * val_scale)
+                            spiral_value = 1.0 - ( faloff_len.length * val_scale )
 
                         else:
-                            val_scale = (((m_coords - start_2d).length / self.bend_scale_len))
-                            bend_scale_value = ((val_scale))
+                            val_scale = ( ( (m_coords - start_2d).length / self.bend_scale_len) )
+                            bend_scale_value = (( val_scale) )
 
                     do_bend = False
-                    if self.tool_mode == 'BEND_ALL' or self.tool_mode == 'BEND_SPIRAL':
+                    if self.tool_mode == 'BEND_ALL' or self.tool_mode ==  'BEND_SPIRAL':
                         do_bend = True
 
                     for vert_data in self.apply_tool_verts:
@@ -446,11 +448,11 @@ class MI_Linear_Deformer(bpy.types.Operator):
                             vert = bm.verts[vert_data[0]]
 
                             if do_bend:
-                                vert_temp = (active_obj.matrix_world * vert_data[2]) - ((faloff_len) * apply_value)
+                                vert_temp =  (active_obj.matrix_world * vert_data[2]) - ((faloff_len) * apply_value)
 
                                 back_offset = (((faloff_len).length / (final_apply_value)) + spiral_value) * (apply_value * bend_scale_value)
                                 vert_temp += bend_side_dir * back_offset
-                                vert.co = vert_temp
+                                vert.co =  vert_temp
                             else:
                                 # set original position
                                 vert.co[0] = vert_data[2][0]
@@ -459,16 +461,16 @@ class MI_Linear_Deformer(bpy.types.Operator):
 
                             # ROTATE VERTS!
                             if do_bend:
-                                vert.co = rot_mat * ((vert.co) - start_pos) + start_pos
+                                vert.co = rot_mat * ( (vert.co) - start_pos) + start_pos
                                 back_offset = ((faloff_len).length / (final_apply_value)) * (apply_value * bend_scale_value)
-                                vert.co = active_obj.matrix_world.inverted() * (vert.co - (bend_side_dir * back_offset))
+                                vert.co = active_obj.matrix_world.inverted() * ( vert.co - (bend_side_dir * back_offset))
                             else:
-                                vert.co = active_obj.matrix_world.inverted() * (rot_mat * ((active_obj.matrix_world * vert.co) - start_pos) + start_pos)
+                                vert.co = active_obj.matrix_world.inverted() * (rot_mat * ( (active_obj.matrix_world * vert.co) - start_pos) + start_pos)
 
                     self.deform_vec_pos = new_vec_dir
                     self.deform_mouse_pos = rot_angle  # set new angle rotation for next step
 
-                    # bm.normal_update()
+                    #bm.normal_update()
                     bmesh.update_edit_mesh(active_obj.data)
                 self.do_update = False
 
@@ -520,7 +522,7 @@ def reset_params(self):
 def add_history(verts, h_undo):
     history = []
     for vert in verts:
-        history.append((vert.index, vert.co.copy()))
+        history.append( (vert.index, vert.co.copy()) )
 
     h_undo.append(history)
 

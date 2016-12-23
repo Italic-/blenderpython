@@ -17,14 +17,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# TODO
-# transfer vgroups without deleting existing ones
-# draw all edges
-# copy modifiers
-# copy constraints
-# copy bone constraints
-# apply LocRotScale after rigifying
-# hard surface weights
 
 import bpy
 import bmesh
@@ -45,28 +37,25 @@ def isShapeKeyType(obj):
     else:
         return False
 
-
 def isMaterialType(obj):
     if ((obj.type == 'MESH') or
-            (obj.type == 'CURVE') or
-            (obj.type == 'SURFACE') or
-            (obj.type == 'FONT') or
-            (obj.type == 'META')):
+        (obj.type == 'CURVE') or
+        (obj.type == 'SURFACE') or
+        (obj.type == 'FONT') or
+        (obj.type == 'META')):
         return True
     else:
         return False
-
 
 def isModifierType(obj):
     if ((obj.type == 'MESH') or
-            (obj.type == 'CURVE') or
-            (obj.type == 'SURFACE') or
-            (obj.type == 'FONT') or
-            (obj.type == 'LATTICE')):
+        (obj.type == 'CURVE') or
+        (obj.type == 'SURFACE') or
+        (obj.type == 'FONT') or
+        (obj.type == 'LATTICE')):
         return True
     else:
         return False
-
 
 def toonify(mat):
     mat.diffuse_shader = 'TOON'
@@ -77,14 +66,12 @@ def toonify(mat):
     mat.specular_toon_size = 0.1
     mat.specular_toon_smooth = 0.03
 
-
 def copyAllShapeKeys(sourceObject, targetObject):
     shapeKeyIndex = 1
     totalShapeKeyCount = len(sourceObject.data.shape_keys.key_blocks.items())
     while (shapeKeyIndex < totalShapeKeyCount):
         copyShapeKey(shapeKeyIndex, sourceObject, targetObject)
         shapeKeyIndex = shapeKeyIndex + 1
-
 
 def copyShapeKey(shapeKeyIndex, sourceObject, targetObject):
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -93,9 +80,8 @@ def copyShapeKey(shapeKeyIndex, sourceObject, targetObject):
     bpy.context.scene.objects.active = targetObject
     bpy.ops.object.shape_key_transfer()
 
-
 def updateShrinkwrap(context, obj):
-    # safety checks
+    #safety checks
     if (len(obj.modifiers) == 0):
         return 'CANCELLED'
 
@@ -104,7 +90,7 @@ def updateShrinkwrap(context, obj):
     renderShrinkwraps = []
     disabledShrinkwraps = []
     for mod in obj.modifiers:
-        # list all shrinkwrap modifiers
+        #list all shrinkwrap modifiers
         if (mod.type == 'SHRINKWRAP'):
             if (mod.show_viewport):
                 viewShrinkwraps.append(mod)
@@ -112,25 +98,24 @@ def updateShrinkwrap(context, obj):
                 renderShrinkwraps.append(mod)
             else:
                 disabledShrinkwraps.append(mod)
-    # safety check
+    #safety check
     if (len(viewShrinkwraps) + len(renderShrinkwraps) + len(disabledShrinkwraps) == 0):
         return 'CANCELLED'
-    # choose
+    #choose
     if (len(viewShrinkwraps) > 0):
         modifier = viewShrinkwraps[0]
     elif (len(renderShrinkwraps) > 0):
         modifier = viewShrinkwraps[0]
     elif (len(disabledShrinkwraps) > 0):
         modifier = viewShrinkwraps[0]
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.modifier_copy(modifier=modifier.name)
-    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=modifier.name)
-    bpy.ops.object.mode_set(mode=modeBackup)
+    bpy.ops.object.mode_set(mode = 'OBJECT')
+    bpy.ops.object.modifier_copy(modifier = modifier.name)
+    bpy.ops.object.modifier_apply(apply_as = 'DATA', modifier = modifier.name)
+    bpy.ops.object.mode_set(mode = modeBackup)
     return 'FINISHED'
 
-
 def bindMesh(context, activeObj, selectedObj, file):
-    # security data
+    #security data
     context.scene.objects.active = selectedObj
     bpy.ops.object.mode_set(mode='EDIT')
     bm = bmesh.from_edit_mesh(bpy.data.meshes[selectedObj.data.name])
@@ -149,32 +134,31 @@ def bindMesh(context, activeObj, selectedObj, file):
     file.write(vCount + " " + eCount + " " + fCount + "\n")
 
     context.scene.objects.active = selectedObj
-    for vert in activeObj.data.vertices:
-        location, normal, faceIndex = selectedObj.closest_point_on_mesh(vert.co)
-        bpy.ops.object.mode_set(mode='EDIT')
-        bm = bmesh.from_edit_mesh(bpy.data.meshes[selectedObj.data.name])
-        vertList = []
-        bm.faces.ensure_lookup_table()
-        for v in bm.faces[faceIndex].verts:
-            vertList.append(v.index)
-        #center = bm.faces[index].calc_center_bounds()
-        center = selectedObj.matrix_world * bm.faces[faceIndex].calc_center_median()
-        # print(str(center))
-        bpy.ops.object.mode_set(mode='OBJECT')
-        delta = (activeObj.matrix_world * vert.co) - center
+    for vert in activeObj.data.vertices :
+            location, normal, faceIndex = selectedObj.closest_point_on_mesh(vert.co)
+            bpy.ops.object.mode_set(mode='EDIT')
+            bm = bmesh.from_edit_mesh(bpy.data.meshes[selectedObj.data.name])
+            vertList = []
+            bm.faces.ensure_lookup_table()
+            for v in bm.faces[faceIndex].verts:
+                vertList.append(v.index)
+            #center = bm.faces[index].calc_center_bounds()
+            center = selectedObj.matrix_world * bm.faces[faceIndex].calc_center_median()
+            #print(str(center))
+            bpy.ops.object.mode_set(mode='OBJECT')
+            delta = (activeObj.matrix_world * vert.co) - center
 
-        output = ""
-        for v in vertList:
-            output = output + str(v) + " "
-        output = str(vert.index) + " " + str(delta.x) + " " + str(delta.y) + " " + str(delta.z) + " " + output + "\n"
-        file.write(output)
+            output = ""
+            for v in vertList:
+                output = output + str(v) + " "
+            output = str(vert.index) + " " + str(delta.x) + " " + str(delta.y) + " " + str(delta.z) + " " + output + "\n"
+            file.write(output)
     file.close()
-
 
 def updateBoundMesh(context, activeObj, selectedObj, filepath):
     f = open(filepath, 'r', encoding="utf-8")
-    f.seek(0, 0)  # set cursor to beginning of file
-    # check if this file is compatible with the selected models
+    f.seek(0, 0) #set cursor to beginning of file
+    #check if this file is compatible with the selected models
     line = f.readline()
     data = line.split()
     context.scene.objects.active = selectedObj
@@ -199,22 +183,22 @@ def updateBoundMesh(context, activeObj, selectedObj, filepath):
     if ((vCount != int(data[0])) or (eCount != int(data[1])) or (fCount != int(data[2]))):
         raise RuntimeError("Active object data doesn't match the data in the .txt file")
         #self.report({'ERROR'}, "Active object data doesn't match the data in the .txt file")
-    # duplicate activeObj
+    #duplicate activeObj
     selectedObj.select = False
     bpy.ops.object.duplicate()
     dupliObj = context.active_object
-    # bpy.ops.object.shape_key_remove(all=True)
+    #bpy.ops.object.shape_key_remove(all=True)
     selectedObj.select = True
     context.scene.objects.active = selectedObj
     bpy.ops.object.mode_set(mode='EDIT')
     bm = bmesh.from_edit_mesh(selectedObj.data)
-    delta = dupliObj.location  # just to initialize as Vector3
+    delta = dupliObj.location #just to initialize as Vector3
     vertCount = len(dupliObj.data.vertices)
-    for i in range(0, vertCount):
+    for i in range(0, vertCount) :
         line = f.readline()
         data = line.split()
         vertCount = len(data) - 4
-        # data[0] is just there for human readability. it's useless here.
+        #data[0] is just there for human readability. it's useless here.
         delta.x = float(data[1])
         delta.y = float(data[2])
         delta.z = float(data[3])
@@ -222,7 +206,7 @@ def updateBoundMesh(context, activeObj, selectedObj, filepath):
         bm.verts.ensure_lookup_table()
         for v in range(4, len(data)):
             vertList.append(bm.verts[int(data[v])])
-        face = bm.faces.get(vertList)  # Returns None if no face found
+        face = bm.faces.get(vertList) #Returns None if no face found
         if (face == None):
             raise RuntimeError("Faces in Active and Reference meshes do not match")
         center = selectedObj.matrix_world * face.calc_center_median()
@@ -259,13 +243,13 @@ def hardenWeights(obj, vgroupName, spread_vgroups):
     for i in range(0, vertCount):
         if (bm.verts[i].select == True):
             hardList.append(i)
-    bpy.ops.mesh.hide(unselected=True)
+    bpy.ops.mesh.hide(unselected = True)
     bpy.ops.mesh.select_all(action='DESELECT')
     for i in range(0, vertCount):
         vert = bm.verts[i]
         if ((vert.index in hardList) and (vert.index not in vertCheckList)):
             vert.select = True
-            bpy.ops.mesh.select_linked(limit=False)
+            bpy.ops.mesh.select_linked(limit = False)
             connectedVertList = []
             for i in range(0, vertCount):
                 if (bm.verts[i].select == True):
@@ -274,7 +258,7 @@ def hardenWeights(obj, vgroupName, spread_vgroups):
             vgroupList = massFindVgroups(obj, connectedVertList)
             for vgroup in vgroupList:
                 averageWeight = findAverageWeight(obj, vgroup.name, connectedVertList)
-                print("average = " + str(averageWeight))
+                print ("average = " + str(averageWeight))
                 bpy.context.scene.tool_settings.vertex_group_weight = averageWeight
                 if (spread_vgroups == False):
                     bpy.ops.mesh.select_all(action='DESELECT')
@@ -285,13 +269,12 @@ def hardenWeights(obj, vgroupName, spread_vgroups):
                         if (i not in connectedVertList):
                             bm.verts[i].select = False
                 bpy.ops.object.vertex_group_assign()
-                # for i in range(0, vertCount):
-                # if (bm.verts[i].select == True):
-                # vertCheckList.append(i)
+                #for i in range(0, vertCount):
+                    #if (bm.verts[i].select == True):
+                        #vertCheckList.append(i)
                 bpy.ops.mesh.reveal()
                 bpy.ops.mesh.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
-
 
 def findAverageWeight(obj, vgroupName, vertList):
     vgroup = obj.vertex_groups[vgroupName]
@@ -307,7 +290,6 @@ def findAverageWeight(obj, vgroupName, vertList):
     averageWeight = sum(weightList) / len(weightList)
     return averageWeight
 
-
 def massFindVgroups(obj, vertList):
     vgroupList = []
     vgroupCount = len(obj.vertex_groups.keys())
@@ -320,7 +302,6 @@ def massFindVgroups(obj, vertList):
                     vgroupList.append(vgroup)
     return vgroupList
 
-
 def findVertices(obj, vgroupName):
     vertList = []
     vgroup = obj.vertex_groups[vgroupName]
@@ -332,7 +313,7 @@ def findVertices(obj, vgroupName):
     bpy.ops.mesh.select_all(action='DESELECT')
     obj.vertex_groups.active_index = vgroup.index
     bpy.ops.object.vertex_group_select()
-    for v in range(0, vertCount):
+    for v in range (0, vertCount):
         if (bm.verts[v].select == True):
             vertList.append(v)
     return vertList
@@ -347,7 +328,6 @@ def findVgroups(obj, vIndex):
             vgroupList.append(vgroup)
     return vgroupList
 
-
 def createVgroup(obj, bm, vgroupName, vertList):
     bpy.ops.mesh.select_all(action='DESELECT')
     bm.verts.ensure_lookup_table()
@@ -358,7 +338,6 @@ def createVgroup(obj, bm, vgroupName, vertList):
     bpy.ops.object.vertex_group_assign()
     bpy.ops.mesh.select_all(action='DESELECT')
 
-
 def delVgroup(obj, vgroupName):
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.scene.objects.active = obj
@@ -366,38 +345,31 @@ def delVgroup(obj, vgroupName):
     bpy.context.active_object.vertex_groups.active_index = vgroupIndex
     bpy.ops.object.vertex_group_remove()
 
-
 def findLayer(obj):
     for i in range(0, 20):
         if obj.layers[i]:
             return i
 
-
 def hideSelect():
     for obj in bpy.context.selected_objects:
         obj.hide_select = True
-
 
 def unhideSelect():
     for obj in bpy.context.scene.objects:
         obj.hide_select = False
 
-
 def hideRender():
     for obj in bpy.context.selected_objects:
         obj.hide_render = True
-
 
 def unhideRender():
     for obj in bpy.context.selected_objects:
         obj.hide_render = False
 
-
 def moveToJunk(obj):
     obj.layers = [False] * 19 + [True]
 
 #------------------------------------------------------------------
-
 
 def isNameExtension(refName, checkName):
     numerals = "0123456789"
@@ -413,20 +385,17 @@ def isNameExtension(refName, checkName):
     #print("It's not a name extension")
     return False
 
-
 def assignMatIndices():
     i = 1
     for j in range(0, len(bpy.data.materials)):
         bpy.data.materials[j].pass_index = i
         i += 1
 
-
 def assignObjIndices(context):
     i = 1
     for obj in context.selected_objects:
         obj.pass_index = i
         i += 1
-
 
 def setupImportedMaterials(context, obj):
     for matslot in obj.material_slots:
@@ -437,13 +406,12 @@ def setupImportedMaterials(context, obj):
             mat.use_transparent_shadows = True
             for texslot in mat.texture_slots:
                 if (texslot is not None):
-                    # spec
+                    #spec
                     if (texslot.use_map_specular):
                         texslot.use_rgb_to_intensity = True
-                    # bump
+                    #bump
                     elif (texslot.use_map_normal):
                         texslot.texture.use_normal_map = True
-
 
 def texturesOff(obj):
     matCount = len(obj.material_slots.keys())
@@ -451,13 +419,11 @@ def texturesOff(obj):
         for matSlot in obj.material_slots:
             matSlot.material.use_textures = [False] * 18
 
-
 def texturesOn(obj):
     matCount = len(obj.material_slots.keys())
     if (matCount > 0):
         for matSlot in obj.material_slots:
             matSlot.material.use_textures = [True] * 18
-
 
 def materialsRemove(obj):
     matCount = len(obj.material_slots.keys())
@@ -467,113 +433,104 @@ def materialsRemove(obj):
         for i in range(0, matCount):
             bpy.ops.object.material_slot_remove()
 
-
 def updateImages():
     return bpy.data.images.keys()
 
 #----------------------------------------------------------------------------
 
-
-def modifiersRealTimeOff(obj, modFilter='ALL', modType='SUBSURF'):
+def modifiersRealTimeOff(obj, modFilter = 'ALL', modType = 'SUBSURF'):
     modList = obj.modifiers
     if (len(modList) > 0):
         bpy.context.scene.objects.active = obj
         for mod in modList:
             if (modFilter == 'ALL'):
                 mod.show_viewport = False
-            else:  # modFilter is 'SPECIFIC'
+            else: #modFilter is 'SPECIFIC'
                 if (mod.type == modType):
                     mod.show_viewport = False
 
-
-def modifiersRealTimeOn(obj, modFilter='ALL', modType='SUBSURF'):
+def modifiersRealTimeOn(obj, modFilter = 'ALL', modType = 'SUBSURF'):
     modList = obj.modifiers
     if (len(modList) > 0):
         bpy.context.scene.objects.active = obj
         for mod in modList:
             if (modFilter == 'ALL'):
                 mod.show_viewport = True
-            else:  # modFilter is 'SPECIFIC'
+            else: #modFilter is 'SPECIFIC'
                 if (mod.type == modType):
                     mod.show_viewport = True
 
-
-def modifiersRenderOff(obj, modFilter='ALL', modType='SUBSURF'):
+def modifiersRenderOff(obj, modFilter = 'ALL', modType = 'SUBSURF'):
     modList = obj.modifiers
     if (len(modList) > 0):
         bpy.context.scene.objects.active = obj
         for mod in modList:
             if (modFilter == 'ALL'):
                 mod.show_render = False
-            else:  # modFilter is 'SPECIFIC'
+            else: #modFilter is 'SPECIFIC'
                 if (mod.type == modType):
                     mod.show_render = False
 
-
-def modifiersRenderOn(obj, modFilter='ALL', modType='SUBSURF'):
+def modifiersRenderOn(obj, modFilter = 'ALL', modType = 'SUBSURF'):
     modList = obj.modifiers
     if (len(modList) > 0):
         bpy.context.scene.objects.active = obj
         for mod in modList:
             if (modFilter == 'ALL'):
                 mod.show_render = True
-            else:  # modFilter is 'SPECIFIC'
+            else: #modFilter is 'SPECIFIC'
                 if (mod.type == modType):
                     mod.show_render = True
 
-
-def modifiersEditModeOff(obj, modFilter='ALL', modType='SUBSURF'):
+def modifiersEditModeOff(obj, modFilter = 'ALL', modType = 'SUBSURF'):
     modList = obj.modifiers
     if (len(modList) > 0):
         bpy.context.scene.objects.active = obj
         for mod in modList:
             if (modFilter == 'ALL'):
                 mod.show_in_edit_mode = False
-            else:  # modFilter is 'SPECIFIC'
+            else: #modFilter is 'SPECIFIC'
                 if (mod.type == modType):
                     mod.show_in_edit_mode = False
 
-
-def modifiersEditModeOn(obj, modFilter='ALL', modType='SUBSURF'):
+def modifiersEditModeOn(obj, modFilter = 'ALL', modType = 'SUBSURF'):
     modList = obj.modifiers
     if (len(modList) > 0):
         bpy.context.scene.objects.active = obj
         for mod in modList:
             if (modFilter == 'ALL'):
                 mod.show_in_edit_mode = True
-            else:  # modFilter is 'SPECIFIC'
+            else: #modFilter is 'SPECIFIC'
                 if (mod.type == modType):
                     mod.show_in_edit_mode = True
 
-
-def modifiersApply(obj, modFilter='ALL', modType='SUBSURF'):
+def modifiersApply(obj, modFilter = 'ALL', modType = 'SUBSURF'):
     modList = obj.modifiers
     if (len(modList) > 0):
-        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode = 'OBJECT')
         bpy.context.scene.objects.active = obj
         i = 0
         while (i < len(modList)):
             if (modFilter == 'ALL'):
-                bpy.ops.object.modifier_apply(apply_as='DATA', modifier=modList[i].name)
+                bpy.ops.object.modifier_apply(apply_as = 'DATA', modifier = modList[i].name)
                 #del modList[i]
-            else:  # modFilter is 'SPECIFIC'
+            else: #modFilter is 'SPECIFIC'
                 if (modList[i].type == modType):
-                    bpy.ops.object.modifier_apply(apply_as='DATA', modifier=modList[i].name)
+                    bpy.ops.object.modifier_apply(apply_as = 'DATA', modifier = modList[i].name)
                 else:
                     i += 1
 
-
-def modifiersRemove(obj, modFilter='ALL', modType='SUBSURF'):
+def modifiersRemove(obj, modFilter = 'ALL', modType = 'SUBSURF'):
     modList = obj.modifiers
     if (len(modList) > 0):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.context.scene.objects.active = obj
         for mod in modList:
             if (modFilter == 'ALL'):
-                bpy.ops.object.modifier_remove(modifier=mod.name)
-            else:  # modFilter is 'SPECIFIC'
+                bpy.ops.object.modifier_remove(modifier = mod.name)
+            else: #modFilter is 'SPECIFIC'
                 if (mod.type == modType):
-                    bpy.ops.object.modifier_remove(modifier=mod.name)
+                    bpy.ops.object.modifier_remove(modifier = mod.name)
 
 
 #--------------------------------------------------------------------------------
@@ -583,12 +540,10 @@ def muteConstraints(obj):
         for con in obj.constraints:
             con.mute = True
 
-
 def unmuteConstraints(obj):
     if (len(obj.constraints) > 0):
         for con in obj.constraints:
             con.mute = False
-
 
 def removeConstraints(obj):
     bpy.context.scene.objects.active = obj
@@ -599,44 +554,44 @@ def removeConstraints(obj):
 #-----------------------------------------------------------------------------------
 
 def startMultiEdit(context):
-    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode = 'OBJECT')
     selectionList = context.selected_objects
     copiesList = []
-    bpy.ops.object.select_all(action='DESELECT')
+    bpy.ops.object.select_all(action = 'DESELECT')
     for obj in selectionList:
         if (obj.type == 'MESH'):
             context.scene.objects.active = obj
             obj.select = True
-            # assign all verts to a vgroup containing object name
-            bpy.ops.object.mode_set(mode='EDIT')
+            #assign all verts to a vgroup containing object name
+            bpy.ops.object.mode_set(mode = 'EDIT')
             bpy.ops.mesh.reveal()
-            bpy.ops.mesh.select_all(action='SELECT')
+            bpy.ops.mesh.select_all(action = 'SELECT')
             bpy.ops.object.vertex_group_add()
             obj.vertex_groups[-1].name = "khalibloo_multiedit_" + obj.name
             bpy.ops.object.vertex_group_assign()
-            bpy.ops.object.mode_set(mode='OBJECT')
-            # store vertex indices as vertex groups
+            bpy.ops.object.mode_set(mode = 'OBJECT')
+            #store vertex indices as vertex groups
             #bpy.ops.object.mode_set(mode = 'EDIT')
             #bpy.ops.mesh.select_all(action = 'DESELECT')
             #bm = bmesh.from_edit_mesh(bpy.data.meshes[obj.data.name])
             #vcount = len(obj.data.vertices)
-            # for i in range(0, vcount):
-            #bm.verts[i].select = True
-            # bpy.ops.object.vertex_group_add()
-            #obj.vertex_groups[-1].name = "khalibloo_multiedit_" + obj.name + "_" + str(i)
-            # bpy.ops.object.vertex_group_assign()
-            #bm.verts[i].select = False
+            #for i in range(0, vcount):
+                #bm.verts[i].select = True
+                #bpy.ops.object.vertex_group_add()
+                #obj.vertex_groups[-1].name = "khalibloo_multiedit_" + obj.name + "_" + str(i)
+                #bpy.ops.object.vertex_group_assign()
+                #bm.verts[i].select = False
             #bpy.ops.object.mode_set(mode = 'OBJECT')
-            # duplicate object
+            #duplicate object
             bpy.ops.object.duplicate()
             copy = context.active_object
             copiesList.append(copy)
-            # hide original
+            #hide original
             obj.select = False
             copy.select = False
-            # label object as original
+            #label object as original
             obj["khalibloo_multiedit"] = "original"
-            # move to junk layer
+            #move to junk layer
             obj["khalibloo_multiedit_original_layers"] = obj.layers
             moveToJunk(obj)
             obj.hide = True
@@ -644,10 +599,9 @@ def startMultiEdit(context):
             selectionList.remove(obj)
     beginMultiEdit(selectionList, copiesList)
 
-
 def beginMultiEdit(selectionList, copiesList):
-    bpy.ops.object.select_all(action='DESELECT')
-    bpy.ops.object.add(type='MESH')
+    bpy.ops.object.select_all(action = 'DESELECT')
+    bpy.ops.object.add(type = 'MESH')
     multiEditObj = bpy.context.active_object
     for copy in copiesList:
         copy.select = True
@@ -661,167 +615,165 @@ def beginMultiEdit(selectionList, copiesList):
     for originalObj in selectionList:
         originalsNameList.append(originalObj.name)
     multiEditObj["khalibloo_multiedit_originalsNameList"] = originalsNameList
-    bpy.ops.object.mode_set(mode='EDIT')
-
+    bpy.ops.object.mode_set(mode = 'EDIT')
 
 def endMultiEdit(multiEditObj):
-    # get a list of the originals
+    #get a list of the originals
     originalsList = multiEditObj["khalibloo_multiedit_originalsNameList"]
     del multiEditObj["khalibloo_multiedit"]
     del multiEditObj["khalibloo_multiedit_originalsNameList"]
     multiEditObj.name = "khalibloo_multiedit_residue"
-    # deselect all objects and select only the multiEditObj, set as active
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.select_all(action='DESELECT')
+    #deselect all objects and select only the multiEditObj, set as active
+    bpy.ops.object.mode_set(mode = 'OBJECT')
+    bpy.ops.object.select_all(action = 'DESELECT')
     bpy.context.scene.objects.active = multiEditObj
     multiEditObj.select = True
-    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.object.mode_set(mode = 'EDIT')
     bm = bmesh.from_edit_mesh(bpy.data.meshes[multiEditObj.data.name])
     bpy.ops.mesh.reveal()
-    bpy.ops.mesh.select_all(action='DESELECT')
-    print("checkpoint 01")
+    bpy.ops.mesh.select_all(action = 'DESELECT')
+    print ("checkpoint 01")
     for originalObjName in originalsList:
-        # select all vgroups starting with khalibloo_multiedit_originalName
+        #select all vgroups starting with khalibloo_multiedit_originalName
         for vgroup in multiEditObj.vertex_groups:
             if vgroup.name.startswith("khalibloo_multiedit_" + originalObjName):
-                bpy.ops.object.vertex_group_set_active(group=vgroup.name)
+                bpy.ops.object.vertex_group_set_active(group = vgroup.name)
                 bpy.ops.object.vertex_group_select()
-        # if selection size > 0
-        # separate selection from the multiEditObj
+        #if selection size > 0
+        #separate selection from the multiEditObj
         vcount = countSelectedVerts(bm)
         if (vcount > 0):
-            bpy.ops.mesh.separate(type='SELECTED')
-            print("checkpoint 02")
-    # if no vertices remain in multiEditObj
-    bpy.ops.object.mode_set(mode='OBJECT')
+            bpy.ops.mesh.separate(type = 'SELECTED')
+            print ("checkpoint 02")
+    #if no vertices remain in multiEditObj
+    bpy.ops.object.mode_set(mode = 'OBJECT')
     print(str(len(multiEditObj.data.vertices)))
     if (len(multiEditObj.data.vertices) == 0):
-        # mark multiEditObj for deletion
+        #mark multiEditObj for deletion
         multiEditObj["khalibloo_multiedit_marked_for_deletion"] = True
     else:
         multiEditObj["khalibloo_multiedit_marked_for_deletion"] = False
-    # get list of separated objects
+    #get list of separated objects
     newObjsList = bpy.context.selected_objects
     newObjsList.remove(multiEditObj)
     for newObj in newObjsList:
         bpy.context.scene.objects.active = newObj
-        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.mode_set(mode = 'EDIT')
         bm = bmesh.from_edit_mesh(bpy.data.meshes[newObj.data.name])
-        bpy.ops.mesh.select_all(action='DESELECT')
+        bpy.ops.mesh.select_all(action = 'DESELECT')
         for vgroup in newObj.vertex_groups:
-            # delete empty khalibloo_multiedit vgroups
-            # bpy.ops.object.mode_set(mode='EDIT')
+            #delete empty khalibloo_multiedit vgroups
+            #bpy.ops.object.mode_set(mode='EDIT')
             if vgroup.name.startswith("khalibloo_multiedit_"):
-                bpy.ops.object.vertex_group_set_active(group=vgroup.name)
+                bpy.ops.object.vertex_group_set_active(group = vgroup.name)
                 bpy.ops.object.vertex_group_select()
                 vcount = countSelectedVerts(bm)
                 if (vcount == 0):
-                    bpy.ops.object.vertex_group_remove(all=False)
+                    bpy.ops.object.vertex_group_remove(all = False)
                 else:
-                    bpy.ops.mesh.select_all(action='DESELECT')
-        bpy.ops.object.mode_set(mode='OBJECT')
+                    bpy.ops.mesh.select_all(action = 'DESELECT')
+        bpy.ops.object.mode_set(mode = 'OBJECT')
         greenlight = False
         for vgroup in newObj.vertex_groups:
-            # retrieve original name from remaining vgroup
+            #retrieve original name from remaining vgroup
             if (vgroup.name.startswith("khalibloo_multiedit_")):
                 originalName = retrieveMultiEditName(vgroup.name)
                 if (originalName is not None and originalName in bpy.data.objects.keys()):
                     originalObj = bpy.data.objects[originalName]
                     greenlight = True
                     break
-        # if greenlight == False, skip this iteration
+        #if greenlight == False, skip this iteration
         if (greenlight == False):
-            # print warning! the original object has been renamed or deleted
+            #print warning! the original object has been renamed or deleted
             continue
         originalObj.hide = False
-        # if originalObj has shape keys
+        #if originalObj has shape keys
         if (originalObj.data.shape_keys is not None):
-            # if we have matching indices, join as shapes
+            #if we have matching indices, join as shapes
             if (compareMeshes(bpy.data.meshes[newObj.data.name], bpy.data.meshes[originalObj.data.name])):
-                bpy.ops.object.mode_set(mode='OBJECT')
-                bpy.ops.object.select_all(action='DESELECT')
+                bpy.ops.object.mode_set(mode = 'OBJECT')
+                bpy.ops.object.select_all(action = 'DESELECT')
                 originalObj.layers = intsToBools(originalObj["khalibloo_multiedit_original_layers"])
                 del originalObj["khalibloo_multiedit_original_layers"]
                 bpy.context.scene.objects.active = originalObj
-                bpy.ops.object.mode_set(mode='EDIT')
-                bpy.ops.mesh.select_all(action='DESELECT')
-                bpy.ops.object.mode_set(mode='OBJECT')
-                bpy.ops.object.shape_key_add(from_mix=False)
+                bpy.ops.object.mode_set(mode = 'EDIT')
+                bpy.ops.mesh.select_all(action = 'DESELECT')
+                bpy.ops.object.mode_set(mode = 'OBJECT')
+                bpy.ops.object.shape_key_add(from_mix = False)
                 originalObj.data.shape_keys.key_blocks[-1].name = "khalibloo_multiedit"
                 bpy.context.scene.objects.active = newObj
-                bpy.ops.object.mode_set(mode='EDIT')
-                bpy.ops.mesh.select_all(action='DESELECT')
-                bpy.ops.object.mode_set(mode='OBJECT')
+                bpy.ops.object.mode_set(mode = 'EDIT')
+                bpy.ops.mesh.select_all(action = 'DESELECT')
+                bpy.ops.object.mode_set(mode = 'OBJECT')
                 for i in range(0, len(originalObj.data.vertices)):
                     bpy.context.scene.objects.active = newObj
-                    bpy.ops.object.mode_set(mode='EDIT')
+                    bpy.ops.object.mode_set(mode = 'EDIT')
                     bm = bmesh.from_edit_mesh(bpy.data.meshes[newObj.data.name])
                     bm.verts.ensure_lookup_table()
                     bm.verts[i].select = True
                     bpy.ops.view3d.snap_cursor_to_selected()
                     bm.verts[i].select = False
-                    bpy.ops.object.mode_set(mode='OBJECT')
+                    bpy.ops.object.mode_set(mode = 'OBJECT')
                     bpy.context.scene.objects.active = originalObj
-                    bpy.ops.object.mode_set(mode='EDIT')
+                    bpy.ops.object.mode_set(mode = 'EDIT')
                     bm = bmesh.from_edit_mesh(bpy.data.meshes[originalObj.data.name])
                     bm.verts.ensure_lookup_table()
                     bm.verts[i].select = True
                     bpy.ops.view3d.snap_selected_to_cursor()
                     bm.verts[i].select = False
-                    bpy.ops.object.mode_set(mode='OBJECT')
-                # delete new object
-                bpy.ops.object.select_all(action='DESELECT')
+                    bpy.ops.object.mode_set(mode = 'OBJECT')
+                #delete new object
+                bpy.ops.object.select_all(action = 'DESELECT')
                 bpy.context.scene.objects.active = newObj
                 newObj.select = True
                 bpy.ops.object.delete()
-        # if originalObj has no shape keys
+        #if originalObj has no shape keys
         else:
-            # if newObj has shape keys, something weird happens here... you gotta fix it
-            # TOFIX
+            #if newObj has shape keys, something weird happens here... you gotta fix it
+            #TOFIX
 
-            # delete all verts from original
+            #delete all verts from original
             originalObj.layers = intsToBools(originalObj["khalibloo_multiedit_original_layers"])
             del originalObj["khalibloo_multiedit_original_layers"]
             bpy.context.scene.objects.active = originalObj
             originalObj.select = True
-            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.object.mode_set(mode = 'EDIT')
             bpy.ops.mesh.reveal()
-            bpy.ops.mesh.select_all(action='SELECT')
-            bpy.ops.mesh.delete(type='VERT')
-            bpy.ops.object.mode_set(mode='OBJECT')
-            # join new with original
-            bpy.ops.object.select_all(action='DESELECT')
+            bpy.ops.mesh.select_all(action = 'SELECT')
+            bpy.ops.mesh.delete(type = 'VERT')
+            bpy.ops.object.mode_set(mode = 'OBJECT')
+            #join new with original
+            bpy.ops.object.select_all(action = 'DESELECT')
             newObj.select = True
             originalObj.select = True
             bpy.context.scene.objects.active = originalObj
             bpy.ops.object.join()
-        # clear khalibloo_multiedit vgroups and custom properties
+        #clear khalibloo_multiedit vgroups and custom properties
         originalObj.select = True
         bpy.context.scene.objects.active = originalObj
         for vgroup in originalObj.vertex_groups:
             if (vgroup.name.startswith("khalibloo_multiedit_")):
-                bpy.ops.object.vertex_group_set_active(group=vgroup.name)
+                bpy.ops.object.vertex_group_set_active(group = vgroup.name)
                 bpy.ops.object.vertex_group_remove()
         del originalObj["khalibloo_multiedit"]
-    # if multiEditObj has been marked for deletion, delete it
+    #if multiEditObj has been marked for deletion, delete it
     if (multiEditObj["khalibloo_multiedit_marked_for_deletion"]):
-        bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.ops.object.select_all(action='DESELECT')
+        bpy.ops.object.mode_set(mode = 'OBJECT')
+        bpy.ops.object.select_all(action = 'DESELECT')
         multiEditObj.select = True
         bpy.context.scene.objects.active = multiEditObj
         bpy.ops.object.delete()
     else:
-        # clear khalibloo_multiedit vgroups and custom properties
-        bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.ops.object.select_all(action='DESELECT')
+        #clear khalibloo_multiedit vgroups and custom properties
+        bpy.ops.object.mode_set(mode = 'OBJECT')
+        bpy.ops.object.select_all(action = 'DESELECT')
         bpy.context.scene.objects.active = multiEditObj
         multiEditObj.select = True
         for vgroup in multiEditObj.vertex_groups:
             if (vgroup.name.startswith("khalibloo_multiedit_")):
-                bpy.ops.object.vertex_group_set_active(group=vgroup.name)
+                bpy.ops.object.vertex_group_set_active(group = vgroup.name)
                 bpy.ops.object.vertex_group_remove()
         del multiEditObj["khalibloo_multiedit_marked_for_deletion"]
-
 
 def intsToBools(intsList):
     boolsList = []
@@ -833,15 +785,13 @@ def intsToBools(intsList):
     print(str(boolsList))
     return boolsList
 
-
-def retrieveMultiEditName(name):
+def retrieveMultiEditName (name):
     if name.startswith("khalibloo_multiedit_"):
         name = name[20:]
         #name = name[:name.rfind("_")]
         return name
     else:
         return None
-
 
 def countSelectedVerts(bm):
     vcount = 0
@@ -850,7 +800,6 @@ def countSelectedVerts(bm):
         if (vert.select == True):
             vcount += 1
     return vcount
-
 
 def compareMeshes(mesh1, mesh2):
     bmesh1 = bmesh.new()
@@ -863,7 +812,7 @@ def compareMeshes(mesh1, mesh2):
         return False
     if (len(bmesh1.faces) != len(bmesh2.faces)):
         return False
-    # for each face, if the same verts make up the face
+    #for each face, if the same verts make up the face
     for i in range(0, len(bmesh1.faces)):
         bmesh1faceVertsList = []
         bmesh2faceVertsList = []
@@ -877,7 +826,7 @@ def compareMeshes(mesh1, mesh2):
         bmesh2faceVertsList.sort()
         if (bmesh1faceVertsList != bmesh2faceVertsList):
             return False
-    # for each edge, if the same verts make up the edge
+    #for each edge, if the same verts make up the edge
     for i in range(0, len(bmesh1.edges)):
         bmesh1edgeVertsList = []
         bmesh2edgeVertsList = []
@@ -891,7 +840,7 @@ def compareMeshes(mesh1, mesh2):
         bmesh2edgeVertsList.sort()
         if (bmesh1edgeVertsList != bmesh2edgeVertsList):
             return False
-    # if we make it through all the checks, we have a match!
+    #if we make it through all the checks, we have a match!
     return True
 
 
@@ -916,7 +865,6 @@ class NameObjectData (bpy.types.Operator):
                 pass
         return{'FINISHED'}
 
-
 class CopyAllShapeKeys(bpy.types.Operator):
     """Copies all shape keys of selected object(s) to active object"""
     bl_idname = "object.khalibloo_copy_all_shape_keys"
@@ -935,11 +883,11 @@ class CopyAllShapeKeys(bpy.types.Operator):
             selectionSize = len(selectionList)
             currentObjectIndex = 0
 
-            # to avoid problems with active object not having shape keys initially
+            #to avoid problems with active object not having shape keys initially
             bpy.ops.object.shape_key_add(from_mix=False)
             shapeKeysCount = len(targetObject.data.shape_keys.key_blocks)
 
-            # but if it already had a shape key, delete the one just created
+            #but if it already had a shape key, delete the one just created
             if (shapeKeysCount > 1):
                 bpy.ops.object.shape_key_remove()
 
@@ -1014,6 +962,8 @@ class RigifyNeckFix(bpy.types.Operator):
     def poll(cls, context):
         return ((context.active_object is not None) and (context.active_object.type == 'ARMATURE'))
 
+
+
     def execute(self, context):
         rig = bpy.context.active_object
         neck = rig.pose.bones["neck"].custom_shape
@@ -1037,7 +987,6 @@ class RigifyNeckFix(bpy.types.Operator):
 
         return{'FINISHED'}
 
-
 class ModifiersRealTimeOn(bpy.types.Operator):
     """Turn on real time display of modifiers of the selected objects"""
     bl_idname = "object.khalibloo_modifiers_realtime_on"
@@ -1046,6 +995,7 @@ class ModifiersRealTimeOn(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1058,7 +1008,6 @@ class ModifiersRealTimeOn(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ModifiersRealTimeOff(bpy.types.Operator):
     """Turn off real time display of modifiers of the selected objects"""
     bl_idname = "object.khalibloo_modifiers_realtime_off"
@@ -1067,6 +1016,7 @@ class ModifiersRealTimeOff(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1079,7 +1029,6 @@ class ModifiersRealTimeOff(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ModifiersRenderOn(bpy.types.Operator):
     """Turn on modifiers of the selected objects during rendering"""
     bl_idname = "object.khalibloo_modifiers_render_on"
@@ -1088,6 +1037,7 @@ class ModifiersRenderOn(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1100,7 +1050,6 @@ class ModifiersRenderOn(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ModifiersRenderOff(bpy.types.Operator):
     """Turn off modifiers of the selected objects during rendering"""
     bl_idname = "object.khalibloo_modifiers_render_off"
@@ -1109,6 +1058,7 @@ class ModifiersRenderOff(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1121,7 +1071,6 @@ class ModifiersRenderOff(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ModifiersEditModeOn(bpy.types.Operator):
     """Turn on edit mode display of modifiers of the selected objects"""
     bl_idname = "object.khalibloo_modifiers_editmode_on"
@@ -1130,6 +1079,7 @@ class ModifiersEditModeOn(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1142,7 +1092,6 @@ class ModifiersEditModeOn(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ModifiersEditModeOff(bpy.types.Operator):
     """Turn off edit mode display of modifiers of the selected objects"""
     bl_idname = "object.khalibloo_modifiers_editmode_off"
@@ -1151,6 +1100,7 @@ class ModifiersEditModeOff(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1163,7 +1113,6 @@ class ModifiersEditModeOff(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ModifiersApply(bpy.types.Operator):
     """Apply all modifiers of the selected objects in order"""
     bl_idname = "object.khalibloo_modifiers_apply"
@@ -1172,6 +1121,7 @@ class ModifiersApply(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1184,7 +1134,6 @@ class ModifiersApply(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ModifiersRemove(bpy.types.Operator):
     """Delete all modifiers of the selected objects"""
     bl_idname = "object.khalibloo_modifiers_remove"
@@ -1193,6 +1142,7 @@ class ModifiersRemove(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1205,7 +1155,6 @@ class ModifiersRemove(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ConstraintsMute(bpy.types.Operator):
     """Mute all constraints of the selected objects"""
     bl_idname = "object.khalibloo_constraints_mute"
@@ -1214,6 +1163,7 @@ class ConstraintsMute(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return (len(context.selected_objects) > 0)
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1224,7 +1174,6 @@ class ConstraintsMute(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ConstraintsUnmute(bpy.types.Operator):
     """Unmute all constraints of the selected objects"""
     bl_idname = "object.khalibloo_constraints_unmute"
@@ -1233,6 +1182,7 @@ class ConstraintsUnmute(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return (len(context.selected_objects) > 0)
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1243,7 +1193,6 @@ class ConstraintsUnmute(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ConstraintsRemove(bpy.types.Operator):
     """Delete all constraints of the selected objects"""
     bl_idname = "object.khalibloo_constraints_remove"
@@ -1252,6 +1201,7 @@ class ConstraintsRemove(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return (len(context.selected_objects) > 0)
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1262,7 +1212,6 @@ class ConstraintsRemove(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class BoneConstraintsMute(bpy.types.Operator):
     """Mute all constraints of the selected bones"""
     bl_idname = "object.khalibloo_bone_constraints_mute"
@@ -1271,14 +1220,14 @@ class BoneConstraintsMute(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((context.mode == 'POSE') and (len(context.selected_pose_bones) > 0))
-        # the 2nd parameter would spit an error if we are not in pose mode
-        # so, it's importaant to check for pose mode before counting selected pose bones
+        #the 2nd parameter would spit an error if we are not in pose mode
+        #so, it's importaant to check for pose mode before counting selected pose bones
+
 
     def execute(self, context):
         for bone in bpy.context.selected_pose_bones:
             muteConstraints(bone)
         return {'FINISHED'}
-
 
 class BoneConstraintsUnmute(bpy.types.Operator):
     """Unmute all constraints of the selected bones"""
@@ -1287,15 +1236,15 @@ class BoneConstraintsUnmute(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return ((context.mode == 'POSE') and (len(context.selected_pose_bones) > 0))
-        # the 2nd parameter would spit an error if we are not in pose mode
-        # so, it's importaant to check for pose mode before counting selected pose bones
+       return ((context.mode == 'POSE') and (len(context.selected_pose_bones) > 0))
+        #the 2nd parameter would spit an error if we are not in pose mode
+        #so, it's importaant to check for pose mode before counting selected pose bones
+
 
     def execute(self, context):
         for bone in bpy.context.selected_pose_bones:
             unmuteConstraints(bone)
         return {'FINISHED'}
-
 
 class BoneConstraintsRemove(bpy.types.Operator):
     """Delete all constraints of the selected bones"""
@@ -1305,14 +1254,14 @@ class BoneConstraintsRemove(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((context.mode == 'POSE') and (len(context.selected_pose_bones) > 0))
-        # the 2nd parameter would spit an error if we are not in pose mode
-        # so, it's importaant to check for pose mode before counting selected pose bones
+        #the 2nd parameter would spit an error if we are not in pose mode
+        #so, it's importaant to check for pose mode before counting selected pose bones
+
 
     def execute(self, context):
         for bone in bpy.context.selected_pose_bones:
             removeConstraints(bone)
         return {'FINISHED'}
-
 
 class MetarigGamerigSetup(bpy.types.Operator):
     """Hookup active metarig to selected rigify rig"""
@@ -1333,10 +1282,10 @@ class MetarigGamerigSetup(bpy.types.Operator):
         prefix = "DEF-"
         if (metarig is not None and metarig.type == 'ARMATURE'):
             bpy.ops.object.mode_set(mode='EDIT')
-            # AUTOMATIC EDITS
+            #AUTOMATIC EDITS
             for bone in metarig.data.edit_bones:
                 bone.name = prefix + bone.name
-            # MANUAL EDITS
+            #MANUAL EDITS
             metarig.data.edit_bones["DEF-upper_arm.L"].name = "DEF-upper_arm.01.L"
             metarig.data.edit_bones["DEF-upper_arm.R"].name = "DEF-upper_arm.01.R"
             metarig.data.edit_bones["DEF-forearm.L"].name = "DEF-forearm.01.L"
@@ -1355,7 +1304,7 @@ class MetarigGamerigSetup(bpy.types.Operator):
             metarig.data.edit_bones["DEF-thigh.R"].name = "DEF-thigh.01.R"
             metarig.data.edit_bones["DEF-shin.L"].name = "DEF-shin.01.L"
             metarig.data.edit_bones["DEF-shin.R"].name = "DEF-shin.01.R"
-            # DELETE JUNK BONES
+            #DELETE JUNK BONES
             bpy.ops.armature.select_all(action='DESELECT')
             metarig.data.edit_bones["DEF-heel.L"].select = True
             metarig.data.edit_bones["DEF-heel.R"].select = True
@@ -1370,14 +1319,13 @@ class MetarigGamerigSetup(bpy.types.Operator):
             metarig.data.edit_bones["DEF-palm.04.L"].select = True
             metarig.data.edit_bones["DEF-palm.04.R"].select = True
             bpy.ops.armature.delete()
-            # CONSTRAINTS
+            #CONSTRAINTS
             bpy.ops.object.mode_set(mode='POSE')
             for bone in metarig.pose.bones:
                 bone.constraints.new(type='COPY_TRANSFORMS')
                 bone.constraints[0].target = rigifyRig
                 bone.constraints[0].subtarget = bone.name
         return {'FINISHED'}
-
 
 class TexturesOff(bpy.types.Operator):
     """Disable all textures of all materials of the selected objects"""
@@ -1388,6 +1336,7 @@ class TexturesOff(bpy.types.Operator):
     def poll(cls, context):
         return (len(context.selected_objects) > 0)
 
+
     def execute(self, context):
         #objBackup = bpy.context.active_object
 
@@ -1396,7 +1345,6 @@ class TexturesOff(bpy.types.Operator):
 
         #bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
-
 
 class TexturesOn(bpy.types.Operator):
     """Enable all textures of all materials of the selected objects"""
@@ -1407,6 +1355,7 @@ class TexturesOn(bpy.types.Operator):
     def poll(cls, context):
         return (len(context.selected_objects) > 0)
 
+
     def execute(self, context):
         #objBackup = bpy.context.active_object
 
@@ -1415,7 +1364,6 @@ class TexturesOn(bpy.types.Operator):
 
         #bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
-
 
 class MaterialsRemove(bpy.types.Operator):
     """Remove all materials from the selected objects"""
@@ -1426,6 +1374,7 @@ class MaterialsRemove(bpy.types.Operator):
     def poll(cls, context):
         return (len(context.selected_objects) > 0)
 
+
     def execute(self, context):
         objBackup = bpy.context.active_object
 
@@ -1434,7 +1383,6 @@ class MaterialsRemove(bpy.types.Operator):
 
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
-
 
 class AssignMatIndices(bpy.types.Operator):
     """Assign unique pass indices to all materials"""
@@ -1445,10 +1393,10 @@ class AssignMatIndices(bpy.types.Operator):
     def poll(cls, context):
         return (len(bpy.data.materials) > 0)
 
+
     def execute(self, context):
         assignMatIndices()
         return {'FINISHED'}
-
 
 class ImportedMaterialsSetup(bpy.types.Operator):
     """Setup materials for imported objects"""
@@ -1465,7 +1413,6 @@ class ImportedMaterialsSetup(bpy.types.Operator):
                 setupImportedMaterials(context, obj)
         return {'FINISHED'}
 
-
 class AssignObjIndices(bpy.types.Operator):
     """Assign unique pass indices to selected objects"""
     bl_idname = "object.khalibloo_assign_obj_indices"
@@ -1475,10 +1422,10 @@ class AssignObjIndices(bpy.types.Operator):
     def poll(cls, context):
         return (len(context.selected_objects) > 0)
 
+
     def execute(self, context):
         assignObjIndices(context)
         return {'FINISHED'}
-
 
 class LocationApply(bpy.types.Operator):
     """Apply location transforms of the selected objects"""
@@ -1488,6 +1435,7 @@ class LocationApply(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1500,7 +1448,6 @@ class LocationApply(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class RotationApply(bpy.types.Operator):
     """Apply rotation transforms of the selected objects"""
     bl_idname = "object.khalibloo_apply_rotation"
@@ -1509,6 +1456,7 @@ class RotationApply(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1521,7 +1469,6 @@ class RotationApply(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class ScaleApply(bpy.types.Operator):
     """Apply scale transforms of the selected objects"""
     bl_idname = "object.khalibloo_apply_scale"
@@ -1530,6 +1477,7 @@ class ScaleApply(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1542,7 +1490,6 @@ class ScaleApply(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class VisualTransformApply(bpy.types.Operator):
     """Apply visual transforms (constraints, etc) of the selected objects"""
     bl_idname = "object.khalibloo_apply_visual_transform"
@@ -1551,6 +1498,7 @@ class VisualTransformApply(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
+
 
     def execute(self, context):
         objBackup = bpy.context.active_object
@@ -1563,7 +1511,6 @@ class VisualTransformApply(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class HideSelect(bpy.types.Operator):
     """Make selected objects unselectable"""
     bl_idname = "object.khalibloo_hide_select"
@@ -1573,10 +1520,10 @@ class HideSelect(bpy.types.Operator):
     def poll(cls, context):
         return (len(context.selected_objects) > 0)
 
+
     def execute(self, context):
         hideSelect()
         return {'FINISHED'}
-
 
 class UnhideSelect(bpy.types.Operator):
     """Make all objects selectable"""
@@ -1587,10 +1534,10 @@ class UnhideSelect(bpy.types.Operator):
     def poll(cls, context):
         return (len(context.scene.objects) > 0)
 
+
     def execute(self, context):
         unhideSelect()
         return {'FINISHED'}
-
 
 class HideRender(bpy.types.Operator):
     """Make selected objects invisible in renders"""
@@ -1601,10 +1548,10 @@ class HideRender(bpy.types.Operator):
     def poll(cls, context):
         return (len(context.selected_objects) > 0)
 
+
     def execute(self, context):
         hideRender()
         return {'FINISHED'}
-
 
 class UnhideRender(bpy.types.Operator):
     """Make selected objects visible in renders"""
@@ -1615,10 +1562,10 @@ class UnhideRender(bpy.types.Operator):
     def poll(cls, context):
         return (len(context.selected_objects) > 0)
 
+
     def execute(self, context):
         unhideRender()
         return {'FINISHED'}
-
 
 class ModifierAdd(bpy.types.Operator):
     """Add the modifier specified above to the selected objects"""
@@ -1629,21 +1576,22 @@ class ModifierAdd(bpy.types.Operator):
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None))
 
+
     def execute(self, context):
         objBackup = bpy.context.active_object
         mod_type = bpy.context.scene.khalibloo_modifier_type
         nonMeshModList = ['MESH_CACHE', 'ARRAY', 'BUILD', 'DECIMATE', 'EDGE_SPLIT', 'MIRROR',
-                          'REMESH', 'SCREW', 'SOLIDIFY', 'SUBSURF', 'TRIANGULATE',
-                          'ARMATURE', 'CAST', 'CURVE', 'HOOK', 'LATTICE', 'MESH_DEFORM',
-                          'SHRINKWRAP', 'SIMPLE_DEFORM', 'SMOOTH', 'WARP', 'WAVE',
-                          'SOFT_BODY']
+                           'REMESH', 'SCREW', 'SOLIDIFY', 'SUBSURF', 'TRIANGULATE',
+                           'ARMATURE', 'CAST', 'CURVE', 'HOOK', 'LATTICE', 'MESH_DEFORM',
+                           'SHRINKWRAP', 'SIMPLE_DEFORM', 'SMOOTH', 'WARP', 'WAVE',
+                           'SOFT_BODY']
 
         for obj in bpy.context.selected_objects:
             if (obj.type == 'MESH'):
                 bpy.context.scene.objects.active = obj
                 bpy.ops.object.modifier_add(type=mod_type)
 
-            # if it's not a mesh, but is still a modifiable object
+            #if it's not a mesh, but is still a modifiable object
             elif (isModifierType(obj)):
                 if (mod_type in nonMeshModList):
                     bpy.context.scene.objects.active = obj
@@ -1671,7 +1619,6 @@ class MultiEditStart(bpy.types.Operator):
             startMultiEdit(context)
         return {'FINISHED'}
 
-
 class MultiEditEnd(bpy.types.Operator):
     """End editing multiple meshes, and separate them"""
     bl_idname = "object.khalibloo_multiedit_end"
@@ -1685,7 +1632,7 @@ class MultiEditEnd(bpy.types.Operator):
         for obj in context.selected_objects:
             greenlight = False
             if (obj.type == 'MESH'):
-                print("mesh")
+                print ("mesh")
                 if (obj["khalibloo_multiedit"] == "multi object" and len(obj["khalibloo_multiedit_originalsNameList"]) > 0):
                     i = len(obj.vertex_groups) - 1
                     print("checkpoint 01")
@@ -1699,12 +1646,11 @@ class MultiEditEnd(bpy.types.Operator):
                                 groups += 1
                                 if (groups > 1):
                                     greenlight = True
-                                    print("Greenlight")
+                                    print ("Greenlight")
                             i -= 1
                         if (greenlight):
                             endMultiEdit(obj)
         return {'FINISHED'}
-
 
 class Toonify(bpy.types.Operator):
     """Toonify active object's active material"""
@@ -1721,7 +1667,6 @@ class Toonify(bpy.types.Operator):
         toonify(mat)
         return {'FINISHED'}
 
-
 class BindMesh(bpy.types.Operator, ExportHelper):
     """Bind mesh"""
     bl_idname = "object.khalibloo_bind_mesh"
@@ -1731,17 +1676,17 @@ class BindMesh(bpy.types.Operator, ExportHelper):
     filename_ext = ".txt"
 
     filter_glob = StringProperty(
-        default="*.txt",
-        options={'HIDDEN'},
-    )
+            default="*.txt",
+            options={'HIDDEN'},
+            )
 
     path_mode = path_reference_mode
     check_extension = True
 
     @classmethod
     def poll(cls, context):
-        if ((context.active_object is not None) and (len(context.selected_objects) == 2)):
-            if ((context.selected_objects[0].type == 'MESH') and (context.selected_objects[1].type == 'MESH')):
+        if ((context.active_object is not None) and (len(context.selected_objects) == 2)) :
+            if ((context.selected_objects[0].type == 'MESH') and (context.selected_objects[1].type == 'MESH')) :
                 return True
         return False
 
@@ -1749,15 +1694,14 @@ class BindMesh(bpy.types.Operator, ExportHelper):
         file = open(self.filepath, 'w')
         bpy.ops.object.mode_set(mode='OBJECT')
         activeObj = context.active_object
-        for obj in context.selected_objects:
-            if obj == activeObj:
+        for obj in context.selected_objects :
+            if obj == activeObj :
                 pass
-            else:
+            else :
                 selectedObj = obj
         bindMesh(context, activeObj, selectedObj, file)
         context.scene.objects.active = activeObj
         return {'FINISHED'}
-
 
 class UpdateBoundMesh(bpy.types.Operator, ImportHelper):
     """Update the position of each vertex in the active mesh to match the offsets of the selected mesh"""
@@ -1768,29 +1712,30 @@ class UpdateBoundMesh(bpy.types.Operator, ImportHelper):
     filename_ext = ".txt"
 
     filter_glob = StringProperty(
-        default="*.txt",
-        options={'HIDDEN'},
-    )
+            default="*.txt",
+            options={'HIDDEN'},
+            )
 
     @classmethod
     def poll(cls, context):
-        if ((context.active_object is not None) and (len(context.selected_objects) == 2)):
-            if ((context.selected_objects[0].type == 'MESH') and (context.selected_objects[1].type == 'MESH')):
+        if ((context.active_object is not None) and (len(context.selected_objects) == 2)) :
+            if ((context.selected_objects[0].type == 'MESH') and (context.selected_objects[1].type == 'MESH')) :
                 return True
         return False
 
     def execute(self, context):
         bpy.ops.object.mode_set(mode='OBJECT')
         activeObj = context.active_object
-        for obj in context.selected_objects:
-            if obj == activeObj:
+        for obj in context.selected_objects :
+            if obj == activeObj :
                 pass
-            else:
+            else :
                 selectedObj = obj
         updateBoundMesh(context, activeObj, selectedObj, self.filepath)
         bpy.ops.object.mode_set(mode='OBJECT')
         context.scene.objects.active = activeObj
         return {'FINISHED'}
+
 
 
 #---------------------------------------------------------------------
@@ -1804,11 +1749,11 @@ class FlattenUVx(bpy.types.Operator):
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None) and (context.active_object.type == 'MESH'))
 
-    def execute(self, context):
-        bpy.ops.transform.resize(value=(0, 1, 1), constraint_axis=(True, False, False),
-                                 constraint_orientation='GLOBAL', proportional='DISABLED')
-        return {'FINISHED'}
 
+    def execute(self, context):
+        bpy.ops.transform.resize(value = (0, 1, 1), constraint_axis = (True, False, False),
+                                 constraint_orientation = 'GLOBAL', proportional = 'DISABLED')
+        return {'FINISHED'}
 
 class FlattenUVy(bpy.types.Operator):
     """Flatten selected UV elements on the Y axis"""
@@ -1819,150 +1764,151 @@ class FlattenUVy(bpy.types.Operator):
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None) and (context.active_object.type == 'MESH'))
 
+
     def execute(self, context):
-        bpy.ops.transform.resize(value=(1, 0, 1), constraint_axis=(False, True, False),
-                                 constraint_orientation='GLOBAL', proportional='DISABLED')
+        bpy.ops.transform.resize(value = (1, 0, 1), constraint_axis = (False, True, False),
+                                 constraint_orientation = 'GLOBAL', proportional = 'DISABLED')
         return {'FINISHED'}
 
 
 def initialize():
-    bpy.types.Scene.khalibloo_genesis_platform_subclass = bpy.props.EnumProperty(items=(
-        ('FIGURE', 'Figure', ''),
-        ('ITEM', 'Item', '')),
-        name=' ',
-        default='FIGURE')
+    bpy.types.Scene.khalibloo_genesis_platform_subclass = bpy.props.EnumProperty(items =(
+                                         ('FIGURE', 'Figure',''),
+                                         ('ITEM', 'Item','')),
+                                name = ' ',
+                                default = 'FIGURE')
 
     bpy.types.Scene.khalibloo_genesis2_platform_subclass = bpy.props.EnumProperty(items=(
-        ('MALE', 'Male', ''),
-        ('FEMALE', 'Female', ''),
-        ('ITEM', 'Item', '')),
-        name=' ',
-        default='MALE')
+                                         ('MALE', 'Male',''),
+                                         ('FEMALE', 'Female',''),
+                                         ('ITEM', 'Item', '')),
+                                name = ' ',
+                                default = 'MALE')
 
     bpy.types.Scene.khalibloo_genesis3_platform_subclass = bpy.props.EnumProperty(items=(
-        ('MALE', 'Male', ''),
-        ('FEMALE', 'Female', ''),
-        ('ITEM', 'Item', '')),
-        name=' ',
-        default='MALE')
+                                         ('MALE', 'Male',''),
+                                         ('FEMALE', 'Female',''),
+                                         ('ITEM', 'Item', '')),
+                                name = ' ',
+                                default = 'MALE')
 
     bpy.types.Scene.khalibloo_platform = bpy.props.EnumProperty(items=(
-        ('GENERAL', 'General', ''),
-        ('DAZ GENESIS', 'DAZ Genesis', ''),
-        ('DAZ GENESIS 2', 'DAZ Genesis 2', ''),
-        ('DAZ GENESIS 3', 'DAZ Genesis 3', '')),
-        name='',
-        description='Choose platform type',
-        default='GENERAL')
+                                         ('GENERAL', 'General', ''),
+                                         ('DAZ GENESIS', 'DAZ Genesis', ''),
+                                         ('DAZ GENESIS 2', 'DAZ Genesis 2', ''),
+                                         ('DAZ GENESIS 3', 'DAZ Genesis 3', '')),
+                                name = 'Platform Type',
+                                description = 'Choose platform type',
+                                default = 'GENERAL')
 
     bpy.types.Scene.khalibloo_general_platform_subclass = bpy.props.EnumProperty(items=(
-        ('OBJECT DATA', 'Object Data', '', 'OBJECT_DATA', 0),
-        ('MESH DATA', 'Mesh Data', '', 'MESH_DATA', 1),
-        ('MATERIALS', 'Materials', '', 'MATERIAL', 2),
-        ('MODIFIERS', 'Modifiers', '', 'MODIFIER', 3),
-        ('ARMATURES', 'Armatures', '', 'ARMATURE_DATA', 4),
-        ('CONSTRAINTS', 'Constraints', '', 'CONSTRAINT', 5),
-        ('CUSTOM_OPS', 'Custom Ops', '', 'ZOOMIN', 6)),
-        name='',
-        description='Type of tools to display',
-        default='OBJECT DATA')
+                                         ('OBJECT DATA', 'Object Data','', 'OBJECT_DATA', 0),
+                                         ('MESH DATA', 'Mesh Data','', 'MESH_DATA', 1),
+                                         ('MATERIALS', 'Materials', '', 'MATERIAL', 2),
+                                         ('MODIFIERS', 'Modifiers', '', 'MODIFIER', 3),
+                                         ('ARMATURES', 'Armatures', '', 'ARMATURE_DATA', 4),
+                                         ('CONSTRAINTS', 'Constraints', '', 'CONSTRAINT', 5),
+                                         ('CUSTOM_OPS', 'Custom Ops', '', 'ZOOMIN', 6)),
+                                name = '',
+                                description = 'Type of tools to display',
+                                default = 'OBJECT DATA')
 
-    bpy.types.Scene.khalibloo_modifier_type = bpy.props.EnumProperty(items=(
-        # Modify
-        ('MESH_CACHE', 'Mesh Cache', '', 'MOD_MESHDEFORM', 0),
-        ('UV_PROJECT', 'UV Project', '', 'MOD_UVPROJECT', 1),
-        ('UV_WARP', 'UV Warp', '', 'MOD_UVPROJECT', 2),
-        ('VERTEX_WEIGHT_EDIT', 'Vertex Weight Edit', '', 'MOD_VERTEX_WEIGHT', 3),
-        ('VERTEX_WEIGHT_MIX', 'Vertex Weight Mix', '', 'MOD_VERTEX_WEIGHT', 4),
-        ('VERTEX_WEIGHT_PROXIMITY', 'Vertex Weight Proximity', '', 'MOD_VERTEX_WEIGHT', 5),
-        # Generate
-        ('ARRAY', 'Array', '', 'MOD_ARRAY', 6),
-        ('BEVEL', 'Bevel', '', 'MOD_BEVEL', 7),
-        ('BOOLEAN', 'Boolean', '', 'MOD_BOOLEAN', 8),
-        ('BUILD', 'Build', '', 'MOD_BUILD', 9),
-        ('DECIMATE', 'Decimate', '', 'MOD_DECIM', 10),
-        ('EDGE_SPLIT', 'Edge Split', '', 'MOD_EDGESPLIT', 11),
-        ('MASK', 'Mask', '', 'MOD_MASK', 12),
-        ('MIRROR', 'Mirror', '', 'MOD_MIRROR', 13),
-        ('MULTIRES', 'Multiresolution', '', 'MOD_MULTIRES', 14),
-        ('REMESH', 'Remesh', '', 'MOD_REMESH', 15),
-        ('SCREW', 'Screw', '', 'MOD_SCREW', 16),
-        ('SKIN', 'Skin', '', 'MOD_SKIN', 17),
-        ('SOLIDIFY', 'Solidify', '', 'MOD_SOLIDIFY', 18),
-        ('SUBSURF', 'Subsurface Division', '', 'MOD_SUBSURF', 19),
-        ('TRIANGULATE', 'Triangulate', '', 'MOD_TRIANGULATE', 20),
-        ('WIREFRAME', 'Wireframe', '', 'MOD_WIREFRAME', 21),
-        # Deform
-        ('ARMATURE', 'Armature', '', 'MOD_ARMATURE', 22),
-        ('CAST', 'Cast', '', 'MOD_CAST', 23),
-        ('CURVE', 'Curve', '', 'MOD_CURVE', 24),
-        ('DISPLACE', 'Displace', '', 'MOD_DISPLACE', 25),
-        ('HOOK', 'Hook', '', 'HOOK', 26),
-        ('LAPLACIANDEFORM', 'Laplacian Deform', '', 'MOD_MESHDEFORM', 27),
-        ('LAPLACIANSMOOTH', 'Laplacian Smooth', '', 'MOD_SMOOTH', 28),
-        ('LATTICE', 'Lattice', '', 'MOD_LATTICE', 29),
-        ('MESH_DEFORM', 'Mesh Deform', '', 'MOD_MESHDEFORM', 30),
-        ('SHRINKWRAP', 'Shrinkwrap', '', 'MOD_SHRINKWRAP', 31),
-        ('SIMPLE_DEFORM', 'Simple Deform', '', 'MOD_SIMPLEDEFORM', 32),
-        ('SMOOTH', 'Smooth', '', 'MOD_SMOOTH', 33),
-        ('WARP', 'Warp', '', 'MOD_WARP', 34),
-        ('WAVE', 'Wave', '', 'MOD_WAVE', 35),
-        # Simulate
-        ('CLOTH', 'Cloth', '', 'MOD_CLOTH', 36),
-        ('COLLISION', 'Collision', '', 'MOD_PHYSICS', 37),
-        ('DYNAMIC_PAINT', 'Dynamic Paint', '', 'MOD_DYNAMICPAINT', 38),
-        ('EXPLODE', 'Explode', '', 'MOD_EXPLODE', 39),
-        ('FLUID_SIMULATION', 'Fluid Simulation', '', 'MOD_FLUIDSIM', 40),
-        ('OCEAN', 'Ocean', '', 'MOD_OCEAN', 41),
-        ('PARTICLE_INSTANCE', 'Particle Instance', '', 'MOD_PARTICLES', 42),
-        ('PARTICLE_SYSTEM', 'Particle System', '', 'MOD_PARTICLES', 43),
-        ('SMOKE', 'Smoke', '', 'MOD_SMOKE', 44),
-        ('SOFT_BODY', 'Soft Body', '', 'MOD_SOFT', 45)),
-        name='',
-        description='Select type of modifier to be affected by the buttons below',
-        default='SUBSURF')
+    bpy.types.Scene.khalibloo_modifier_type = bpy.props.EnumProperty(items =(
+                                         #Modify
+                                         ('MESH_CACHE', 'Mesh Cache', '', 'MOD_MESHDEFORM', 0),
+                                         ('UV_PROJECT', 'UV Project', '', 'MOD_UVPROJECT', 1),
+                                         ('UV_WARP', 'UV Warp', '', 'MOD_UVPROJECT', 2),
+                                         ('VERTEX_WEIGHT_EDIT', 'Vertex Weight Edit', '', 'MOD_VERTEX_WEIGHT', 3),
+                                         ('VERTEX_WEIGHT_MIX', 'Vertex Weight Mix', '', 'MOD_VERTEX_WEIGHT', 4),
+                                         ('VERTEX_WEIGHT_PROXIMITY', 'Vertex Weight Proximity', '', 'MOD_VERTEX_WEIGHT', 5),
+                                         #Generate
+                                         ('ARRAY', 'Array', '', 'MOD_ARRAY', 6),
+                                         ('BEVEL', 'Bevel', '', 'MOD_BEVEL', 7),
+                                         ('BOOLEAN', 'Boolean', '', 'MOD_BOOLEAN', 8),
+                                         ('BUILD', 'Build', '', 'MOD_BUILD', 9),
+                                         ('DECIMATE', 'Decimate', '', 'MOD_DECIM', 10),
+                                         ('EDGE_SPLIT', 'Edge Split', '', 'MOD_EDGESPLIT', 11),
+                                         ('MASK', 'Mask', '', 'MOD_MASK', 12),
+                                         ('MIRROR', 'Mirror', '', 'MOD_MIRROR', 13),
+                                         ('MULTIRES', 'Multiresolution', '', 'MOD_MULTIRES', 14),
+                                         ('REMESH', 'Remesh', '', 'MOD_REMESH', 15),
+                                         ('SCREW', 'Screw', '', 'MOD_SCREW', 16),
+                                         ('SKIN', 'Skin', '', 'MOD_SKIN', 17),
+                                         ('SOLIDIFY', 'Solidify', '', 'MOD_SOLIDIFY', 18),
+                                         ('SUBSURF', 'Subsurface Division', '', 'MOD_SUBSURF', 19),
+                                         ('TRIANGULATE', 'Triangulate', '', 'MOD_TRIANGULATE', 20),
+                                         ('WIREFRAME', 'Wireframe', '', 'MOD_WIREFRAME', 21),
+                                         #Deform
+                                         ('ARMATURE', 'Armature', '', 'MOD_ARMATURE', 22),
+                                         ('CAST', 'Cast', '', 'MOD_CAST', 23),
+                                         ('CURVE', 'Curve', '', 'MOD_CURVE', 24),
+                                         ('DISPLACE', 'Displace', '', 'MOD_DISPLACE', 25),
+                                         ('HOOK', 'Hook', '', 'HOOK', 26),
+                                         ('LAPLACIANDEFORM', 'Laplacian Deform', '', 'MOD_MESHDEFORM', 27),
+                                         ('LAPLACIANSMOOTH', 'Laplacian Smooth', '', 'MOD_SMOOTH', 28),
+                                         ('LATTICE', 'Lattice', '', 'MOD_LATTICE', 29),
+                                         ('MESH_DEFORM', 'Mesh Deform', '', 'MOD_MESHDEFORM', 30),
+                                         ('SHRINKWRAP', 'Shrinkwrap', '', 'MOD_SHRINKWRAP', 31),
+                                         ('SIMPLE_DEFORM', 'Simple Deform', '', 'MOD_SIMPLEDEFORM', 32),
+                                         ('SMOOTH', 'Smooth', '', 'MOD_SMOOTH', 33),
+                                         ('WARP', 'Warp', '', 'MOD_WARP', 34),
+                                         ('WAVE', 'Wave', '', 'MOD_WAVE', 35),
+                                         #Simulate
+                                         ('CLOTH', 'Cloth', '', 'MOD_CLOTH', 36),
+                                         ('COLLISION', 'Collision', '', 'MOD_PHYSICS', 37),
+                                         ('DYNAMIC_PAINT', 'Dynamic Paint', '', 'MOD_DYNAMICPAINT', 38),
+                                         ('EXPLODE', 'Explode', '', 'MOD_EXPLODE', 39),
+                                         ('FLUID_SIMULATION', 'Fluid Simulation', '', 'MOD_FLUIDSIM', 40),
+                                         ('OCEAN', 'Ocean', '', 'MOD_OCEAN', 41),
+                                         ('PARTICLE_INSTANCE', 'Particle Instance', '', 'MOD_PARTICLES', 42),
+                                         ('PARTICLE_SYSTEM', 'Particle System', '', 'MOD_PARTICLES', 43),
+                                         ('SMOKE', 'Smoke', '', 'MOD_SMOKE', 44),
+                                         ('SOFT_BODY', 'Soft Body', '', 'MOD_SOFT', 45)),
+                                         name = '',
+                                         description = 'Select type of modifier to be affected by the buttons below',
+                                         default = 'SUBSURF')
 
-    bpy.types.Scene.khalibloo_modifier_filter_mode = bpy.props.EnumProperty(items=(
-        ('ALL', 'All', 'Actions will affect all types of modifiers of all selected objects'),
-        ('SPECIFIC', 'Specific', 'Actions will affect a specific type of modifier of all selected objects')),
-        name=' ',
-        description='Choose whether to affect all types of modifiers or just a specific type',
-        default='ALL')
+    bpy.types.Scene.khalibloo_modifier_filter_mode = bpy.props.EnumProperty(items =(
+                                         ('ALL', 'All', 'Actions will affect all types of modifiers of all selected objects'),
+                                         ('SPECIFIC', 'Specific', 'Actions will affect a specific type of modifier of all selected objects')),
+                                name = ' ',
+                                description = 'Choose whether to affect all types of modifiers or just a specific type',
+                                default = 'ALL')
 
     bpy.types.Scene.khalibloo_spread_harden_vgroups = bpy.props.BoolProperty(
-        name="Spread Vertex Groups",
-        description="Whether or not vertex group weights may spread to vertices that are not initially part of the vertex groups",
-        default=True)
+    name = "Spread Vertex Groups",
+    description = "Whether or not vertex group weights may spread to vertices that are not initially part of the vertex groups",
+    default=True)
 
     bpy.types.Scene.khalibloo_affect_textures = bpy.props.BoolProperty(
-        name="Textures",
-        description="Whether or not the material setup affects textures as well",
-        default=True)
+    name = "Textures",
+    description = "Whether or not the material setup affects textures as well",
+    default=True)
 
     bpy.types.Scene.khalibloo_merge_mats = bpy.props.BoolProperty(
-        name="Merge Materials",
-        description="Merge materials with the same diffuse textures. Warning: This will affect EVERY material slot in the active Genesis figure, not just the default Genesis materials",
-        default=False)
+    name = "Merge Materials",
+    description = "Merge materials with the same diffuse textures. Warning: This will affect EVERY material slot in the active Genesis figure, not just the default Genesis materials",
+    default = False)
 
     bpy.types.Scene.khalibloo_genesis_morph_dir = bpy.props.StringProperty(
-        name="",
-        description="Folder where your Genesis morphs of choice are located",
-        subtype="DIR_PATH",
-        default="c:/")
+    name = "",
+    description = "Folder where your Genesis morphs of choice are located",
+    subtype = "DIR_PATH",
+    default = "c:/")
 
-    bpy.types.Scene.khalibloo_batchbake_images = bpy.props.EnumProperty(items=(
-        ('Default', 'Default', ''),
-        ('Untitled', 'Untitled', '')),
-        name="",
-        description="Image to save as",
-        default='Default')
+    bpy.types.Scene.khalibloo_batchbake_images = bpy.props.EnumProperty(items = (
+                                ('Default', 'Default', ''),
+                                ('Untitled', 'Untitled', '')),
+                                name = "",
+                                description = "Image to save as",
+                                default = 'Default')
 
     bpy.types.Scene.khalibloo_batchbake_startframe = bpy.props.IntProperty(
-        name="Start Frame",
-        description="The frame from which to start baking",
-        default=1)
+    name = "Start Frame",
+    description = "The frame from which to start baking",
+    default = 1)
 
     bpy.types.Scene.khalibloo_batchbake_endframe = bpy.props.IntProperty(
-        name="End Frame",
-        description="The frame on which to end baking",
-        default=250)
+    name = "End Frame",
+    description = "The frame on which to end baking",
+    default = 250)

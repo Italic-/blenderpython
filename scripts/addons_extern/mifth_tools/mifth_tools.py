@@ -33,7 +33,7 @@ class MFTPanelAnimation(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_context = "objectmode"
-    bl_category = 'Mifth'
+    bl_category = 'Animation'
     # bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
@@ -130,6 +130,7 @@ class MFTCropNodeRegion(bpy.types.Operator):
         cropNode = nodes.active
         crop_percentage = context.scene.render.resolution_percentage / 100.0
 
+
         if cropNode != None:
             if cropNode.type == 'CROP':
                 cropNode.min_x = scene.render.border_min_x * scene.render.resolution_x * crop_percentage
@@ -149,7 +150,6 @@ class MFTCropNodeRegion(bpy.types.Operator):
             self.report({'INFO'}, "Select Crop Node!")
 
         return {'FINISHED'}
-
 
 class MFTCropToViewport(bpy.types.Operator):
     bl_idname = "mft.crop_to_viewport"

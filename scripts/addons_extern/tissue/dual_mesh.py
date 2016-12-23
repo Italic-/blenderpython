@@ -197,7 +197,7 @@ class dual_mesh(bpy.types.Operator):
 
 class dual_mesh_panel(bpy.types.Panel):
     bl_label = "Dual Mesh"
-    bl_category = "Tissue"
+    bl_category = "Create"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
     bl_context = (("objectmode"))

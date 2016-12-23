@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 bl_info = {
-    "name": "Landscape",
+    "name": "Landscape Mesh",
     "author": "Roman Riesen",
     "version": (0, 0, 1),
     "blender": (2, 74, 0),

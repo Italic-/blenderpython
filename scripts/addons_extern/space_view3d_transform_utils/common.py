@@ -51,36 +51,32 @@ addon = AddonManager()
 
 #============================================================================#
 
-
 def LeftRightPanel(cls=None, **kwargs):
     def AddPanels(cls, kwargs):
         doc = cls.__doc__
         name = kwargs.get("bl_idname") or kwargs.get("idname") or cls.__name__
-
+        
         # expected either class or function
         if not isinstance(cls, type):
             cls = type(name, (), dict(__doc__=doc, draw=cls))
-
+        
         def is_panel_left():
-            if not addon.preferences:
-                return False
+            if not addon.preferences: return False
             return addon.preferences.use_panel_left
-
         def is_panel_right():
-            if not addon.preferences:
-                return False
+            if not addon.preferences: return False
             return addon.preferences.use_panel_right
-
+        
         @addon.Panel(**kwargs)
         class LeftPanel(cls):
             bl_idname = name + "_left"
             bl_region_type = 'TOOLS'
-
+        
         @addon.Panel(**kwargs)
         class RightPanel(cls):
             bl_idname = name + "_right"
             bl_region_type = 'UI'
-
+        
         poll = getattr(cls, "poll", None)
         if poll:
             LeftPanel.poll = classmethod(lambda cls, context: is_panel_left() and poll(cls, context))
@@ -88,9 +84,8 @@ def LeftRightPanel(cls=None, **kwargs):
         else:
             LeftPanel.poll = classmethod(lambda cls, context: is_panel_left())
             RightPanel.poll = classmethod(lambda cls, context: is_panel_right())
-
+        
         return cls
-
-    if cls:
-        return AddPanels(cls, kwargs)
+    
+    if cls: return AddPanels(cls, kwargs)
     return (lambda cls: AddPanels(cls, kwargs))

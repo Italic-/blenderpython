@@ -123,7 +123,7 @@ class QuickArmature(bpy.types.Operator):
         if armature != None:
             bpy.ops.object.mode_set(mode='EDIT')
             bone = armature.data.edit_bones.new("Bone")
-            bone.head = self.sprite_object.matrix_world.inverted() * context.scene.cursor_location
+            bone.head = self.active_object.matrix_world.inverted() * context.scene.cursor_location
             bone.hide = True
             bone.bbone_x = .05
             bone.bbone_z = .05
@@ -158,7 +158,7 @@ class QuickArmature(bpy.types.Operator):
             mouse_vec_norm = (context.scene.cursor_location - self.mouse_click_vec).normalized()
             mouse_vec = (context.scene.cursor_location - self.mouse_click_vec)
             angle = (math.atan2(mouse_vec_norm[0], mouse_vec_norm[2])*180/math.pi)
-            cursor_local = self.sprite_object.matrix_world.inverted() * context.scene.cursor_location   
+            cursor_local = self.active_object.matrix_world.inverted() * context.scene.cursor_location   
             if event.shift:
                 if angle > -22.5 and angle < 22.5:
                     ### up
@@ -185,7 +185,7 @@ class QuickArmature(bpy.types.Operator):
                     ### left up
                     bone.tail = (bone.head +  Vector((mouse_vec[0],0,-mouse_vec[0])))
             else:
-                bone.tail = self.sprite_object.matrix_world.inverted() * context.scene.cursor_location
+                bone.tail = self.active_object.matrix_world.inverted() * context.scene.cursor_location
                  
     def set_parent(self,context,obj):
         obj.select = True
@@ -218,7 +218,7 @@ class QuickArmature(bpy.types.Operator):
         orig_armature.select = True     
         obj.select = True       
         
-        obj_orig_location = obj.location
+        obj_orig_location = Vector(obj.location)
         obj.location[1] = 0
         bpy.ops.object.parent_set(type='ARMATURE_AUTO')
         obj.location = obj_orig_location

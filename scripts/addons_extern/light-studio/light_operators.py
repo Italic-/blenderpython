@@ -282,10 +282,10 @@ class BSL_ShowAllLights(bpy.types.Operator):
 
 class BlenderLightStudioPanelStudio(bpy.types.Panel):
     bl_idname = "blender_light_studio_panel_studio"
-    bl_label = "Studio"
+    bl_label = "BLight Studio"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Light Studio"
+    bl_category = "Create"
 
     @classmethod
     def poll(cls, context):
@@ -303,10 +303,10 @@ class BlenderLightStudioPanelStudio(bpy.types.Panel):
 
 class BlenderLightStudioPanelLight(bpy.types.Panel):
     bl_idname = "blender_light_studio_panel_light"
-    bl_label = "Lights"
+    bl_label = "BLights"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Light Studio"
+    bl_category = "Create"
 
     @classmethod
     def poll(cls, context):
@@ -322,10 +322,10 @@ class BlenderLightStudioPanelLight(bpy.types.Panel):
 
 class BLS_ProfileList(bpy.types.Panel):
     bl_idname = "bls_profile_list"
-    bl_label = "Profiles"
+    bl_label = "BLight Profiles"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Light Studio"
+    bl_category = "Create"
 
     @classmethod
     def poll(cls, context):
@@ -355,10 +355,10 @@ class BLS_ProfileList(bpy.types.Panel):
 
 class BlenderLightStudioPanelSelected(bpy.types.Panel):
     bl_idname = "blender_light_studio_panel_selected"
-    bl_label = "Selected Light"
+    bl_label = "BLight Selected"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Light Studio"
+    bl_category = "Create"
 
     @classmethod
     def poll(cls, context):

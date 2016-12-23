@@ -61,7 +61,7 @@ def update_middle_point(lw_tool):
 
 def get_tool_verts(lw_tool, verts_ids, bm, obj, do_clamp, local_coords):
     apply_tool_verts = []
-    final_dir = (lw_tool.end_point.position - lw_tool.start_point.position)
+    final_dir = ( lw_tool.end_point.position - lw_tool.start_point.position )
     max_dist = final_dir.length
     for vert_id in verts_ids:
         v_pos = obj.matrix_world * bm.verts[vert_id].co
@@ -76,7 +76,7 @@ def get_tool_verts(lw_tool, verts_ids, bm, obj, do_clamp, local_coords):
             if local_coords is True:
                 pos_final = bm.verts[vert_id].co.copy()
 
-            apply_tool_verts.append((vert_id, value, pos_final))
+            apply_tool_verts.append( (vert_id, value, pos_final) )
 
     return apply_tool_verts
 
@@ -156,7 +156,7 @@ def setup_lw_tool(rv3d, lw_tool, active_obj, verts, center_type, scale_size):
     # get verts bounds
     cam_x = (rv3d.view_rotation * Vector((1.0, 0.0, 0.0))).normalized()
     cam_y = (rv3d.view_rotation * Vector((0.0, 1.0, 0.0))).normalized()
-    # cam_z = (rv3d.view_rotation * Vector((0.0, 0.0, -1.0))).normalized()  # Camera Direction
+    #cam_z = (rv3d.view_rotation * Vector((0.0, 0.0, -1.0))).normalized()  # Camera Direction
     bounds = ut_base.get_verts_bounds(verts, active_obj, cam_x, cam_y, None, False)
 
     # set middle_point

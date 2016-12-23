@@ -88,6 +88,7 @@ class MI_CurveStretch(bpy.types.Operator):
                 self.manipulator = context.space_data.show_manipulator
                 context.space_data.show_manipulator = False
 
+
                 for loop in self.loops:
                     loop_verts = [active_obj.matrix_world * bm.verts[i].co for i in loop[0]]
                     loop_line = cur_main.pass_line(loop_verts, loop[1])
@@ -102,7 +103,7 @@ class MI_CurveStretch(bpy.types.Operator):
 
                     cur_main.generate_bezier_points(self.active_curve, self.active_curve.display_bezier, curve_settings.curve_resolution)
 
-                    self.original_verts_data.append(cur_main.pass_line([bm.verts[i].co.copy() for i in loop[0]], loop[1]))
+                    self.original_verts_data.append( cur_main.pass_line([bm.verts[i].co.copy() for i in loop[0]] , loop[1]) )
 
                     # move point to the curve
                     for curve in self.all_curves:
@@ -130,6 +131,7 @@ class MI_CurveStretch(bpy.types.Operator):
             #finish_work(self, context)
             self.report({'WARNING'}, "View3D not found, cannot run operator!")
             return {'CANCELLED'}
+
 
     def modal(self, context, event):
         context.area.tag_redraw()
@@ -190,7 +192,7 @@ class MI_CurveStretch(bpy.types.Operator):
                             # add to display
                             cur_main.curve_point_changed(self.active_curve, self.active_curve.curve_points.index(new_point), curve_settings.curve_resolution, self.active_curve.display_bezier)
 
-                # return {'RUNNING_MODAL'}
+                #return {'RUNNING_MODAL'}
 
             elif event.type in {'DEL'}:
                 for curve in self.all_curves:
@@ -262,7 +264,7 @@ class MI_CurveStretch(bpy.types.Operator):
                 return {'RUNNING_MODAL'}
             else:
                 # set to move point
-                if (Vector((m_coords[0], m_coords[1])) - Vector((self.deform_mouse_pos[0], self.deform_mouse_pos[1]))).length > 4.0:
+                if ( Vector((m_coords[0], m_coords[1])) - Vector((self.deform_mouse_pos[0], self.deform_mouse_pos[1])) ).length > 4.0:
                     self.curve_tool_mode = 'MOVE_POINT'
                     return {'RUNNING_MODAL'}
 
@@ -315,14 +317,15 @@ class MI_CurveStretch(bpy.types.Operator):
 
                 return {'RUNNING_MODAL'}
 
-        # elif self.curve_tool_mode == 'ADD_POINT':
+        #elif self.curve_tool_mode == 'ADD_POINT':
             #self.curve_tool_mode = 'MOVE_POINT'
-            # return {'RUNNING_MODAL'}
+            #return {'RUNNING_MODAL'}
 
         else:
             if event.value == 'RELEASE' and event.type in {'LEFTMOUSE', 'SELECTMOUSE'}:
-                self.curve_tool_mode = 'IDLE'
+                self.curve_tool_mode = 'IDLE'            
                 return {'RUNNING_MODAL'}
+
 
         # get keys
         if keys_pass is True:
@@ -413,12 +416,12 @@ def draw_curve_2d(curves, active_cur, context):
 
                 # Handlers
                 if curve_settings.draw_handlers:
-                    # if curve.curve_points.index(cu_point) < len(curve.curve_points)-1:
+                #if curve.curve_points.index(cu_point) < len(curve.curve_points)-1:
                     if cu_point.handle1:
                         handle_1_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.handle1)
                         if handle_1_pos_2d:
                             mi_draw_2d_point(handle_1_pos_2d.x, handle_1_pos_2d.y, 3, col_man.cur_handle_1_base)
-                # if curve.curve_points.index(cu_point) > 0:
+                #if curve.curve_points.index(cu_point) > 0:
                     if cu_point.handle2:
                         handle_2_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.handle2)
                         if handle_2_pos_2d:
@@ -426,10 +429,10 @@ def draw_curve_2d(curves, active_cur, context):
 
 
 # TODO MOVE TO UTILITIES
-def mi_draw_2d_point(point_x, point_y, p_size=4, p_col=(1.0, 1.0, 1.0, 1.0)):
+def mi_draw_2d_point(point_x, point_y, p_size=4, p_col=(1.0,1.0,1.0,1.0)):
     bgl.glEnable(bgl.GL_BLEND)
     #bgl.glColor4f(1.0, 1.0, 1.0, 0.5)
-    # bgl.glLineWidth(2)
+    #bgl.glLineWidth(2)
 
     bgl.glPointSize(p_size)
 #    bgl.glBegin(bgl.GL_LINE_LOOP)
@@ -471,3 +474,4 @@ def mi_curve_draw_3d_polyline(points, p_size, p_col, x_ray):
     bgl.glLineWidth(1)
     bgl.glDisable(bgl.GL_BLEND)
     bgl.glColor4f(0.0, 0.0, 0.0, 1.0)
+

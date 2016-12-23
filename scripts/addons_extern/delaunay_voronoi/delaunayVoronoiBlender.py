@@ -35,7 +35,7 @@ def checkEqual(lst):
 
 
 class ToolsPanelDelaunay(bpy.types.Panel):
-    bl_category = "GIS"  # Tab
+    bl_category = "Create"  # Tab
     bl_label = "Delaunay Voronoi"
     bl_space_type = "VIEW_3D"
     bl_context = "objectmode"

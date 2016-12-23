@@ -19,8 +19,8 @@
 bl_info = {
     "name": "Mira Tools",
     "author": "Paul Geraskin, Marvin K. Breuer",
-    "version": (0, 3, 0),
-    "blender": (2, 74, 0),
+    "version": (2, 0, 0),
+    "blender": (2, 78, 0),
     "location": "3D Viewport",
     "description": "Mira Tools",
     "warning": "",
@@ -42,6 +42,8 @@ if "bpy" in locals():
     imp.reload(mi_curve_guide)
     imp.reload(mi_draw_extrude)
     imp.reload(mi_poly_loop)
+    imp.reload(mi_make_arc)
+    imp.reload(mi_wrap_master)
 else:
     from . import mi_curve_test
     from . import mi_curve_stretch
@@ -54,6 +56,8 @@ else:
     from . import mi_noise
     from . import mi_draw_extrude
     from . import mi_poly_loop
+    from . import mi_make_arc
+    from . import mi_wrap_master
 
 
 import bpy
@@ -70,10 +74,10 @@ def register():
     #     description="Mira Curve"
     # )
 
-    # bpy.types.Object.mi_curves = CollectionProperty(
-    #name="Mira Tool Variables",
-    # type=mi_curve_test.MI_CurveObject,
-    #description="Mira Curve"
+    #bpy.types.Object.mi_curves = CollectionProperty(
+        #name="Mira Tool Variables",
+        #type=mi_curve_test.MI_CurveObject,
+        #description="Mira Curve"
     #)
 
     bpy.types.Scene.mi_settings = PointerProperty(
@@ -112,21 +116,27 @@ def register():
         description="Curve Guide Settings"
     )
 
-    # alternative gui
-    bpy.types.WindowManager.mirawindow = bpy.props.PointerProperty(type=mi_gui.DropdownMiraToolProps)
+    bpy.types.Scene.mi_makearc_settings = PointerProperty(
+        name="Make Arc Variables",
+        type=mi_make_arc.MI_MakeArc_Settings,
+        description="Make Arc Settings"
+    )
 
+    # alternative gui
+    bpy.types.WindowManager.mirawindow = bpy.props.PointerProperty(type = mi_gui.DropdownMiraToolProps)
 
 def unregister():
     import bpy
 
     #del bpy.types.Scene.miraTool
-    # del bpy.types.Object.mi_curves  # need to investigate if i need to delete it
+    #del bpy.types.Object.mi_curves  # need to investigate if i need to delete it
     del bpy.types.Scene.mi_settings
     del bpy.types.Scene.mi_cur_stretch_settings
     del bpy.types.Scene.mi_cur_surfs_settings
     del bpy.types.Scene.mi_extrude_settings
     del bpy.types.Scene.mi_ldeformer_settings
     del bpy.types.Scene.mi_curguide_settings
+    del bpy.types.Scene.mi_makearc_settings
 
     del bpy.types.WindowManager.mirawindow
 

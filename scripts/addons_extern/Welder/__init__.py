@@ -30,7 +30,7 @@ class ToolsPanel(bpy.types.Panel):
     bl_label = "Welder"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Welder"
+    bl_category = "Create"
  
     def draw(self, context):
         self.layout.operator("weld.weld").obje = "Plane"
@@ -216,8 +216,7 @@ class OBJECT_OT_HelloButton(bpy.types.Operator):
         
         
         return {'FINISHED'}
-    
-bpy.utils.register_module(__name__)
+
 
 def register():
 	bpy.utils.register_module(__name__)	

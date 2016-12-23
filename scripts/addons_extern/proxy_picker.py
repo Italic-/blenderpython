@@ -58,8 +58,11 @@ def string_list(list):
 @persistent
 def proxy_picker(scene):
     
-    
-    ob = bpy.context.active_object
+    ob = None
+    try:
+        ob = bpy.context.active_object
+    except:
+        pass
     if ob != None:
         if ob.mode == "POSE":
             if bpy.context.scene.Proxy_Picker.active == True:

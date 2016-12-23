@@ -17,9 +17,6 @@
 # ##### END GPL LICENSE BLOCK #####
 # Contributed to by
 # SAYproductions, meta-androcto, jambay, brikbot#
-from .add_window import __init__
-from .add_window import window_panel
-from .add_window import window_tools
 
 bl_info = {
     "name": "Building Objects",
@@ -38,8 +35,6 @@ if "bpy" in locals():
     import importlib
     importlib.reload(add_mesh_balcony)
     importlib.reload(add_mesh_sove)
-    importlib.reload(add_mesh_window)
-    importlib.reload(add_mesh_beam_builder)
     importlib.reload(Wallfactory)
     importlib.reload(stairbuilder)
     importlib.reload(Blocks)
@@ -53,8 +48,6 @@ if "bpy" in locals():
 else:
     from . import add_mesh_balcony
     from . import add_mesh_sove
-    from . import add_mesh_window
-    from . import add_mesh_beam_builder
     from . import Wallfactory
     from . import stairbuilder
     from . import Blocks
@@ -82,8 +75,6 @@ class INFO_MT_mesh_objects_add(bpy.types.Menu):
                         text="Balcony")
         layout.operator("mesh.add_say3d_sove",
                         text="Sove")
-        layout.operator("mesh.add_say3d_pencere2",
-                        text="Window")
         layout.operator("mesh.wall_add",
                         text="Wall Factory")
         layout.operator("mesh.stairs",

@@ -183,45 +183,17 @@ class procedural_dupli_spin(bpy.types.Operator):
 
 # Creating Panel
 
-
-class procedural_dupli_spin_Panel(bpy.types.Panel):
-    """Docstring of procedural dupli spin Panel"""
-    bl_idname = "procedural dupli spin panel"
-    bl_label = "procedural dupli spin"
-
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'TOOLS'
-    bl_context = 'mesh_edit'
-    bl_category = 'Tools'
-
-    def draw(self, context):
-        layout = self.layout
-        layout.operator(procedural_dupli_spin.bl_idname, text="Procedural Dupli Spin", icon='MOD_ARRAY')
-
 # store keymaps here to access after registration
 addon_keymaps = []
 
 
 def register():
     bpy.utils.register_class(procedural_dupli_spin)
-    bpy.utils.register_class(procedural_dupli_spin_Panel)
-
-    #addon_keymaps = []
-    wm = bpy.context.window_manager
-    km = wm.keyconfigs.addon.keymaps.new(name='Window', space_type='EMPTY')
-    kmi = km.keymap_items.new(procedural_dupli_spin.bl_idname, 'R', 'PRESS', shift=True, ctrl=True)
-    #kmi.properties.my_prop = 'some'
-    addon_keymaps.append((km, kmi))
 
 
 def unregister():
     bpy.utils.unregister_class(procedural_dupli_spin)
-    bpy.utils.register_class(procedural_dupli_spin_Panel)
 
-    # handle the keymap
-    for km, kmi in addon_keymaps:
-        km.keymap_items.remove(kmi)
-    addon_keymaps.clear()
 
 if __name__ == "__main__":
     register()

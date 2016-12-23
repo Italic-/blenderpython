@@ -8,7 +8,7 @@ class PerfectShapePanel(bpy.types.Panel):
     bl_region_type = 'TOOLS'
     bl_category = "Perfect Shape"
     bl_context = "mesh_edit"
-    bl_label = "Perfect Shape"
+    bl_label = "Tools"
 
     def draw(self, context):
         wm = context.window_manager

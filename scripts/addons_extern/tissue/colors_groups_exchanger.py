@@ -187,7 +187,7 @@ class vertex_group_to_vertex_colors(bpy.types.Operator):
 
 class colors_groups_exchanger_panel(bpy.types.Panel):
     bl_label = "Colors-Weight Exchanger"
-    bl_category = "Tissue"
+    bl_category = "Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
     #bl_context = "objectmode"

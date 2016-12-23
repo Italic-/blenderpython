@@ -45,13 +45,13 @@ class MI_ExtrudeSettings(bpy.types.PropertyGroup):
         items=(('Asolute', 'Asolute', ''),
                ('Relative', 'Relative', '')
                ),
-        default='Relative'
+        default = 'Relative'
     )
-    # extrude_mode = EnumProperty(
-    # items=(('Screen', 'Screen', ''),
-    #('Raycast', 'Raycast', '')
-    #),
-    #default = 'Screen'
+    #extrude_mode = EnumProperty(
+        #items=(('Screen', 'Screen', ''),
+               #('Raycast', 'Raycast', '')
+               #),
+        #default = 'Screen'
     #)
 
     do_symmetry = BoolProperty(default=False)
@@ -60,7 +60,7 @@ class MI_ExtrudeSettings(bpy.types.PropertyGroup):
                ('Y', 'Y', ''),
                ('Z', 'Z', '')
                ),
-        default='X'
+        default = 'X'
     )
 
 
@@ -211,6 +211,7 @@ class MI_StartDraw(bpy.types.Operator):
             self.report({'WARNING'}, "View3D not found, cannot run operator")
             return {'CANCELLED'}
 
+
     def modal(self, context, event):
         context.area.tag_redraw()
 
@@ -280,7 +281,7 @@ class MI_StartDraw(bpy.types.Operator):
 
             if mi_settings.surface_snap is True:
                 best_obj, hit_normal, hit_position = ut_base.get_mouse_raycast(
-                    context, self.picked_meshes, m_coords, 10000.0)
+                    context, self.picked_meshes, m_coords)
                 new_pos = hit_position
 
                 # set offset for surface normal and extrude_center
@@ -364,10 +365,10 @@ class MI_StartDraw(bpy.types.Operator):
                     rot_angle = self.extrude_points[
                         -1].direction.angle(offset_dir)
 
-                    # if mi_settings.surface_snap is True:
-                    # rotate_dir_vec = self.extrude_points[
-                    #-1].direction.cross(offset_dir)
-                    # else:
+                    #if mi_settings.surface_snap is True:
+                        #rotate_dir_vec = self.extrude_points[
+                            #-1].direction.cross(offset_dir)
+                    #else:
                     rotate_dir_vec = cam_dir
 
                     # rotation is only for non snapping mode
@@ -378,7 +379,7 @@ class MI_StartDraw(bpy.types.Operator):
                             rot_angle = -rot_angle
 
                         # rotate verts!
-                        rot_mat = Matrix.Rotation(rot_angle, 3, rotate_dir_vec)
+                        rot_mat = Matrix.Rotation(rot_angle, 3,  rotate_dir_vec)
                         for vert in selected_verts:
                             vert.co = active_obj.matrix_world.inverted() * (rot_mat * ((active_obj.matrix_world * vert.co) - new_pos) + new_pos)
 
@@ -426,7 +427,7 @@ class MI_StartDraw(bpy.types.Operator):
                             fix_rot_angle = -fix_rot_angle
 
                         # rotate verts!
-                        rot_mat = Matrix.Rotation(fix_rot_angle, 3, rotate_dir_vec)
+                        rot_mat = Matrix.Rotation(fix_rot_angle, 3,  rotate_dir_vec)
                         for vert in previous_extrude_verts:
                             vert.co = active_obj.matrix_world.inverted() * (rot_mat * ((active_obj.matrix_world * vert.co) - fix_step.position) + fix_step.position)
                             vert.select = False
@@ -443,7 +444,7 @@ class MI_StartDraw(bpy.types.Operator):
                         rotate_all_epoints(
                             active_obj, bm, self.extrude_points, self.rotate_all)
 
-                # bm.normal_update()
+                #bm.normal_update()
                 bmesh.update_edit_mesh(active_obj.data)
 
             return {'RUNNING_MODAL'}
@@ -503,7 +504,7 @@ class MI_StartDraw(bpy.types.Operator):
 
                         self.deform_mouse_pos = m_coords
 
-                # bm.normal_update()
+                #bm.normal_update()
                 bmesh.update_edit_mesh(active_obj.data)
 
                 return {'RUNNING_MODAL'}

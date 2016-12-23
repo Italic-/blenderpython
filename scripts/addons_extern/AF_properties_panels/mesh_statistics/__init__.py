@@ -469,6 +469,7 @@ def Vector3DToString(vector):
 
 
 class MeshStatisticsPanel(bpy.types.Panel):
+    bl_category = "Tools"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_label = "Mesh Statistics"

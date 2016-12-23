@@ -1546,7 +1546,7 @@ class ModifiersSubsurfLevel_6(bpy.types.Operator):
 class VIEW3D_PT_FastNavigate(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Display Tools"
+    bl_category = "Display"
     bl_label = "Fast Navigate"
     bl_options = {"DEFAULT_CLOSED"}
 
@@ -1577,7 +1577,7 @@ class VIEW3D_PT_FastNavigate(bpy.types.Panel):
 class VIEW3D_PT_DisplayMode(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Display Tools"
+    bl_category = "Display"
     bl_label = "Display Mode"
     bl_options = {"DEFAULT_CLOSED"}
 
@@ -1602,7 +1602,7 @@ class VIEW3D_PT_DisplayMode(bpy.types.Panel):
 class VIEW3D_PT_ShadingSetup(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Display Tools"
+    bl_category = "Display"
     bl_label = "Shading Setup"
     bl_options = {"DEFAULT_CLOSED"}
 
@@ -1648,7 +1648,7 @@ class VIEW3D_PT_ShadingSetup(bpy.types.Panel):
 class VIEW3D_PT_SceneVisualization(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Display Tools"
+    bl_category = "Display"
     bl_label = "Scene Visualization"
     bl_options = {"DEFAULT_CLOSED"}
 
@@ -1682,7 +1682,7 @@ class VIEW3D_PT_SceneVisualization(bpy.types.Panel):
 class VIEW3D_PT_ModifierTools(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_category = "Display Tools"
+    bl_category = "Display"
     bl_label = "Modifier Tools"
     bl_options = {"DEFAULT_CLOSED"}
 

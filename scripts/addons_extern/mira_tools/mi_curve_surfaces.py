@@ -41,17 +41,16 @@ from . import mi_inputs
 
 class MI_CurveSurfacesSettings(bpy.types.PropertyGroup):
     spread_loops_type = EnumProperty(
-        name="Spread Loops",
-        items=(('OnCurve', 'OnCurve', ''),
-               ('Interpolate', 'Interpolate', '')
-               ),
-        default='OnCurve'
+        name = "Spread Loops",
+        items = (('OnCurve', 'OnCurve', ''),
+                ('Interpolate', 'Interpolate', '')
+                ),
+        default = 'OnCurve'
     )
 
 
 # extended class of cur_main.MI_CurveObject
 class MI_SurfaceCurveObject(cur_main.MI_CurveObject):
-
     def __init__(self, *args, **kwargs):
         super(MI_SurfaceCurveObject, self).__init__(*args, **kwargs)
         self.curve_verts_ids = None  # This is ids only
@@ -77,11 +76,11 @@ class MI_SurfaceObject():
         # main_loop_center WILL BE STORED IN WORLD COORDINATES
         if main_loop_ids:
             self.main_loop_center = ut_base.get_vertices_center(loop_verts, obj, False)
-            self.original_loop_data = cur_main.pass_line([vert.co.copy() for vert in loop_verts], False)
+            self.original_loop_data = cur_main.pass_line([vert.co.copy() for vert in loop_verts] , False)
 
         self.all_curves = []
         self.active_curve = None
-        # self.curves_verts = {}  # verts ids per curve id
+        #self.curves_verts = {}  # verts ids per curve id
 
         # surf_type is a type of loops to draw
         self.surf_type = surf_type
@@ -173,8 +172,9 @@ class MI_CurveSurfaces(bpy.types.Operator):
             self.report({'WARNING'}, "View3D not found, cannot run operator")
             return {'CANCELLED'}
 
+
     def modal(self, context, event):
-        # print(event.type)
+        #print(event.type)
         context.area.tag_redraw()
 
         context.area.header_text_set("NewSurface: Shift+A, NewCurve: A, Add/Remove Loops: +/-, Add/Remove CrossLoops: Ctrl++/Ctrl+-, NewPoint: Ctrl+Click, SelectAdditive: Shift+Click, DeletePoint: Del, SurfaceSnap: Shift+Tab, SelectLinked: L/Shift+L, SpreadMode: M")
@@ -214,7 +214,7 @@ class MI_CurveSurfaces(bpy.types.Operator):
                                 for curve in surf.all_curves:
                                     if curve is not self.active_surf.active_curve:
                                         cur_main.select_all_points(curve.curve_points, False)  # deselect points
-                                        curve.active_point = None
+                                        curve.active_point = None                                
 
                     cur_main.select_point(self.active_surf.active_curve, picked_point, additive_sel)
 
@@ -304,7 +304,7 @@ class MI_CurveSurfaces(bpy.types.Operator):
                                         # create polygons
                                         for i, verts in enumerate(all_loops_verts):
                                             if i > 0:
-                                                new_faces = create_polyloops(verts, all_loops_verts[i - 1], bm)
+                                                new_faces = create_polyloops(verts, all_loops_verts[i-1], bm)
 
                                         bmesh.update_edit_mesh(active_obj.data)
 
@@ -599,7 +599,7 @@ class MI_CurveSurfaces(bpy.types.Operator):
                 return {'RUNNING_MODAL'}
             else:
                 # set to move point
-                if (Vector((m_coords[0], m_coords[1])) - Vector((self.deform_mouse_pos[0], self.deform_mouse_pos[1]))).length > 4.0:
+                if ( Vector((m_coords[0], m_coords[1])) - Vector((self.deform_mouse_pos[0], self.deform_mouse_pos[1])) ).length > 4.0:
                     self.surf_tool_mode = 'MOVE_POINT'
                     return {'RUNNING_MODAL'}
 
@@ -668,7 +668,7 @@ class MI_CurveSurfaces(bpy.types.Operator):
                 self.surf_tool_mode = 'IDLE'
                 return {'RUNNING_MODAL'}
             else:
-                # if event.ctrl:
+                #if event.ctrl:
                 if event.type in {'LEFTMOUSE', 'SELECTMOUSE'} and event.value == 'PRESS':
                     # get center
                     center_plane = None
@@ -722,6 +722,7 @@ class MI_CurveSurfaces(bpy.types.Operator):
                 self.surf_tool_mode = 'IDLE'
                 return {'RUNNING_MODAL'}
 
+
         # get keys
         if keys_pass is True:
             # allow navigation
@@ -770,12 +771,12 @@ def spread_verts_uniform(obj, surf, loop_verts, curve_settings):
     curves_verts_pos = []
 
     if surf.main_loop_ids:
-        curves_verts_pos.append([vert.co.copy() for vert in loop_verts[0]])
+        curves_verts_pos.append([ vert.co.copy() for vert in loop_verts[0] ])
 
     for curve in surf.all_curves:
         if len(curve.curve_points) > 1:
             update_curve_line(obj, curve, loop_verts[-1], curve_settings.spread_mode, surf.original_loop_data)
-            curves_verts_pos.append([vert.co.copy() for vert in loop_verts[-1]])
+            curves_verts_pos.append([ vert.co.copy() for vert in loop_verts[-1] ])
 
     # new curve
     spread_cur = cur_main.MI_CurveObject(None)
@@ -876,8 +877,8 @@ def create_surface_loop(surf, curve_to_spread, bm, obj, curve_settings, self):
 
             update_curve_line(obj, surf.all_curves[0], fix_main_loop_verts, curve_settings.spread_mode, None)
 
-            # for vert in fix_main_loop_verts:
-            # prev_loop_verts_ids.append(vert.index)
+            #for vert in fix_main_loop_verts:
+                #prev_loop_verts_ids.append(vert.index)
 
             prev_curve.curve_verts_ids = fix_main_loop_verts_ids
             prev_loop_verts_ids = fix_main_loop_verts_ids
@@ -900,21 +901,21 @@ def create_surface_loop(surf, curve_to_spread, bm, obj, curve_settings, self):
 
     bm.verts.index_update()
     bm.verts.ensure_lookup_table()
-    # print(next_loop_verts_ids)
+    #print(next_loop_verts_ids)
 
-    # another approach by extruding edges
+    ## another approach by extruding edges
     #get_edges = []
-    # for edge in bm.edges:
-    # if edge.verts[0] in prev_loop_verts and edge.verts[1] in prev_loop_verts:
-    # get_edges.append(edge)
+    #for edge in bm.edges:
+        #if edge.verts[0] in prev_loop_verts and edge.verts[1] in prev_loop_verts:
+            #get_edges.append(edge)
     #new_geo_data = bmesh.ops.extrude_edge_only(bm, edges=get_edges)
 
-    # bm.verts.ensure_lookup_table()
+    #bm.verts.ensure_lookup_table()
 
-    # for geo_obj in new_geo_data.get('geom'):
-    # if type(geo_obj) is bmesh.types.BMVert:
-    # next_loop_verts.append(geo_obj)
-    # next_loop_verts_ids.append(geo_obj.index)
+    #for geo_obj in new_geo_data.get('geom'):
+        #if type(geo_obj) is bmesh.types.BMVert:
+            #next_loop_verts.append(geo_obj)
+            #next_loop_verts_ids.append(geo_obj.index)
 
     update_curve_line(obj, curve_to_spread, next_loop_verts, curve_settings.spread_mode, orig_loop_data)
 
@@ -927,8 +928,8 @@ def create_polyloops(next_loop_verts, prev_loop_verts, bm):
     new_faces = []
     for i, vert in enumerate(next_loop_verts):
         if i > 0:
-            new_face = bm.faces.new((next_loop_verts[i - 1], vert, prev_loop_verts[i], prev_loop_verts[i - 1]))
-            # new_face.normal_update
+            new_face = bm.faces.new( (next_loop_verts[i-1], vert, prev_loop_verts[i], prev_loop_verts[i-1]) )
+            #new_face.normal_update
             new_faces.append(new_face)
 
     bm.faces.index_update()
@@ -997,7 +998,7 @@ def pick_surf(all_surfs, context, mouse_coords):
                 else:
                     if the_length < picked_point_length:
                         picked_surf = surf
-                        picked_point_length = the_length
+                        picked_point_length = the_length                    
 
     return picked_surf
 
@@ -1032,9 +1033,9 @@ def draw_surf_2d(surfs, active_surf, context):
             surf_center_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, surf.main_loop_center)
             if surf_center_2d:
                 if surf is active_surf:
-                    mi_draw_2d_point(surf_center_2d.x, surf_center_2d.y, 6, (0.7, 0.75, 0.95, 1.0))
+                    mi_draw_2d_point(surf_center_2d.x, surf_center_2d.y, 6, (0.7,0.75,0.95,1.0))
                 else:
-                    mi_draw_2d_point(surf_center_2d.x, surf_center_2d.y, 6, (0.5, 0.5, 0.8, 1.0))
+                    mi_draw_2d_point(surf_center_2d.x, surf_center_2d.y, 6, (0.5,0.5,0.8,1.0))
 
         # draw curves points
         for curve in surf.all_curves:
@@ -1057,12 +1058,12 @@ def draw_surf_2d(surfs, active_surf, context):
 
                     # Handlers
                     if curve_settings.draw_handlers:
-                        # if curve.curve_points.index(cu_point) < len(curve.curve_points)-1:
+                    #if curve.curve_points.index(cu_point) < len(curve.curve_points)-1:
                         if cu_point.handle1:
                             handle_1_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.handle1)
                             if handle_1_pos_2d:
                                 mi_draw_2d_point(handle_1_pos_2d.x, handle_1_pos_2d.y, 3, col_man.cur_handle_1_base)
-                    # if curve.curve_points.index(cu_point) > 0:
+                    #if curve.curve_points.index(cu_point) > 0:
                         if cu_point.handle2:
                             handle_2_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.handle2)
                             if handle_2_pos_2d:
@@ -1070,10 +1071,10 @@ def draw_surf_2d(surfs, active_surf, context):
 
 
 # TODO MOVE TO UTILITIES
-def mi_draw_2d_point(point_x, point_y, p_size=4, p_col=(1.0, 1.0, 1.0, 1.0)):
+def mi_draw_2d_point(point_x, point_y, p_size=4, p_col=(1.0,1.0,1.0,1.0)):
     bgl.glEnable(bgl.GL_BLEND)
     #bgl.glColor4f(1.0, 1.0, 1.0, 0.5)
-    # bgl.glLineWidth(2)
+    #bgl.glLineWidth(2)
 
     bgl.glPointSize(p_size)
 #    bgl.glBegin(bgl.GL_LINE_LOOP)
@@ -1115,3 +1116,4 @@ def mi_draw_3d_polyline(points, p_size, p_col, x_ray):
     bgl.glLineWidth(1)
     bgl.glDisable(bgl.GL_BLEND)
     bgl.glColor4f(0.0, 0.0, 0.0, 1.0)
+

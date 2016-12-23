@@ -77,13 +77,13 @@ class MI_DeformPanel(bpy.types.Panel):
         layout.prop(lin_def_settings, "manual_update", text='ManualUpdate')
 
         layout.separator()
-        # layout.label(text="CurveStretch:")
+        #layout.label(text="CurveStretch:")
         layout.operator("mira.curve_stretch", text="Curve Stretch")
         #row = layout.row()
         layout.prop(cur_stretch_settings, "points_number", text='Points')
 
         layout.separator()
-        # layout.label(text="CurveGuide:")
+        #layout.label(text="CurveGuide:")
         layout.operator("mira.curve_guide", text="Curve Guide")
         row = layout.row()
         row.prop(curguide_settings, "points_number", text='LoopSpread')
@@ -96,6 +96,7 @@ class MI_SettingsPanel(bpy.types.Panel):
     bl_region_type = 'TOOLS'
     bl_context = "mesh_edit"
     bl_category = 'Mira'
+
 
     def draw(self, context):
         layout = self.layout

@@ -107,7 +107,7 @@ def enum_previews_from_directory_items(self, context):
 # Panel
 class PreviewsPanel(bpy.types.Panel):
     # Create a Panel in the Tool Shelf
-    bl_category = "Grass"
+    bl_category = "Create"
     bl_label = "Grass Free"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'

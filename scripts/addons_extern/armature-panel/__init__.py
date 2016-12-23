@@ -267,7 +267,7 @@ class VIEW3D_PT_armature_data(Panel):  # TODO: Account for linked armatures.
   bl_space_type = 'VIEW_3D'
   bl_region_type = 'UI'
   bl_label = 'Armature'
-
+  bl_category = "Animation"
   # poll
   @classmethod
   def poll(cls, context):

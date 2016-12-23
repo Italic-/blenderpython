@@ -84,19 +84,19 @@ class MI_CurveTest(bpy.types.Operator):
                 cur = cur_main.MI_CurveObject(self.all_curves)
                 cur.closed = True
                 self.all_curves.append(cur)
-                # self.active_curve = cur  # set active curve
+                #self.active_curve = cur  # set active curve
 
                 for i in range(8):
                     point = cur_main.MI_CurvePoint(cur.curve_points)
                     vec = Vector((-10.0, 0.0, 0.0))
 
-                    beta = math.radians((360.0 / 8.0) * i)
+                    beta = math.radians((360.0 /8.0)*i )
 
                     eul = mathu.Euler((0.0, 0.0, beta), 'XYZ')
                     vec.rotate(eul)
                     point.position = Vector((vec.x, vec.y, vec.z))
-                    # if i == 4:
-                    #point.position = Vector((vec.x+15.0, vec.y, vec.z))
+                    #if i == 4:
+                        #point.position = Vector((vec.x+15.0, vec.y, vec.z))
                     cur.curve_points.append(point)
                 cur_main.generate_bezier_points(cur, cur.display_bezier, curve_settings.curve_resolution)
 
@@ -122,8 +122,9 @@ class MI_CurveTest(bpy.types.Operator):
             self.report({'WARNING'}, "View3D not found, cannot run operator")
             return {'CANCELLED'}
 
+
     def modal(self, context, event):
-        # print(context.active_operator)
+        #print(context.active_operator)
         context.area.tag_redraw()
 
         context.area.header_text_set("NewPoint: Ctrl+Click, SelectAdditive: Shift+Click, DeletePoint: Del, SurfaceSnap: Shift+Tab, SelectLinked: L/Shift+L")
@@ -181,7 +182,7 @@ class MI_CurveTest(bpy.types.Operator):
                             # add to display
                             cur_main.curve_point_changed(self.active_curve, self.active_curve.curve_points.index(new_point), curve_settings.curve_resolution, self.active_curve.display_bezier)
 
-                # return {'RUNNING_MODAL'}
+                #return {'RUNNING_MODAL'}
 
             elif event.type in {'DEL'} and event.value == 'PRESS':
                 for curve in self.all_curves:
@@ -230,7 +231,7 @@ class MI_CurveTest(bpy.types.Operator):
                 return {'RUNNING_MODAL'}
             else:
                 # set to move point
-                if (Vector((m_coords[0], m_coords[1])) - Vector((self.deform_mouse_pos[0], self.deform_mouse_pos[1]))).length > 4.0:
+                if ( Vector((m_coords[0], m_coords[1])) - Vector((self.deform_mouse_pos[0], self.deform_mouse_pos[1])) ).length > 4.0:
                     self.curve_tool_mode = 'MOVE_POINT'
                     return {'RUNNING_MODAL'}
 
@@ -271,14 +272,15 @@ class MI_CurveTest(bpy.types.Operator):
 
                 return {'RUNNING_MODAL'}
 
-        # elif self.curve_tool_mode == 'ADD_POINT':
+        #elif self.curve_tool_mode == 'ADD_POINT':
             #self.curve_tool_mode = 'MOVE_POINT'
-            # return {'RUNNING_MODAL'}
+            #return {'RUNNING_MODAL'}
 
         else:
             if event.value == 'RELEASE' and event.type in {'LEFTMOUSE', 'SELECTMOUSE'}:
                 self.curve_tool_mode = 'IDLE'
                 return {'RUNNING_MODAL'}
+
 
         # get keys
         if keys_pass is True:
@@ -323,10 +325,10 @@ def mi_curve_draw_3d(self, context):
 
 
 # TODO MOVE TO UTILITIES
-def mi_draw_2d_point(point_x, point_y, p_size=4, p_col=(1.0, 1.0, 1.0, 1.0)):
+def mi_draw_2d_point(point_x, point_y, p_size=4, p_col=(1.0,1.0,1.0,1.0)):
     bgl.glEnable(bgl.GL_BLEND)
     #bgl.glColor4f(1.0, 1.0, 1.0, 0.5)
-    # bgl.glLineWidth(2)
+    #bgl.glLineWidth(2)
 
     bgl.glPointSize(p_size)
 #    bgl.glBegin(bgl.GL_LINE_LOOP)
@@ -395,12 +397,12 @@ def draw_curve_2d(curves, context):
 
                 # Handlers
                 if curve_settings.draw_handlers:
-                    # if curve.curve_points.index(cu_point) < len(curve.curve_points)-1:
+                #if curve.curve_points.index(cu_point) < len(curve.curve_points)-1:
                     if cu_point.handle1:
                         handle_1_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.handle1)
                         if handle_1_pos_2d:
                             mi_draw_2d_point(handle_1_pos_2d.x, handle_1_pos_2d.y, 3, col_man.cur_handle_1_base)
-                # if curve.curve_points.index(cu_point) > 0:
+                #if curve.curve_points.index(cu_point) > 0:
                     if cu_point.handle2:
                         handle_2_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.handle2)
                         if handle_2_pos_2d:
@@ -429,18 +431,18 @@ def draw_callback_px_3d(self, context):
     bgl.glVertex3f(1.0, 0.0, 0.0)
     bgl.glEnd()
 
-    # bgl.glEnable(bgl.GL_BLEND)
-    # bgl.glLineWidth(1.5)
-    # bgl.glPointSize(4)
-# bgl.glBegin(bgl.GL_LINE_LOOP)
-    # bgl.glBegin(bgl.GL_POINTS)
- # bgl.glBegin(bgl.GL_POLYGON)
-    # bgl.glColor4f(0.5,1.1,1.0,0.5)
+    ##bgl.glEnable(bgl.GL_BLEND)
+    ##bgl.glLineWidth(1.5)
+    #bgl.glPointSize(4)
+##    bgl.glBegin(bgl.GL_LINE_LOOP)
+    #bgl.glBegin(bgl.GL_POINTS)
+ ##   bgl.glBegin(bgl.GL_POLYGON)
+    #bgl.glColor4f(0.5,1.1,1.0,0.5)
     #bgl.glVertex2f(10, 20)
-    # bgl.glVertex2f(50,60)
-    # bgl.glVertex2f(700,80)
-    # bgl.glVertex2f(2,180)
-    # bgl.glEnd()
+    #bgl.glVertex2f(50,60)
+    #bgl.glVertex2f(700,80)
+    #bgl.glVertex2f(2,180)
+    #bgl.glEnd()
 
     # restore opengl defaults
     bgl.glLineWidth(1)
@@ -460,25 +462,25 @@ def draw_callback_px_2d(self, context):
    # bgl.glVertex3f(*context.scene.cursor_location)
    # bgl.glEnd()
 
-    # bgl.glBegin(bgl.GL_POLYGON)
+    #bgl.glBegin(bgl.GL_POLYGON)
     ##bgl.glColor4f(0.0, 0.0, 0.0, 0.5)
     #bgl.glVertex3f(0.0, 0.0, 0.0)
     #bgl.glVertex3f(0.0, 1.0, 0.0)
     #bgl.glVertex3f(1.0, 1.0, 0.0)
     #bgl.glVertex3f(1.0, 0.0, 0.0)
-    # bgl.glEnd()
+    #bgl.glEnd()
 
-    # bgl.glEnable(bgl.GL_BLEND)
-    # bgl.glLineWidth(1.5)
+    #bgl.glEnable(bgl.GL_BLEND)
+    #bgl.glLineWidth(1.5)
     bgl.glPointSize(4)
 #    bgl.glBegin(bgl.GL_LINE_LOOP)
     bgl.glBegin(bgl.GL_POINTS)
  #   bgl.glBegin(bgl.GL_POLYGON)
-    bgl.glColor4f(0.5, 1.1, 1.0, 0.5)
+    bgl.glColor4f(0.5,1.1,1.0,0.5)
     bgl.glVertex2f(10, 20)
-    bgl.glVertex2f(50, 60)
-    bgl.glVertex2f(700, 80)
-    bgl.glVertex2f(2, 180)
+    bgl.glVertex2f(50,60)
+    bgl.glVertex2f(700,80)
+    bgl.glVertex2f(2,180)
     bgl.glEnd()
 
     # restore opengl defaults

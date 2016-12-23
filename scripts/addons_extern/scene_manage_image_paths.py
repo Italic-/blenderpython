@@ -124,6 +124,7 @@ class MIPImagePathsPanel(bpy.types.Panel):
     bl_context = "scene"
 
     def draw(self, context):
+        print("draw!", time())
         layout = self.layout
         images = get_images()
         props = context.scene.mip_props

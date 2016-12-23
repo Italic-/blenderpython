@@ -1,0 +1,3 @@
+nothing here
+folder is active with my addon_utils.py in modules
+i use to store paid for addons so you canput all the paid for ones in a folder & just add it to newer builds

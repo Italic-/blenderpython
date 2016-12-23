@@ -542,6 +542,7 @@ def draw_extra(context, layout):
 
 
 class VIEW3D_PT_tools_objectmode(Panel):
+    bl_category = "Tools"
     bl_space_type = 'VIEW_3D'
     bl_region_type = switch
     # bl_region_type = context.scene.tool	# check if exist, set
@@ -590,6 +591,7 @@ class VIEW3D_PT_tools_objectmode(Panel):
 
 
 class VIEW3D_PT_tools_meshedit(Panel):
+    bl_category = "Tools"
     bl_space_type = 'VIEW_3D'
     bl_region_type = switch
     bl_context = "mesh_edit"
@@ -698,6 +700,7 @@ class VIEW3D_PT_tools_meshedit(Panel):
 
 
 class VIEW3D_PT_tools_armatureedit(Panel):
+    bl_category = "Tools"
     bl_space_type = 'VIEW_3D'
     bl_region_type = switch
     bl_context = "armature_edit"

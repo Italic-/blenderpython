@@ -1920,7 +1920,7 @@ class Transform(bpy.types.Panel):
     bl_label = 'Transform Extend'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
-    bl_category = 'Tools'
+    bl_category = 'Move'
     bl_options = {'DEFAULT_CLOSED'}
 
     bpy.types.Object.delta_scale_xyz = FloatProperty(options={'HIDDEN'}, name='XYZ', min=0.0, max=20.0, step=1, default=1.0, update=f_delta_scale_xyz,

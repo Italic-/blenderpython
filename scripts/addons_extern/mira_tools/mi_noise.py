@@ -47,9 +47,10 @@ class MI_Noise(bpy.types.Operator):
                ('Fractal', 'Fractal', ''),
                ('HeteroTerrain', 'HeteroTerrain', ''),
                ),
-        default='Turbulence'
+        default = 'Turbulence'
     )
 
+    frequency = FloatProperty(default=1.0)
     intensity = FloatProperty(default=1.0)
     offset_x = FloatProperty(default=0.0)
     offset_y = FloatProperty(default=0.0)
@@ -58,6 +59,7 @@ class MI_Noise(bpy.types.Operator):
     amplitude_scale = FloatProperty(default=0.5)
     frequency_scale = FloatProperty(default=2.0)
     hard = BoolProperty(default=True)
+
 
     def execute(self, context):
 
@@ -74,8 +76,8 @@ class MI_Noise(bpy.types.Operator):
 
         return self.execute(context)
         # else:
-        # self.report({'WARNING'}, "View3D not found, cannot run operator")
-        # return {'CANCELLED'}
+            # self.report({'WARNING'}, "View3D not found, cannot run operator")
+            # return {'CANCELLED'}
 
 
 def noise_obj(obj, context, self):
@@ -85,7 +87,7 @@ def noise_obj(obj, context, self):
         verts = [v for v in bm.verts if v.hide is False]
 
     for vert in verts:
-        noise_pos = vert.co.copy()
+        noise_pos = self.frequency * vert.co.copy()
         noise_pos.x += self.offset_x
         noise_pos.z += self.offset_y
         noise_pos.z += self.offset_z

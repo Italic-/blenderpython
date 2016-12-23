@@ -350,9 +350,11 @@ class VTOOLS_CC_objectsLayerManager(bpy.types.PropertyGroup):
 	
 class VTOOLS_PN_objectsLayerManager(bpy.types.Panel):
 	bl_space_type = 'VIEW_3D'
-	bl_region_type = 'UI'
+	bl_region_type = 'TOOLS'
+	bl_category = 'Layers'
 	bl_label = "Objects Layer Manager"
 	bl_options = {'DEFAULT_CLOSED'}
+	bl_context = 'objectmode'
 	def draw(self,context):
 		layout = self.layout
 		row = layout.row()

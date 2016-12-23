@@ -105,7 +105,7 @@ class PanelMP(bpy.types.Panel):
     bl_label = 'Parent to Mesh'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
-
+    bl_category = "Relations"
     def draw(self, context):
         wm = bpy.context.window_manager
         layout = self.layout

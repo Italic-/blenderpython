@@ -47,7 +47,6 @@ class MI_PL_LoopObject():
         self.selected_verts = selected_verts  # Boolean, if the loop is from selected or not
         self.revert_prev_loops = False  # revert previous loops for face creation in some cases
 
-
 class MI_PolyLoop(bpy.types.Operator):
     """Draw a line with the mouse"""
     bl_idname = "mira.poly_loop"
@@ -129,8 +128,9 @@ class MI_PolyLoop(bpy.types.Operator):
             self.report({'WARNING'}, "View3D not found, cannot run operator")
             return {'CANCELLED'}
 
+
     def modal(self, context, event):
-        # print(context.active_operator)
+        #print(context.active_operator)
         context.area.tag_redraw()
 
         context.area.header_text_set("Shift+A: NewLoops, A: NewLoop, LeftClick: CreatePoint, X: DeletePoint, C: CreateTriangle, Ctrl+LeftClick: CreateTriangle2, Shift+Tab: SurfaceSnap")
@@ -171,7 +171,7 @@ class MI_PolyLoop(bpy.types.Operator):
                     self.all_loops_ids[-1].revert_prev_loops = True
             elif not pos_2d_1:
                 self.id_to_index = (last_id, pos_2d_2)
-                self.all_loops_ids[-1].revert_prev_loops = True
+                self.all_loops_ids[-1].revert_prev_loops = True                
             elif not pos_2d_2:
                 self.id_to_index = (first_id, pos_2d_1)
                 self.all_loops_ids[-1].revert_prev_loops = False
@@ -187,7 +187,7 @@ class MI_PolyLoop(bpy.types.Operator):
                 # get position
                 new_point_pos = None
                 if mi_settings.surface_snap is True and self.picked_meshes:
-                    best_obj, hit_normal, hit_position = ut_base.get_mouse_raycast(context, self.picked_meshes, m_coords, 10000.0)
+                    best_obj, hit_normal, hit_position = ut_base.get_mouse_raycast(context, self.picked_meshes, m_coords)
                     if hit_position:
                         new_point_pos = active_obj.matrix_world.inverted() * hit_position
                 else:
@@ -230,7 +230,7 @@ class MI_PolyLoop(bpy.types.Operator):
 
                             other_verts = ut_base.get_verts_from_ids(temp_ids, self.id_layer, bm)
                             new_face_verts += other_verts
-                            new_face = bm.faces.new(new_face_verts)
+                            new_face = bm.faces.new( new_face_verts )
 
                             bmesh.ops.recalc_face_normals(bm, faces=[new_face])
 
@@ -293,7 +293,7 @@ class MI_PolyLoop(bpy.types.Operator):
 
                         other_verts = ut_base.get_verts_from_ids(temp_ids, self.id_layer, bm)
                         new_face_verts += other_verts
-                        new_face = bm.faces.new(new_face_verts)
+                        new_face = bm.faces.new( new_face_verts )
 
                         bmesh.ops.recalc_face_normals(bm, faces=[new_face])
 
@@ -372,7 +372,7 @@ class MI_PolyLoop(bpy.types.Operator):
 
                 last_vert = ut_base.get_verts_from_ids([self.all_loops_ids[-1].loop_ids[-1]], self.id_layer, bm)[0]
                 if mi_settings.surface_snap is True and self.picked_meshes:
-                    best_obj, hit_normal, hit_position = ut_base.get_mouse_raycast(context, self.picked_meshes, m_coords, 10000.0)
+                    best_obj, hit_normal, hit_position = ut_base.get_mouse_raycast(context, self.picked_meshes, m_coords)
                     if hit_position:
                         last_vert.co = active_obj.matrix_world.inverted() * hit_position
 
@@ -448,23 +448,23 @@ def mi_pl_draw_2d(self, context):
         mi_draw_2d_point(self.id_to_index[1][0], self.id_to_index[1][1], p_size=6, p_col=col_man.pl_point_col)
 
 
-# def mi_pl_draw_3d(self, context):
+#def mi_pl_draw_3d(self, context):
     #active_obj = context.scene.objects.active
-    # if self.all_curves:
-        # test1
+    #if self.all_curves:
+        ## test1
         #region = context.region
         #rv3d = context.region_data
-        # for curve in self.all_curves:
-        # for cur_point in curve.curve_points:
-        # if cur_point.point_id in curve.display_bezier:
-        #mi_pl_draw_3d_polyline(curve.display_bezier[cur_point.point_id], 2, col_man.cur_line_base, True)
+        #for curve in self.all_curves:
+            #for cur_point in curve.curve_points:
+                #if cur_point.point_id in curve.display_bezier:
+                    #mi_pl_draw_3d_polyline(curve.display_bezier[cur_point.point_id], 2, col_man.cur_line_base, True)
 
 
 # TODO MOVE TO UTILITIES
-def mi_draw_2d_point(point_x, point_y, p_size=4, p_col=(1.0, 1.0, 1.0, 1.0)):
+def mi_draw_2d_point(point_x, point_y, p_size=4, p_col=(1.0,1.0,1.0,1.0)):
     bgl.glEnable(bgl.GL_BLEND)
     #bgl.glColor4f(1.0, 1.0, 1.0, 0.5)
-    # bgl.glLineWidth(2)
+    #bgl.glLineWidth(2)
 
     bgl.glPointSize(p_size)
 #    bgl.glBegin(bgl.GL_LINE_LOOP)
@@ -480,66 +480,66 @@ def mi_draw_2d_point(point_x, point_y, p_size=4, p_col=(1.0, 1.0, 1.0, 1.0)):
     bgl.glColor4f(0.0, 0.0, 0.0, 1.0)
 
 
-# TODO MOVE TO UTILITIES
-# def mi_pl_draw_3d_polyline(points, p_size, p_col, x_ray):
-    # bgl.glEnable(bgl.GL_BLEND)
-    # bgl.glLineWidth(1)
+## TODO MOVE TO UTILITIES
+#def mi_pl_draw_3d_polyline(points, p_size, p_col, x_ray):
+    #bgl.glEnable(bgl.GL_BLEND)
+    #bgl.glLineWidth(1)
 
-    # if x_ray is True:
-    # bgl.glDisable(bgl.GL_DEPTH_TEST)
+    #if x_ray is True:
+        #bgl.glDisable(bgl.GL_DEPTH_TEST)
 
-    # bgl.glPointSize(p_size)
-# bgl.glBegin(bgl.GL_LINE_LOOP)
-    # bgl.glBegin(bgl.GL_LINE_STRIP)
+    #bgl.glPointSize(p_size)
+##    bgl.glBegin(bgl.GL_LINE_LOOP)
+    #bgl.glBegin(bgl.GL_LINE_STRIP)
     #bgl.glColor4f(p_col[0], p_col[1], p_col[2], p_col[3])
- # bgl.glBegin(bgl.GL_POLYGON)
+ ##   bgl.glBegin(bgl.GL_POLYGON)
 
-    # for point in points:
-    #bgl.glVertex3f(point[0], point[1], point[2])
+    #for point in points:
+        #bgl.glVertex3f(point[0], point[1], point[2])
 
-    # if x_ray is True:
-    # bgl.glEnable(bgl.GL_DEPTH_TEST)
+    #if x_ray is True:
+        #bgl.glEnable(bgl.GL_DEPTH_TEST)
 
-    # bgl.glEnd()
+    #bgl.glEnd()
 
-    # restore opengl defaults
-    # bgl.glLineWidth(1)
-    # bgl.glDisable(bgl.GL_BLEND)
+    ## restore opengl defaults
+    #bgl.glLineWidth(1)
+    #bgl.glDisable(bgl.GL_BLEND)
     #bgl.glColor4f(0.0, 0.0, 0.0, 1.0)
 
 
-# def draw_curve_2d(curves, context):
+#def draw_curve_2d(curves, context):
     #region = context.region
     #rv3d = context.region_data
     #mi_settings = context.scene.mi_settings
     ## coord = event.mouse_region_x, event.mouse_region_y
-    # for curve in curves:
-    # for cu_point in curve.curve_points:
-    #point_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.position)
+    #for curve in curves:
+        #for cu_point in curve.curve_points:
+            #point_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.position)
 
-    # if point_pos_2d:
-    #p_col = col_man.cur_point_base
-    # if curve.closed is True:
-    # if curve.curve_points.index(cu_point) == 0:
-    #p_col = col_man.cur_point_closed_start
-    # elif curve.curve_points.index(cu_point) == len(curve.curve_points) - 1:
-    #p_col = col_man.cur_point_closed_end
+            #if point_pos_2d:
+                #p_col = col_man.cur_point_base
+                #if curve.closed is True:
+                    #if curve.curve_points.index(cu_point) == 0:
+                        #p_col = col_man.cur_point_closed_start
+                    #elif curve.curve_points.index(cu_point) == len(curve.curve_points) - 1:
+                        #p_col = col_man.cur_point_closed_end
 
-    # if cu_point.select:
-    #p_col = col_man.cur_point_selected
-    # if cu_point.point_id == curve.active_point:
-    #p_col = col_man.cur_point_active
-    #mi_draw_2d_point(point_pos_2d.x, point_pos_2d.y, 6, p_col)
+                #if cu_point.select:
+                    #p_col = col_man.cur_point_selected
+                #if cu_point.point_id == curve.active_point:
+                    #p_col = col_man.cur_point_active
+                #mi_draw_2d_point(point_pos_2d.x, point_pos_2d.y, 6, p_col)
 
-    # Handlers
-    # if mi_settings.draw_handlers:
-    # if curve.curve_points.index(cu_point) < len(curve.curve_points)-1:
-    # if cu_point.handle1:
-    #handle_1_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.handle1)
-    # if handle_1_pos_2d:
-    #mi_draw_2d_point(handle_1_pos_2d.x, handle_1_pos_2d.y, 3, col_man.cur_handle_1_base)
-    # if curve.curve_points.index(cu_point) > 0:
-    # if cu_point.handle2:
-    #handle_2_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.handle2)
-    # if handle_2_pos_2d:
-    #mi_draw_2d_point(handle_2_pos_2d.x, handle_2_pos_2d.y, 3, col_man.cur_handle_2_base)
+                ## Handlers
+                #if mi_settings.draw_handlers:
+                ##if curve.curve_points.index(cu_point) < len(curve.curve_points)-1:
+                    #if cu_point.handle1:
+                        #handle_1_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.handle1)
+                        #if handle_1_pos_2d:
+                            #mi_draw_2d_point(handle_1_pos_2d.x, handle_1_pos_2d.y, 3, col_man.cur_handle_1_base)
+                ##if curve.curve_points.index(cu_point) > 0:
+                    #if cu_point.handle2:
+                        #handle_2_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, cu_point.handle2)
+                        #if handle_2_pos_2d:
+                            #mi_draw_2d_point(handle_2_pos_2d.x, handle_2_pos_2d.y, 3, col_man.cur_handle_2_base)

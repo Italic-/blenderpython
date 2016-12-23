@@ -14,7 +14,7 @@ class MFTVertexPaintMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
 
-        # layout.separator()
+        #layout.separator()
         layout.operator(MFTSetColorToSelected.bl_idname)
         layout.operator(MFTInvertColors.bl_idname)
 
@@ -49,6 +49,7 @@ class MFTSetColorToSelected(bpy.types.Operator):
             else:
                 self.strength = context.tool_settings.vertex_paint.brush.color
             self.ch_col = True
+
 
         i = 0
         for poly in obj.data.polygons:

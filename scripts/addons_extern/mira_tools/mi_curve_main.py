@@ -34,20 +34,20 @@ from mathutils import Vector
 
 from . import mi_utils_base as ut_base
 
-# class MI_CurvePoint(bpy.types.PropertyGroup):
-#position = FloatVectorProperty()
-#direction = FloatVectorProperty()
-#up_direction = FloatVectorProperty()
-#handle1 = FloatVectorProperty()
-#handle2 = FloatVectorProperty()
-#point_id = StringProperty(default="")
+#class MI_CurvePoint(bpy.types.PropertyGroup):
+    #position = FloatVectorProperty()
+    #direction = FloatVectorProperty()
+    #up_direction = FloatVectorProperty()
+    #handle1 = FloatVectorProperty()
+    #handle2 = FloatVectorProperty()
+    #point_id = StringProperty(default="")
 
 
-# class MI_CurveObject(bpy.types.PropertyGroup):
-# curve_points = CollectionProperty(
-# type=MI_CurvePoint
-#)
-#active_point = StringProperty(default="")
+#class MI_CurveObject(bpy.types.PropertyGroup):
+    #curve_points = CollectionProperty(
+        #type=MI_CurvePoint
+    #)
+    #active_point = StringProperty(default="")
 
 
 class MI_CurveObject(object):
@@ -93,12 +93,12 @@ def curve_point_changed(curve, point_numb, curve_resolution, display_bezier):
     len_cur = len(curve.curve_points)
     for i in range(6):
         new_i = (i - 2) + point_numb
-        if new_i > len_cur - 1 or new_i < 0:
+        if new_i > len_cur-1 or new_i < 0:
             if curve.closed is False:
                 continue
             else:
                 new_i = new_i - len_cur
-                if new_i > len_cur - 1 or new_i < -(len_cur - 1):
+                if new_i > len_cur-1 or new_i < -(len_cur-1):
                     continue  # if out of the list
 
         new_b_points = generate_bezier_area(curve, new_i, curve_resolution)
@@ -125,7 +125,7 @@ def generate_line_area(curve, point_numb):
     if point_numb == 0 and curve.closed is False:
         return None  # return None for closed curve at 0 index
     else:
-        return [curve.curve_points[point_numb - 1].position, curve.curve_points[point_numb].position]
+        return [curve.curve_points[point_numb-1].position, curve.curve_points[point_numb].position]
 
 
 def generate_bezier_area(curve, point_numb, curve_resolution):
@@ -136,22 +136,22 @@ def generate_bezier_area(curve, point_numb, curve_resolution):
         return bezier_vecs  # return None for closed curve at 0 index
 
     elif p_len > 2 and curve_resolution > 1:
-        back_point = point_numb - 1
+        back_point = point_numb-1
 
         two_back_point = None
-        if point_numb - 2 < 0 and curve.closed is False:
-            two_back_point = point_numb - 1
+        if point_numb-2 < 0 and curve.closed is False:
+            two_back_point = point_numb-1
         else:
-            two_back_point = point_numb - 2
+            two_back_point = point_numb-2
 
         forward_point = None
-        if point_numb + 1 > p_len - 1:
+        if point_numb+1 > p_len-1:
             if curve.closed is False:
                 forward_point = point_numb
             else:
-                forward_point = point_numb + 1 - p_len  # last index of points. For closed curves only
+                forward_point = point_numb+1 - p_len  # last index of points. For closed curves only
         else:
-            forward_point = point_numb + 1
+            forward_point = point_numb+1
 
         knot1 = Vector(curve.curve_points[back_point].position)
         knot2 = Vector(curve.curve_points[point_numb].position)
@@ -165,27 +165,27 @@ def generate_bezier_area(curve, point_numb, curve_resolution):
             dl1 = (Vector(curve.curve_points[back_point].position) - Vector(curve.curve_points[point_numb].position))
             dl1_2 = (Vector(curve.curve_points[two_back_point].position) - Vector(curve.curve_points[point_numb].position))
 
-            handle1_len = (dl1.length) * (dl1.length / (dl1.length + dl1_2.length))
+            handle1_len = ( dl1.length  ) * (dl1.length/(dl1.length+dl1_2.length))
 
-            if dl1.length > dl1_2.length / 1.5 and dl1.length != 0:
-                handle1_len *= ((dl1_2.length / 1.5) / dl1.length)
-            elif dl1.length < dl1_2.length / 3.0 and dl1.length != 0:
-                handle1_len *= (dl1_2.length / 3.0) / dl1.length
+            if dl1.length > dl1_2.length/1.5 and dl1.length != 0:
+                handle1_len *= ((dl1_2.length/1.5)/dl1.length)
+            elif dl1.length < dl1_2.length/3.0 and dl1.length != 0:
+                handle1_len *= (dl1_2.length/3.0)/dl1.length
 
-            # handle1_len = min(( dl1.length  ) * (dl1.length/(dl1.length+dl1_2.length)) ,dist1.length* h1_final*0.5)
+            # handle1_len = min(( dl1.length  ) * (dl1.length/(dl1.length+dl1_2.length)) ,dist1.length* h1_final*0.5) 
             handle1 = knot1 + (dist1.normalized() * handle1_len)
 
-        if point_numb < p_len - 1 or curve.closed is True:
+        if point_numb < p_len-1 or curve.closed is True:
             dist2 = (Vector(curve.curve_points[back_point].position) - Vector(curve.curve_points[forward_point].position))
             dl2 = (Vector(curve.curve_points[back_point].position) - Vector(curve.curve_points[point_numb].position))
             dl2_2 = (Vector(curve.curve_points[back_point].position) - Vector(curve.curve_points[forward_point].position))
 
-            handle2_len = (dl2.length) * (dl2.length / (dl2.length + dl2_2.length))
+            handle2_len = (dl2.length  ) * (dl2.length/(dl2.length+dl2_2.length)) 
 
-            if dl2.length > dl2_2.length / 1.5 and dl2.length != 0:
-                handle2_len *= ((dl2_2.length / 1.5) / dl2.length)
-            elif dl2.length < dl2_2.length / 3.0 and dl2.length != 0:
-                handle2_len *= (dl2_2.length / 3.0) / dl2.length
+            if dl2.length > dl2_2.length/1.5 and dl2.length != 0:
+                handle2_len *= ((dl2_2.length/1.5)/dl2.length)
+            elif dl2.length < dl2_2.length/3.0 and dl2.length != 0:
+                handle2_len *= (dl2_2.length/3.0)/dl2.length
 
             # handle2_len = min((dl2.length  ) * (dl2.length/(dl2.length+dl2_2.length)), dist2.length* h2_final*0.5)
             handle2 = knot2 + (dist2.normalized() * handle2_len)
@@ -207,7 +207,7 @@ def generate_bezier_area(curve, point_numb, curve_resolution):
         # Get all the points on the curve between these two items.  Uses the default of 12 for a "preview" resolution
         # on the curve.  Note the +1 because the "preview resolution" tells how many segments to use.  ie. 2 => 2 segments
         # or 3 points.  The "interpolate_bezier" functions takes the number of points it should generate.
-        bezier_vecs = mathu.geometry.interpolate_bezier(knot1, handle1, handle2, knot2, curve_resolution + 1)
+        bezier_vecs = mathu.geometry.interpolate_bezier(knot1, handle1, handle2, knot2, curve_resolution+1)
     else:
         bezier_vecs = generate_line_area(curve, point_numb)
 
@@ -254,7 +254,7 @@ def pick_curve_point(curve, context, mouse_coords):
             else:
                 if the_length < picked_point_length:
                     picked_point = cu_point
-                    picked_point_length = the_length
+                    picked_point_length = the_length                    
 
     return picked_point, the_length
 
@@ -317,9 +317,9 @@ def add_point(new_point_pos, curve):
     # add to other indexes
     else:
         check_vec = (new_point_pos - active_point.position).normalized()
-        point_1 = ((curve.curve_points[point_index + 1].position) - active_point.position).normalized()
+        point_1 = ((curve.curve_points[point_index + 1].position ) - active_point.position).normalized()
         p1_angle = point_1.angle(check_vec)
-        point_2 = ((curve.curve_points[point_index - 1].position) - active_point.position).normalized()
+        point_2 = ((curve.curve_points[point_index - 1].position ) - active_point.position).normalized()
         p2_angle = point_2.angle(check_vec)
 
         if p1_angle < p2_angle:
@@ -368,23 +368,23 @@ def pass_line(vecs, is_closed_line):
     vecs_len = len(vecs)
 
     for i, vec in enumerate(vecs):
-        # if i == vecs_len - 1 and is_closed_line is False:
+        #if i == vecs_len - 1 and is_closed_line is False:
             #line_data.append((vec, line_length, 0.0, None))
-        # else:
+        #else:
         vec_area = None
         if i == vecs_len - 1:
             if is_closed_line:
                 vec_area = vecs[0] - vec
             else:
-                vec_area = Vector((0.0, 0.0, 0.0))
+                vec_area = Vector( (0.0, 0.0, 0.0) )
         else:
-            vec_area = vecs[i + 1] - vec
+            vec_area = vecs[i+1] - vec
 
         area_length = vec_area.length
 
         vec_dir = None
         if i == vecs_len - 1:
-            vec_dir = (vec - vecs[i - 1]).normalized()
+            vec_dir = (vec - vecs[i-1]).normalized()
         else:
             vec_dir = vec_area.normalized()
 
@@ -413,7 +413,7 @@ def get_bezier_line(curve, active_obj, local_coords):
         b_points = curve.display_bezier.get(point.point_id)
         if b_points:
             # get lengths
-            b_point_len = len(b_points)
+            b_point_len =  len(b_points)
             curve_points_len = len(curve.curve_points)
             #b_points = b_points.copy()
 
@@ -462,13 +462,13 @@ def create_curve_to_line(points_number, line_data, all_curves, is_closed_line):
             break
 
         if is_closed_line:
-            point_len = ((line_len / (points_number)) * (i))
+            point_len = ((line_len/ (points_number)) * (i))
         else:
-            point_len = (line_len / (points_number - 1)) * (i)
+            point_len = (line_len/ (points_number - 1)) * (i)
 
         for point_data in line_data[point_passed:]:
             j = line_data.index(point_data)
-            if line_data[j + 1][1] >= point_len:
+            if line_data[j+1][1] >= point_len:
                 curve_point = MI_CurvePoint(curve.curve_points)
                 curve_point.position = line_data[j][0] + (line_data[j][3] * (point_len - line_data[j][1]))
                 curve.curve_points.append(curve_point)
@@ -497,15 +497,15 @@ def verts_to_line(verts, line_data, verts_data, is_closed_line):
 
         point_len = None
         if verts_data:
-            # if is_closed_line is False:
-            point_len = (verts_data[i][1] / verts_data[-1][1]) * line_len
-            # else:
-            #point_len = ((verts_data[i][1]/ (verts_data[-1][1] + verts_data[-2][2]) ) * (line_len) )
+            #if is_closed_line is False:
+            point_len = (verts_data[i][1]/ verts_data[-1][1] ) * line_len
+            #else:
+                #point_len = ((verts_data[i][1]/ (verts_data[-1][1] + verts_data[-2][2]) ) * (line_len) )
         else:
-            point_len = (line_len / (verts_number - 1)) * (i)
+            point_len = (line_len/ (verts_number - 1)) * (i)
         for point_data in line_data[point_passed:]:
             j = line_data.index(point_data)
-            if line_data[j + 1][1] >= point_len:
+            if line_data[j+1][1] >= point_len:
                 vert.co = line_data[j][0] + (line_data[j][3] * (point_len - line_data[j][1]))
                 point_passed = j
                 break
@@ -518,11 +518,11 @@ def snap_to_surface(context, selected_points, picked_meshes, region, rv3d, move_
         final_pos = point.position
         if move_offset:
             final_pos = point.position + move_offset
-
+        
         point_pos_2d = view3d_utils.location_3d_to_region_2d(region, rv3d, final_pos)
 
         if point_pos_2d:
-            best_obj, hit_normal, hit_position = ut_base.get_mouse_raycast(context, picked_meshes, point_pos_2d, 10000.0)
+            best_obj, hit_normal, hit_position = ut_base.get_mouse_raycast(context, picked_meshes, point_pos_2d)
             #best_obj, hit_normal, hit_position = ut_base.get_3dpoint_raycast(context, self.picked_meshes, final_pos, camera_dir, 10000.0)
         if hit_position:
             point.position = hit_position

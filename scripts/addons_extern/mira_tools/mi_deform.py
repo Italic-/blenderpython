@@ -56,26 +56,26 @@ class MI_Deform(bpy.types.Operator):
                ('Y', 'Y', ''),
                ('Z', 'Z', ''),
                ),
-        default='X'
+        default = 'X'
     )
     # deform_direction = EnumProperty(
-    # items=(('Top', 'Top', ''),
-    #('Bottom', 'Bottom', ''),
-    #('Left', 'Left', ''),
-    #('Right', 'Right', ''),
-    #),
-    # default = 'Top'
+        # items=(('Top', 'Top', ''),
+               #('Bottom', 'Bottom', ''),
+               #('Left', 'Left', ''),
+               #('Right', 'Right', ''),
+               #),
+        # default = 'Top'
     #)
 
     def execute(self, context):
 
-        obj = context.scene.objects.active
+        active_obj = context.scene.objects.active
 
         # reset properties
         if self.reset_values is True:
             reset_all_values(self)
 
-        deform_obj(obj, context, self)
+        deform_obj(active_obj, context, self)
 
         return {'FINISHED'}
 
@@ -87,8 +87,8 @@ class MI_Deform(bpy.types.Operator):
 
         return self.execute(context)
         # else:
-        # self.report({'WARNING'}, "View3D not found, cannot run operator")
-        # return {'CANCELLED'}
+            # self.report({'WARNING'}, "View3D not found, cannot run operator")
+            # return {'CANCELLED'}
 
 
 def reset_all_values(self):
@@ -102,16 +102,16 @@ def reset_all_values(self):
     self.reset_values = False
 
 
-def deform_obj(obj, context, self):
+def deform_obj(active_obj, context, self):
     offset_rotation = 0.2
     offset_axis = 5.0
     bend_scale = 0.7
 
     # get vertices
     verts = None
-    if obj.mode == 'EDIT':
+    if active_obj.mode == 'EDIT':
         # this works only in edit mode,
-        bm = bmesh.from_edit_mesh(obj.data)
+        bm = bmesh.from_edit_mesh(active_obj.data)
 
         verts = [v for v in bm.verts if v.select]
         if len(verts) == 0:
@@ -119,14 +119,14 @@ def deform_obj(obj, context, self):
 
     else:
         # this works only in object mode,
-        verts = [v for v in obj.data.vertices if v.select]
+        verts = [v for v in active_obj.data.vertices if v.select]
         if len(verts) == 0:
-            verts = [v for v in obj.data.vertices if v.hide is False]
+            verts = [v for v in active_obj.data.vertices if v.hide is False]
 
     # TODO Move it into utilities method. As Extrude class has the same
     # min/max.
     if verts:
-        if obj.mode == 'EDIT':
+        if active_obj.mode == 'EDIT':
             bm.verts.ensure_lookup_table()
         x_min = verts[0].co.x
         x_max = verts[0].co.x
@@ -186,7 +186,7 @@ def deform_obj(obj, context, self):
                 if self.twist_angle != 0:
                     twist_angle = self.twist_angle * (visual_up_pos / visual_max)
                     # if self.deform_axis == 'X':
-                    # rot_angle = -rot_angle
+                        # rot_angle = -rot_angle
                     rot_mat = None
                     if self.deform_axis != 'Z':
                         rot_mat = Matrix.Rotation(twist_angle, 3, 'Z')
@@ -236,9 +236,9 @@ def deform_obj(obj, context, self):
                     elif self.deform_axis == 'Z':
                         vert.co.z += move_offset
 
-    # obj.data.update()
-    # bpy.ops.mesh.normals_make_consistent()  # recalculate normals
-    # bpy.ops.object.editmode_toggle()
-    # bpy.ops.object.editmode_toggle()
+    # active_obj.data.update()
+    #bpy.ops.mesh.normals_make_consistent()  # recalculate normals
+    #bpy.ops.object.editmode_toggle()
+    #bpy.ops.object.editmode_toggle()
     bm.normal_update()
-    bmesh.update_edit_mesh(obj.data)
+    bmesh.update_edit_mesh(active_obj.data)

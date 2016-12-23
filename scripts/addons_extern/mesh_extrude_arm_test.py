@@ -234,7 +234,7 @@ class BB(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     numb = IntProperty(name='Max Bones', min=1, max=1000, soft_max=100, default=5, description='Max number of bones')
-    skip = IntProperty(name='Skip Loops', min=0, max=5, default=0, description='Skip some edges to get longer bones')
+    skip = IntProperty(name='Skip Loops', min=0, max=5, default=1, description='Skip some edges to get longer bones')
     long = FloatProperty(name='Min Length', min=0.01, max=5, default=0.15, description='Discard bones shorter than this value')
     ika = BoolProperty(name='IK constraints', default=True, description='Add IK constraint and Empty as target')
     rotk = BoolProperty(name='IK Rotation', default=False, description='IK constraint follows target rotation')
@@ -414,7 +414,7 @@ class UI(bpy.types.Panel):
     bl_label = 'MExtrude'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
-
+    bl_category = "Create"
     def draw(self, context):
         layout = self.layout
         layout.operator('object.mextrude')

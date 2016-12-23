@@ -17,15 +17,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# TODO
-# transfer vgroups without deleting existing ones
-# draw all edges
-# copy modifiers
-# copy constraints
-# copy bone constraints
-# apply LocRotScale after rigifying
-# hard surface weights
-
 import bpy
 import bmesh
 import math
@@ -64,7 +55,6 @@ def copyMeshPos(metarig, genesis, targetBone, headOrTail, vgroupName):
     bpy.ops.armature.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
 
-
 def copyBonePos(metarig, genesisRig, targetBone, headOrTail, sourceBone):
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.scene.objects.active = genesisRig
@@ -92,7 +82,6 @@ def copyBonePos(metarig, genesisRig, targetBone, headOrTail, sourceBone):
     bpy.ops.armature.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
 
-
 def metarigPrep(metarig):
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.scene.objects.active = metarig
@@ -100,7 +89,6 @@ def metarigPrep(metarig):
     bpy.context.active_object.data.use_mirror_x = True
     bpy.context.active_object.data.edit_bones["neck"].use_connect = True
     bpy.ops.object.mode_set(mode='OBJECT')
-
 
 def metarigFinishingTouches(metarig):
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -118,16 +106,15 @@ def metarigFinishingTouches(metarig):
     bpy.ops.armature.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
 
-
 def createFaceRig(g3):
-    # we need to know if it's a g3 because of its unique skeleton
+    #we need to know if it's a g3 because of its unique skeleton
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.armature_add(view_align=False, enter_editmode=False, location=(0, 0, 0))
     faceRig = bpy.context.active_object
     bpy.ops.object.mode_set(mode='EDIT')
 
-    # add tongue bones
-    # the default bone is the tongue's base
+    #add tongue bones
+    #the default bone is the tongue's base
     bpy.context.space_data.cursor_location[0] = 0
     bpy.ops.armature.bone_primitive_add()
     bpy.context.space_data.cursor_location[0] = 1
@@ -141,7 +128,7 @@ def createFaceRig(g3):
         bpy.ops.armature.bone_primitive_add()
         bpy.context.space_data.cursor_location[0] = 5
         bpy.ops.armature.bone_primitive_add()
-    # add eye bones
+    #add eye bones
     bpy.context.space_data.cursor_location[0] = 6
     bpy.ops.armature.bone_primitive_add()
     bpy.context.space_data.cursor_location[0] = 7
@@ -154,7 +141,7 @@ def createFaceRig(g3):
     bpy.ops.armature.bone_primitive_add()
     bpy.context.space_data.cursor_location[0] = 11
 
-    # names
+    #names
     i = 0
     if(g3 == False):
         faceRig.data.edit_bones[i].name = "DEF-tonguebase"
@@ -182,12 +169,12 @@ def createFaceRig(g3):
     i += 1
     faceRig.data.edit_bones[i].name = "IK-eyes_lookat"
 
-    # disable deform
+    #disable deform
     faceRig.data.edit_bones["IK-eye.L"].use_deform = False
     faceRig.data.edit_bones["IK-eye.R"].use_deform = False
     faceRig.data.edit_bones["IK-eyes_lookat"].use_deform = False
 
-    # constraints
+    #constraints
     bpy.ops.object.mode_set(mode='POSE')
 
     faceRig.data.bones.active = faceRig.data.bones["DEF-eye.L"]
@@ -206,9 +193,8 @@ def createFaceRig(g3):
 
     return faceRig
 
-
 def faceRigSetParents(faceRig, g3):
-    # we need to know if it's a g3 because of its unique skeleton
+    #we need to know if it's a g3 because of its unique skeleton
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.scene.objects.active = faceRig
     bpy.ops.object.mode_set(mode='EDIT')
@@ -238,13 +224,12 @@ def faceRigSetParents(faceRig, g3):
     faceRig.data.edit_bones["IK-eye.L"].parent = faceRig.data.edit_bones["IK-eyes_lookat"]
     faceRig.data.edit_bones["IK-eye.R"].parent = faceRig.data.edit_bones["IK-eyes_lookat"]
 
-
 def faceRigFinishingTouches(faceRig):
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.scene.objects.active = faceRig
     bpy.ops.object.mode_set(mode='EDIT')
 
-    # Left Eye IK bone
+    #Left Eye IK bone
     bpy.ops.armature.select_all(action='DESELECT')
     bpy.context.active_object.data.edit_bones["DEF-eye.L"].select_tail = True
     bpy.ops.view3d.snap_cursor_to_selected()
@@ -260,7 +245,7 @@ def faceRigFinishingTouches(faceRig):
     bpy.context.space_data.cursor_location[1] = cursorY - 0.05
     bpy.ops.view3d.snap_selected_to_cursor()
 
-    # Right Eye IK bone
+    #Right Eye IK bone
     bpy.ops.armature.select_all(action='DESELECT')
     bpy.context.active_object.data.edit_bones["DEF-eye.R"].select_tail = True
     bpy.ops.view3d.snap_cursor_to_selected()
@@ -276,7 +261,8 @@ def faceRigFinishingTouches(faceRig):
     bpy.context.space_data.cursor_location[1] = cursorY - 0.05
     bpy.ops.view3d.snap_selected_to_cursor()
 
-    # Eyes Look-at Bone
+
+    #Eyes Look-at Bone
     bpy.ops.armature.select_all(action='DESELECT')
     bpy.context.active_object.data.edit_bones["DEF-eye.L"].select_tail = True
     bpy.context.active_object.data.edit_bones["DEF-eye.R"].select_tail = True
@@ -296,7 +282,6 @@ def faceRigFinishingTouches(faceRig):
 
     bpy.ops.armature.select_all(action='SELECT')
     bpy.ops.armature.calculate_roll(type='POS_X')
-
 
 def setGenesisRolls(metarig):
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -340,7 +325,6 @@ def setGenesisRolls(metarig):
     bpy.ops.armature.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
 
-
 def setGenesis2FemaleRolls(metarig):
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.scene.objects.active = metarig
@@ -353,7 +337,7 @@ def setGenesis2FemaleRolls(metarig):
     bpy.context.active_object.data.edit_bones["hips"].roll = 3.141593
     bpy.context.active_object.data.edit_bones["thigh.L"].roll = -0.050401
     bpy.context.active_object.data.edit_bones["shin.L"].roll = -0.015987
-    bpy.context.active_object.data.edit_bones["foot.L"].roll = 1.789502  # 1.944836
+    bpy.context.active_object.data.edit_bones["foot.L"].roll = 1.789502 #1.944836
     bpy.context.active_object.data.edit_bones["toe.L"].roll = 1.789502
     bpy.context.active_object.data.edit_bones["heel.L"].roll = 0.0939
     bpy.context.active_object.data.edit_bones["heel.02.L"].roll = 0.0000
@@ -383,7 +367,6 @@ def setGenesis2FemaleRolls(metarig):
     bpy.ops.armature.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
 
-
 def setGenesis2MaleRolls(metarig):
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.scene.objects.active = metarig
@@ -397,7 +380,7 @@ def setGenesis2MaleRolls(metarig):
     bpy.context.active_object.data.edit_bones["thigh.L"].roll = -0.050401
     bpy.context.active_object.data.edit_bones["shin.L"].roll = -0.015987
     bpy.context.active_object.data.edit_bones["foot.L"].roll = 1.658602
-    bpy.context.active_object.data.edit_bones["toe.L"].roll = 1.658602  # 2.005925
+    bpy.context.active_object.data.edit_bones["toe.L"].roll = 1.658602 #2.005925
     bpy.context.active_object.data.edit_bones["heel.L"].roll = 0.0939
     bpy.context.active_object.data.edit_bones["heel.02.L"].roll = 0.0000
     bpy.context.active_object.data.edit_bones["shoulder.L"].roll = -0.006807
@@ -425,7 +408,6 @@ def setGenesis2MaleRolls(metarig):
     bpy.context.active_object.data.edit_bones["f_pinky.03.L"].roll = 0.182735
     bpy.ops.armature.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
-
 
 def setGenesis3FemaleRolls(metarig):
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -469,9 +451,50 @@ def setGenesis3FemaleRolls(metarig):
     bpy.ops.armature.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
 
+def setGenesis3MaleRolls(metarig):
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.context.scene.objects.active = metarig
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.armature.select_all(action='DESELECT')
+    bpy.context.active_object.data.edit_bones["head"].roll = 3.141593
+    bpy.context.active_object.data.edit_bones["neck"].roll = 3.141593
+    bpy.context.active_object.data.edit_bones["chest"].roll = 3.141593
+    bpy.context.active_object.data.edit_bones["spine"].roll = 3.141593
+    bpy.context.active_object.data.edit_bones["hips"].roll = 3.141593
+    bpy.context.active_object.data.edit_bones["thigh.L"].roll = -0.050401
+    bpy.context.active_object.data.edit_bones["shin.L"].roll = -0.015987
+    bpy.context.active_object.data.edit_bones["foot.L"].roll = -1.210693
+    bpy.context.active_object.data.edit_bones["toe.L"].roll = 1.538201
+    bpy.context.active_object.data.edit_bones["heel.L"].roll = -0.0061
+    bpy.context.active_object.data.edit_bones["heel.02.L"].roll = 0.0000
+    bpy.context.active_object.data.edit_bones["shoulder.L"].roll = -0.006807
+    bpy.context.active_object.data.edit_bones["upper_arm.L"].roll = 0.037177
+    bpy.context.active_object.data.edit_bones["forearm.L"].roll = 1.635199
+    bpy.context.active_object.data.edit_bones["hand.L"].roll = -0.009100
+    bpy.context.active_object.data.edit_bones["thumb.01.L"].roll = 1.396754
+    bpy.context.active_object.data.edit_bones["thumb.02.L"].roll = 1.538887
+    bpy.context.active_object.data.edit_bones["thumb.03.L"].roll = 1.702941
+    bpy.context.active_object.data.edit_bones["palm.01.L"].roll = 0.059231
+    bpy.context.active_object.data.edit_bones["f_index.01.L"].roll = 0.107271
+    bpy.context.active_object.data.edit_bones["f_index.02.L"].roll = 0.119477
+    bpy.context.active_object.data.edit_bones["f_index.03.L"].roll = 0.044151
+    bpy.context.active_object.data.edit_bones["palm.02.L"].roll = 0.025885
+    bpy.context.active_object.data.edit_bones["f_middle.01.L"].roll = 0.045638
+    bpy.context.active_object.data.edit_bones["f_middle.02.L"].roll = 0.167271
+    bpy.context.active_object.data.edit_bones["f_middle.03.L"].roll = 0.029049
+    bpy.context.active_object.data.edit_bones["palm.03.L"].roll = 0.038919
+    bpy.context.active_object.data.edit_bones["f_ring.01.L"].roll = 0.078443
+    bpy.context.active_object.data.edit_bones["f_ring.02.L"].roll = 0.090552
+    bpy.context.active_object.data.edit_bones["f_ring.03.L"].roll = 0.03262
+    bpy.context.active_object.data.edit_bones["palm.04.L"].roll = 0.110783
+    bpy.context.active_object.data.edit_bones["f_pinky.01.L"].roll = 0.065368
+    bpy.context.active_object.data.edit_bones["f_pinky.02.L"].roll = 0.061447
+    bpy.context.active_object.data.edit_bones["f_pinky.03.L"].roll = -0.007734
+    bpy.ops.armature.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
 
 def joinFaceRig(faceRig, rigifyRig, g3):
-    # we need to know if it's g3
+    #we need to know if it's g3
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
     faceRig.select = True
@@ -503,10 +526,10 @@ def joinFaceRig(faceRig, rigifyRig, g3):
         rigifyRig.data.edit_bones["DEF-tongue.05"].layers = [False] * 23 + [True] + [False] * 8
         rigifyRig.data.edit_bones["DEF-tonguetip"].layers = [False] * 23 + [True] + [False] * 8
 
+
     bpy.context.object.data.layers[22] = True
     bpy.context.object.show_x_ray = True
     bpy.ops.object.mode_set(mode='OBJECT')
-
 
 def parentWGTs():
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -526,19 +549,19 @@ def parentWGTs():
             obj.parent = wgtParent
 
 
+
 #-------------------------------------------------------------
 
 def mixVgroups(obj, vgroupA, vgroupB):
     if ((vgroupA in obj.vertex_groups.keys()) and (vgroupB in obj.vertex_groups.keys())):
-
         backupName = vgroupA + "_copy"
         if (backupName not in obj.vertex_groups.keys()):
-            # Create backup
+            #Create backup
             bpy.ops.object.vertex_group_set_active(group=vgroupA)
             bpy.ops.object.vertex_group_copy()
 
         bpy.ops.object.modifier_add(type='VERTEX_WEIGHT_MIX')
-        # to determine the name of the modifier just created
+        #to determine the name of the modifier just created
         length = len(obj.modifiers.keys())
         index = length - 1
         mod_name = obj.modifiers[index].name
@@ -549,11 +572,9 @@ def mixVgroups(obj, vgroupA, vgroupB):
         obj.modifiers[mod_name].mix_set = 'OR'
         bpy.ops.object.modifier_apply(modifier=mod_name)
 
-
 def renameVgroups(obj, oldname, newname):
     if (oldname in obj.vertex_groups.keys()):
         obj.vertex_groups[oldname].name = newname
-
 
 def setupArmatureModifier(obj, rigifyRig):
     if (len(obj.modifiers.keys()) > 0):
@@ -564,27 +585,25 @@ def setupArmatureModifier(obj, rigifyRig):
                     obj.modifiers["Armature"].object = rigifyRig
 
 
+
 #------------------------------------------------------------------
 
 def checkForMatName(obj, checkName):
     objMatList = obj.material_slots.keys()
     for key in objMatList:
         if (key == checkName):
-            # normally, this checkpoint should be useless.
-            # the next checkpoint should handle this possibility by itself.
-            # I think it's a bug or sth...
+            #normally, this checkpoint should be useless.
+            #the next checkpoint should handle this possibility by itself.
+            #I think it's a bug or sth...
             return key
         if (key.startswith(checkName)):
             if (isNameExtension(key, checkName)):
-                print(key)
                 return key
-    print("Check is False")
     return None
 
-
 def setupSpecTex(mat, name):
-    mat.texture_slots[0].texture.name = name + "-COL"
-    texName = name + "-SPEC"
+    mat.texture_slots[0].texture.name = name+"-COL"
+    texName = name+"-SPEC"
     matList = bpy.context.active_object.material_slots.keys()
     index = matList.index(name)
     bpy.context.object.active_material_index = index
@@ -593,7 +612,7 @@ def setupSpecTex(mat, name):
     tex = bpy.data.textures.new(texName, 'IMAGE')
     mat.texture_slots.add()
     mat.texture_slots[texCount].texture = tex
-    image = mat.texture_slots[texCount - 1].texture.image
+    image = mat.texture_slots[texCount-1].texture.image
     mat.texture_slots[texCount].texture.type = 'IMAGE'
     mat.texture_slots[texCount].texture.image = image
     mat.texture_slots[texCount].texture_coords = 'UV'
@@ -601,10 +620,9 @@ def setupSpecTex(mat, name):
     mat.texture_slots[texCount].use_map_specular = True
     mat.texture_slots[texCount].use_rgb_to_intensity = True
 
-
 def setupBumpTex(mat, name):
-    mat.texture_slots[0].texture.name = name + "-COL"
-    texName = name + "-BUMP"
+    mat.texture_slots[0].texture.name = name+"-COL"
+    texName = name+"-BUMP"
     matList = bpy.context.active_object.material_slots.keys()
     index = matList.index(name)
     bpy.context.object.active_material_index = index
@@ -613,7 +631,7 @@ def setupBumpTex(mat, name):
     tex = bpy.data.textures.new(texName, 'IMAGE')
     mat.texture_slots.add()
     mat.texture_slots[texCount].texture = tex
-    image = mat.texture_slots[texCount - 1].texture.image
+    image = mat.texture_slots[texCount-1].texture.image
     mat.texture_slots[texCount].texture.type = 'IMAGE'
     mat.texture_slots[texCount].texture.image = image
     mat.texture_slots[texCount].texture_coords = 'UV'
@@ -622,11 +640,10 @@ def setupBumpTex(mat, name):
     mat.texture_slots[texCount].normal_factor = 0.05
     mat.texture_slots[texCount].use_rgb_to_intensity = True
 
-
 def genMatMergeList(obj, originalMatList):
     matList = obj.material_slots.keys()
     originalMatListLength = len(originalMatList)
-    for m in range(0, originalMatListLength - 1):
+    for m in range(0, originalMatListLength-1):
         n = len(obj.material_slots[m].material.texture_slots.keys())
         if (n == 0):
             index = matList.index(originalMatList[m])
@@ -635,7 +652,6 @@ def genMatMergeList(obj, originalMatList):
             index = matList.index(originalMatList[m])
             del matList[index]
     return matList
-
 
 def mergeMats(obj, originalMatList):
     matList = genMatMergeList(obj, originalMatList)
@@ -657,9 +673,8 @@ def mergeMats(obj, originalMatList):
 
     delMaterial(obj, terminationList, originalMatList)
 
-
 def extractMat(obj, mainMatIndex, childMatIndex):
-    # bpy.ops.object.mode_set(mode='OBJECT')
+    #bpy.ops.object.mode_set(mode='OBJECT')
     #bpy.context.scene.objects.active = obj
     obj.active_material_index = childMatIndex
     bpy.ops.object.mode_set(mode='EDIT')
@@ -670,7 +685,6 @@ def extractMat(obj, mainMatIndex, childMatIndex):
     bpy.ops.mesh.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
 
-
 def delMaterial(obj, terminationList, originalMatList):
     bpy.ops.object.mode_set(mode='OBJECT')
     #bpy.context.scene.objects.active = obj
@@ -680,20 +694,17 @@ def delMaterial(obj, terminationList, originalMatList):
         del originalMatList[index]
         bpy.ops.object.material_slot_remove()
 
-
 def texturesOff(obj):
     matCount = len(obj.material_slots.keys())
     if (matCount > 0):
         for matSlot in obj.material_slots:
             matSlot.material.use_textures = [False] * 18
 
-
 def texturesOn(obj):
     matCount = len(obj.material_slots.keys())
     if (matCount > 0):
         for matSlot in obj.material_slots:
             matSlot.material.use_textures = [True] * 18
-
 
 def materialsRemove(obj):
     matCount = len(obj.material_slots.keys())
@@ -730,23 +741,24 @@ class GenesisRigifySetup(bpy.types.Operator):
                 genesisRig.hide = False
                 bpy.context.scene.layers[findLayer(genesisRig)] = True
 
-                # VERTEX GROUPS RAW DATA
+
+                #VERTEX GROUPS RAW DATA
                 bpy.ops.object.mode_set(mode='EDIT')
                 bm = bmesh.from_edit_mesh(bpy.data.meshes[genesis.data.name])
 
                 head_tail = [3189, 3230]
                 chest_head = [181, 182, 183, 184, 189, 190, 192, 3956, 3957, 4111, 4170, 4501,
                               4503, 4514, 4675, 4738, 4744, 4770, 4773, 4782, 4783, 4784,
-                              4785, 4794, 4801, 4830, 4989, 4997, 4998, 4999, 5001, 5003,
-                              5005, 5006, 5008, 5009, 5010, 5011, 5013, 5014, 5015, 5028,
-                              6425, 6426, 6427, 6428, 6482, 6485, 6494, 6495, 6506, 6516,
-                              6517, 6518, 6519, 9617, 9618, 9619, 9620, 9625, 9626, 9628,
-                              13267, 13268, 13421, 13474, 13783, 13785, 13796, 13950, 14011,
-                              14017, 14043, 14046, 14055, 14056, 14057, 14058, 14067, 14074,
-                              14103, 14249, 14257, 14258, 14259, 14261, 14263, 14265, 14266,
-                              14268, 14269, 14270, 14271, 14273, 14274, 14285, 15648, 15649,
-                              15650, 15651, 15705, 15708, 15717, 15718, 15729, 15739, 15740,
-                              15741, 15742]
+                                4785, 4794, 4801, 4830, 4989, 4997, 4998, 4999, 5001, 5003,
+                                5005, 5006, 5008, 5009, 5010, 5011, 5013, 5014, 5015, 5028,
+                                6425, 6426, 6427, 6428, 6482, 6485, 6494, 6495, 6506, 6516,
+                                6517, 6518, 6519, 9617, 9618, 9619, 9620, 9625, 9626, 9628,
+                                13267, 13268, 13421, 13474, 13783, 13785, 13796, 13950, 14011,
+                                14017, 14043, 14046, 14055, 14056, 14057, 14058, 14067, 14074,
+                                14103, 14249, 14257, 14258, 14259, 14261, 14263, 14265, 14266,
+                                14268, 14269, 14270, 14271, 14273, 14274, 14285, 15648, 15649,
+                                15650, 15651, 15705, 15708, 15717, 15718, 15729, 15739, 15740,
+                                15741, 15742]
                 spine_head = [3943, 4834, 4870, 4973, 4986, 5063, 5068, 5074, 5075, 5076, 5077,
                               5078, 5079, 5080, 5081, 5082, 5083, 5084, 5085, 5086, 5087, 5088,
                               5089, 5090, 5100, 5108, 5109, 5110, 5111, 5112, 5113, 5114, 5115,
@@ -757,12 +769,12 @@ class GenesisRigifySetup(bpy.types.Operator):
                               14363, 14364, 14365, 14366, 14367, 14368, 14369, 14370, 14371, 14372,
                               14373, 14374, 15745, 15746, 15747, 15748]
                 hips_head = [166, 454, 483, 484, 485, 486, 487, 488, 489, 491, 492, 502, 507, 510,
-                             511, 539, 542, 608, 609, 610, 611, 612, 613, 3780, 3781, 3837, 3920,
-                             3923, 3932, 3933, 4365, 6466, 6467, 6472, 6473, 9272, 9277, 9602, 9890,
-                             9919, 9920, 9921, 9922, 9923, 9924, 9925, 9927, 9928, 9938, 9943, 9946,
-                             9947, 9975, 9978, 10044, 10045, 10046, 10047, 10048, 10049, 13091, 13092,
-                             13148, 13231, 13234, 13243, 13244, 13659, 15689, 15690, 15695, 15696,
-                             18426, 18431]
+                            511, 539, 542, 608, 609, 610, 611, 612, 613, 3780, 3781, 3837, 3920,
+                            3923, 3932, 3933, 4365, 6466, 6467, 6472, 6473, 9272, 9277, 9602, 9890,
+                            9919, 9920, 9921, 9922, 9923, 9924, 9925, 9927, 9928, 9938, 9943, 9946,
+                            9947, 9975, 9978, 10044, 10045, 10046, 10047, 10048, 10049, 13091, 13092,
+                            13148, 13231, 13234, 13243, 13244, 13659, 15689, 15690, 15695, 15696,
+                            18426, 18431]
                 toe_tail_L = [1288]
                 heel_tail_L = [6575, 6586]
                 heel02_head_L = [289]
@@ -777,7 +789,7 @@ class GenesisRigifySetup(bpy.types.Operator):
                 midcarp_L = [1584, 1670, 1751, 1796, 1798, 1801, 1809, 1873, 1874, 1875]
                 ringcarp_L = [1648, 1666, 1693, 1695, 1696, 1697, 1767, 1768, 1788, 1791, 1801, 6404]
                 pinkycarp_L = [1668, 1692, 1693, 1713, 1791, 1794]
-                # face rig
+                #face rig
                 eye_head_L = [3385, 3386, 3389, 3391, 3393, 3395, 3397, 3399, 3401, 3403, 3405, 3407,
                               3409, 3411, 3413, 3415]
                 eye_head_R = [12700, 12701, 12704, 12706, 12708, 12710, 12712, 12714, 12716, 12718,
@@ -804,7 +816,7 @@ class GenesisRigifySetup(bpy.types.Operator):
                 createVgroup(genesis, bm, "metarig_midcarp.L", midcarp_L)
                 createVgroup(genesis, bm, "metarig_ringcarp.L", ringcarp_L)
                 createVgroup(genesis, bm, "metarig_pinkycarp.L", pinkycarp_L)
-                # face rig
+                #face rig
                 createVgroup(genesis, bm, "metarig_eye_head.L", eye_head_L)
                 createVgroup(genesis, bm, "metarig_eye_head.R", eye_head_R)
                 createVgroup(genesis, bm, "metarig_eye_tail.L", eye_tail_L)
@@ -894,9 +906,9 @@ class GenesisRigifySetup(bpy.types.Operator):
                 delVgroup(genesis, "metarig_ringcarp.L")
                 delVgroup(genesis, "metarig_pinkycarp.L")
 
-                # face rig
+                #face rig
                 faceRig = createFaceRig(False)
-                # print(faceRig.name)
+                #print(faceRig.name)
                 faceRigSetParents(faceRig, False)
                 copyMeshPos(faceRig, genesis, "DEF-eye.L", "head", "metarig_eye_head.L")
                 copyMeshPos(faceRig, genesis, "DEF-eye.R", "head", "metarig_eye_head.R")
@@ -928,7 +940,7 @@ class GenesisRigifySetup(bpy.types.Operator):
                 bpy.ops.pose.rigify_generate()
                 rigifyRig = bpy.context.active_object
                 rigifyRig.name = genesis.name + "-rig"
-                # fix neck issue
+                #fix neck issue
                 bpy.ops.object.khalibloo_rigify_neck_fix()
                 parentWGTs()
 
@@ -937,7 +949,6 @@ class GenesisRigifySetup(bpy.types.Operator):
                 bpy.context.scene.objects.active = genesis
                 genesis.select = True
         return {'FINISHED'}
-
 
 class Genesis2FemaleRigifySetup(bpy.types.Operator):
     """Generate and setup a rigify rig for the active Genesis 2 Female figure"""
@@ -960,7 +971,8 @@ class Genesis2FemaleRigifySetup(bpy.types.Operator):
                 genesisRig.hide = False
                 bpy.context.scene.layers[findLayer(genesisRig)] = True
 
-                # VERTEX GROUPS RAW DATA
+
+                #VERTEX GROUPS RAW DATA
                 bpy.ops.object.mode_set(mode='EDIT')
                 bm = bmesh.from_edit_mesh(bpy.data.meshes[genesis.data.name])
 
@@ -982,7 +994,7 @@ class Genesis2FemaleRigifySetup(bpy.types.Operator):
                 midcarp_L = [1085, 9430, 9437]
                 ringcarp_L = [1083, 9459, 9465]
                 pinkycarp_L = [1008, 9484, 9515]
-                # face rig
+                #face rig
                 eye_head_L = [2191, 2192, 2195, 2197, 8267, 8268, 8271, 8273, 8301, 8323, 8325, 8327, 8357, 8359, 8361, 8382]
                 eye_head_R = [13023, 13024, 13027, 13029, 18938, 18939, 18942, 18944, 18972, 18994, 18996, 18998, 19028,
                               19030, 19032, 19053]
@@ -1008,7 +1020,7 @@ class Genesis2FemaleRigifySetup(bpy.types.Operator):
                 createVgroup(genesis, bm, "metarig_midcarp.L", midcarp_L)
                 createVgroup(genesis, bm, "metarig_ringcarp.L", ringcarp_L)
                 createVgroup(genesis, bm, "metarig_pinkycarp.L", pinkycarp_L)
-                # face rig
+                #face rig
                 createVgroup(genesis, bm, "metarig_eye_head.L", eye_head_L)
                 createVgroup(genesis, bm, "metarig_eye_head.R", eye_head_R)
                 createVgroup(genesis, bm, "metarig_eye_tail.L", eye_tail_L)
@@ -1097,9 +1109,9 @@ class Genesis2FemaleRigifySetup(bpy.types.Operator):
                 delVgroup(genesis, "metarig_ringcarp.L")
                 delVgroup(genesis, "metarig_pinkycarp.L")
 
-                # face rig
+                #face rig
                 faceRig = createFaceRig(False)
-                # print(faceRig.name)
+                #print(faceRig.name)
                 faceRigSetParents(faceRig, False)
                 copyMeshPos(faceRig, genesis, "DEF-eye.L", "head", "metarig_eye_head.L")
                 copyMeshPos(faceRig, genesis, "DEF-eye.R", "head", "metarig_eye_head.R")
@@ -1131,7 +1143,7 @@ class Genesis2FemaleRigifySetup(bpy.types.Operator):
                 bpy.ops.pose.rigify_generate()
                 rigifyRig = bpy.context.active_object
                 rigifyRig.name = genesis.name + "-rig"
-                # fix neck issue
+                #fix neck issue
                 bpy.ops.object.khalibloo_rigify_neck_fix()
                 parentWGTs()
 
@@ -1140,7 +1152,6 @@ class Genesis2FemaleRigifySetup(bpy.types.Operator):
                 bpy.context.scene.objects.active = genesis
                 genesis.select = True
         return {'FINISHED'}
-
 
 class Genesis2MaleRigifySetup(bpy.types.Operator):
     """Generate and setup a rigify rig for the active Genesis 2 Male figure"""
@@ -1163,7 +1174,8 @@ class Genesis2MaleRigifySetup(bpy.types.Operator):
                 genesisRig.hide = False
                 bpy.context.scene.layers[findLayer(genesisRig)] = True
 
-                # VERTEX GROUPS RAW DATA
+
+                #VERTEX GROUPS RAW DATA
                 bpy.ops.object.mode_set(mode='EDIT')
                 bm = bmesh.from_edit_mesh(bpy.data.meshes[genesis.data.name])
 
@@ -1185,7 +1197,7 @@ class Genesis2MaleRigifySetup(bpy.types.Operator):
                 midcarp_L = [1085, 9430, 9437]
                 ringcarp_L = [1083, 9459, 9465]
                 pinkycarp_L = [1008, 9484, 9515]
-                # face rig
+                #face rig
                 eye_head_L = [2191, 2192, 2195, 2197, 8267, 8268, 8271, 8273, 8301, 8323, 8325, 8327, 8357, 8359, 8361, 8382]
                 eye_head_R = [13023, 13024, 13027, 13029, 18938, 18939, 18942, 18944, 18972, 18994, 18996, 18998, 19028,
                               19030, 19032, 19053]
@@ -1211,7 +1223,7 @@ class Genesis2MaleRigifySetup(bpy.types.Operator):
                 createVgroup(genesis, bm, "metarig_midcarp.L", midcarp_L)
                 createVgroup(genesis, bm, "metarig_ringcarp.L", ringcarp_L)
                 createVgroup(genesis, bm, "metarig_pinkycarp.L", pinkycarp_L)
-                # face rig
+                #face rig
                 createVgroup(genesis, bm, "metarig_eye_head.L", eye_head_L)
                 createVgroup(genesis, bm, "metarig_eye_head.R", eye_head_R)
                 createVgroup(genesis, bm, "metarig_eye_tail.L", eye_tail_L)
@@ -1300,9 +1312,9 @@ class Genesis2MaleRigifySetup(bpy.types.Operator):
                 delVgroup(genesis, "metarig_ringcarp.L")
                 delVgroup(genesis, "metarig_pinkycarp.L")
 
-                # face rig
+                #face rig
                 faceRig = createFaceRig(False)
-                # print(faceRig.name)
+                #print(faceRig.name)
                 faceRigSetParents(faceRig, False)
                 copyMeshPos(faceRig, genesis, "DEF-eye.L", "head", "metarig_eye_head.L")
                 copyMeshPos(faceRig, genesis, "DEF-eye.R", "head", "metarig_eye_head.R")
@@ -1336,7 +1348,7 @@ class Genesis2MaleRigifySetup(bpy.types.Operator):
                 bpy.ops.pose.rigify_generate()
                 rigifyRig = bpy.context.active_object
                 rigifyRig.name = genesis.name + "-rig"
-                # fix neck issue
+                #fix neck issue
                 bpy.ops.object.khalibloo_rigify_neck_fix()
                 parentWGTs()
 
@@ -1345,7 +1357,6 @@ class Genesis2MaleRigifySetup(bpy.types.Operator):
                 bpy.context.scene.objects.active = genesis
                 genesis.select = True
         return {'FINISHED'}
-
 
 class Genesis3FemaleRigifySetup(bpy.types.Operator):
     """Generate and setup a rigify rig for the active Genesis 3 Female figure"""
@@ -1368,7 +1379,7 @@ class Genesis3FemaleRigifySetup(bpy.types.Operator):
                 genesisRig.hide = False
                 bpy.context.scene.layers[findLayer(genesisRig)] = True
 
-                # VERTEX GROUPS RAW DATA
+                #VERTEX GROUPS RAW DATA
                 bpy.ops.object.mode_set(mode='EDIT')
                 bm = bmesh.from_edit_mesh(bpy.data.meshes[genesis.data.name])
 
@@ -1384,7 +1395,7 @@ class Genesis3FemaleRigifySetup(bpy.types.Operator):
                 midtip_L = [5316, 5320]
                 ringtip_L = [5306, 5310]
                 pinkytip_L = [5300, 5302]
-                # face rig
+                #face rig
                 eye_head_L = [16648, 16649, 16651, 16655, 16657, 16658, 16659, 16660, 16674, 16675, 16677, 16681, 16683, 16684, 16685, 16686, 16698, 16699, 16706, 16708, 16712, 16714, 16715, 16716, 16725, 16727, 16731, 16733, 16734, 16735, 16744, 16745]
                 eye_tail_L = [16704]
                 eye_head_R = [16810, 16811, 16813, 16817, 16819, 16820, 16821, 16822, 16836, 16837, 16839, 16843, 16845, 16846, 16847, 16848, 16860, 16861, 16868, 16870, 16874, 16876, 16877, 16878, 16887, 16889, 16893, 16895, 16896, 16897, 16906, 16907]
@@ -1402,7 +1413,7 @@ class Genesis3FemaleRigifySetup(bpy.types.Operator):
                 createVgroup(genesis, bm, "metarig_midtip.L", midtip_L)
                 createVgroup(genesis, bm, "metarig_ringtip.L", ringtip_L)
                 createVgroup(genesis, bm, "metarig_pinkytip.L", pinkytip_L)
-                # face rig
+                #face rig
                 createVgroup(genesis, bm, "metarig_eye_head.L", eye_head_L)
                 createVgroup(genesis, bm, "metarig_eye_tail.L", eye_tail_L)
                 createVgroup(genesis, bm, "metarig_eye_head.R", eye_head_R)
@@ -1441,13 +1452,13 @@ class Genesis3FemaleRigifySetup(bpy.types.Operator):
                 copyBonePos(metarig, genesisRig, "neck", "tail", "neckUpper")
                 copyBonePos(metarig, genesisRig, "thigh.L", "head", "lThighBend")
                 copyBonePos(metarig, genesisRig, "shin.L", "head", "lShin")
-                copyBonePos(metarig, genesisRig, "shin.L", "tail", "lShin")
+                copyBonePos(metarig, genesisRig, "shin.L", "tail", "lFoot")
                 copyBonePos(metarig, genesisRig, "toe.L", "head", "lToe")
                 copyBonePos(metarig, genesisRig, "shoulder.L", "head", "lCollar")
-                copyBonePos(metarig, genesisRig, "shoulder.L", "tail", "lCollar")
+                copyBonePos(metarig, genesisRig, "shoulder.L", "tail", "lShldrBend")
                 copyBonePos(metarig, genesisRig, "upper_arm.L", "head", "lShldrBend")
                 copyBonePos(metarig, genesisRig, "forearm.L", "head", "lForearmBend")
-                copyBonePos(metarig, genesisRig, "forearm.L", "tail", "lForearmTwist")
+                copyBonePos(metarig, genesisRig, "forearm.L", "tail", "lHand")
                 copyBonePos(metarig, genesisRig, "palm.01.L", "head", "lCarpal1")
                 copyBonePos(metarig, genesisRig, "palm.02.L", "head", "lCarpal2")
                 copyBonePos(metarig, genesisRig, "palm.03.L", "head", "lCarpal3")
@@ -1483,9 +1494,9 @@ class Genesis3FemaleRigifySetup(bpy.types.Operator):
                 delVgroup(genesis, "metarig_ringtip.L")
                 delVgroup(genesis, "metarig_pinkytip.L")
 
-                # face rig
+                #face rig
                 faceRig = createFaceRig(True)
-                # print(faceRig.name)
+                #print(faceRig.name)
                 faceRigSetParents(faceRig, True)
                 copyMeshPos(faceRig, genesis, "DEF-eye.L", "head", "metarig_eye_head.L")
                 copyMeshPos(faceRig, genesis, "DEF-eye.R", "head", "metarig_eye_head.R")
@@ -1513,7 +1524,7 @@ class Genesis3FemaleRigifySetup(bpy.types.Operator):
                 bpy.ops.pose.rigify_generate()
                 rigifyRig = bpy.context.active_object
                 rigifyRig.name = genesis.name + "-rig"
-                # fix neck issue
+                #fix neck issue
                 bpy.ops.object.khalibloo_rigify_neck_fix()
                 parentWGTs()
 
@@ -1523,6 +1534,180 @@ class Genesis3FemaleRigifySetup(bpy.types.Operator):
                 genesis.select = True
         return {'FINISHED'}
 
+class Genesis3MaleRigifySetup(bpy.types.Operator):
+    """Generate and setup a rigify rig for the active Genesis 3 Male figure"""
+    bl_idname = "object.khalibloo_genesis3male_rigify_setup"
+    bl_label = "Rigify"
+
+    @classmethod
+    def poll(cls, context):
+        return ((context.active_object is not None) and (context.active_object.type == 'MESH'))
+
+    def execute(self, context):
+        genesis = bpy.context.active_object
+        global rigifyRig
+        global genesisRig
+
+        if (genesis.find_armature() is not None):
+            if (len(genesis.data.vertices.items()) == 17246):
+                genesisRig = bpy.context.active_object.find_armature()
+
+                genesisRig.hide = False
+                bpy.context.scene.layers[findLayer(genesisRig)] = True
+
+                #VERTEX GROUPS RAW DATA
+                bpy.ops.object.mode_set(mode='EDIT')
+                bm = bmesh.from_edit_mesh(bpy.data.meshes[genesis.data.name])
+
+                hips_head = [3363, 9918]
+                head_tail = [78, 3733]
+                toe_tail_L = [4826]
+                heel_tail_L = [4465]
+                heel02_tail_L = [3756, 3757]
+                heel02_head_L = [3865, 3866]
+                hand_tail_L = [4140, 5613, 5615, 5623]
+                thumbtip_L = [5043, 5047]
+                indextip_L = [5056, 5058]
+                midtip_L = [5036, 5040]
+                ringtip_L = [5026, 5030]
+                pinkytip_L = [5020, 5022]
+                eye_tail_L = [16049]
+                eye_head_L = [15993, 15994, 15996, 16000, 16002, 16003, 16004, 16005, 16019, 16020, 16022, 16026, 16028, 16029, 16030, 16031, 16043, 16044, 16051, 16053, 16057, 16059, 16060, 16061, 16070, 16072, 16076, 16078, 16079, 16080, 16089, 16090]
+                eye_tail_R = [16211]
+                eye_head_R = [16155, 16156, 16158, 16162, 16164, 16165, 16166, 16167, 16181, 16182, 16184, 16188, 16190, 16191, 16192, 16193, 16205, 16206, 16213, 16215, 16219, 16221, 16222, 16223, 16232, 16234, 16238, 16240, 16241, 16242, 16251, 16252]
+
+                createVgroup(genesis, bm, "metarig_hips_head", hips_head)
+                createVgroup(genesis, bm, "metarig_head_tail", head_tail)
+                createVgroup(genesis, bm, "metarig_toe_tail.L", toe_tail_L)
+                createVgroup(genesis, bm, "metarig_heel_tail.L", heel_tail_L)
+                createVgroup(genesis, bm, "metarig_heel02_head.L", heel02_head_L)
+                createVgroup(genesis, bm, "metarig_heel02_tail.L", heel02_tail_L)
+                createVgroup(genesis, bm, "metarig_hand_tail.L", hand_tail_L)
+                createVgroup(genesis, bm, "metarig_thumbtip.L", thumbtip_L)
+                createVgroup(genesis, bm, "metarig_indextip.L", indextip_L)
+                createVgroup(genesis, bm, "metarig_midtip.L", midtip_L)
+                createVgroup(genesis, bm, "metarig_ringtip.L", ringtip_L)
+                createVgroup(genesis, bm, "metarig_pinkytip.L", pinkytip_L)
+                #face rig
+                createVgroup(genesis, bm, "metarig_eye_head.L", eye_head_L)
+                createVgroup(genesis, bm, "metarig_eye_tail.L", eye_tail_L)
+                createVgroup(genesis, bm, "metarig_eye_head.R", eye_head_R)
+                createVgroup(genesis, bm, "metarig_eye_tail.R", eye_tail_R)
+
+                bpy.ops.object.mode_set(mode='OBJECT')
+                bpy.ops.view3d.snap_cursor_to_center()
+                try:
+                    bpy.ops.object.armature_human_metarig_add()
+                except AttributeError:
+                    self.report({'ERROR'}, "Missing Addon: 'Rigify'")
+                    return {'CANCELLED'}
+                except:
+                    self.report({'ERROR'}, "Rigify: Broken... Something's wrong with Rigify. Please report this")
+                    return {'CANCELLED'}
+                metarig = bpy.context.active_object
+
+                metarigPrep(metarig)
+
+                copyMeshPos(metarig, genesis, "head", "tail", "metarig_head_tail")
+                copyMeshPos(metarig, genesis, "hips", "head", "metarig_hips_head")
+                copyMeshPos(metarig, genesis, "toe.L", "tail", "metarig_toe_tail.L")
+                copyMeshPos(metarig, genesis, "heel.L", "tail", "metarig_heel_tail.L")
+                copyMeshPos(metarig, genesis, "heel.02.L", "head", "metarig_heel02_head.L")
+                copyMeshPos(metarig, genesis, "heel.02.L", "tail", "metarig_heel02_tail.L")
+                copyMeshPos(metarig, genesis, "hand.L", "tail", "metarig_hand_tail.L")
+                copyMeshPos(metarig, genesis, "thumb.03.L", "tail", "metarig_thumbtip.L")
+                copyMeshPos(metarig, genesis, "f_index.03.L", "tail", "metarig_indextip.L")
+                copyMeshPos(metarig, genesis, "f_middle.03.L", "tail", "metarig_midtip.L")
+                copyMeshPos(metarig, genesis, "f_ring.03.L", "tail", "metarig_ringtip.L")
+                copyMeshPos(metarig, genesis, "f_pinky.03.L", "tail", "metarig_pinkytip.L")
+
+                copyBonePos(metarig, genesisRig, "spine", "head", "abdomenLower")
+                copyBonePos(metarig, genesisRig, "spine", "tail", "abdomenUpper")
+                copyBonePos(metarig, genesisRig, "neck", "head", "neckLower")
+                copyBonePos(metarig, genesisRig, "neck", "tail", "neckUpper")
+                copyBonePos(metarig, genesisRig, "thigh.L", "head", "lThighBend")
+                copyBonePos(metarig, genesisRig, "shin.L", "head", "lShin")
+                copyBonePos(metarig, genesisRig, "shin.L", "tail", "lFoot")
+                copyBonePos(metarig, genesisRig, "toe.L", "head", "lToe")
+                copyBonePos(metarig, genesisRig, "shoulder.L", "head", "lCollar")
+                copyBonePos(metarig, genesisRig, "shoulder.L", "tail", "lShldrBend")
+                copyBonePos(metarig, genesisRig, "upper_arm.L", "head", "lShldrBend")
+                copyBonePos(metarig, genesisRig, "forearm.L", "head", "lForearmBend")
+                copyBonePos(metarig, genesisRig, "forearm.L", "tail", "lHand")
+                copyBonePos(metarig, genesisRig, "palm.01.L", "head", "lCarpal1")
+                copyBonePos(metarig, genesisRig, "palm.02.L", "head", "lCarpal2")
+                copyBonePos(metarig, genesisRig, "palm.03.L", "head", "lCarpal3")
+                copyBonePos(metarig, genesisRig, "palm.04.L", "head", "lCarpal4")
+                copyBonePos(metarig, genesisRig, "thumb.01.L", "head", "lThumb1")
+                copyBonePos(metarig, genesisRig, "thumb.02.L", "head", "lThumb2")
+                copyBonePos(metarig, genesisRig, "thumb.03.L", "head", "lThumb3")
+                copyBonePos(metarig, genesisRig, "f_index.01.L", "head", "lIndex1")
+                copyBonePos(metarig, genesisRig, "f_index.02.L", "head", "lIndex2")
+                copyBonePos(metarig, genesisRig, "f_index.03.L", "head", "lIndex3")
+                copyBonePos(metarig, genesisRig, "f_middle.01.L", "head", "lMid1")
+                copyBonePos(metarig, genesisRig, "f_middle.02.L", "head", "lMid2")
+                copyBonePos(metarig, genesisRig, "f_middle.03.L", "head", "lMid3")
+                copyBonePos(metarig, genesisRig, "f_ring.01.L", "head", "lRing1")
+                copyBonePos(metarig, genesisRig, "f_ring.02.L", "head", "lRing2")
+                copyBonePos(metarig, genesisRig, "f_ring.03.L", "head", "lRing3")
+                copyBonePos(metarig, genesisRig, "f_pinky.01.L", "head", "lPinky1")
+                copyBonePos(metarig, genesisRig, "f_pinky.02.L", "head", "lPinky2")
+                copyBonePos(metarig, genesisRig, "f_pinky.03.L", "head", "lPinky3")
+                metarigFinishingTouches(metarig)
+                setGenesis3MaleRolls(metarig)
+
+                delVgroup(genesis, "metarig_head_tail")
+                delVgroup(genesis, "metarig_hips_head")
+                delVgroup(genesis, "metarig_toe_tail.L")
+                delVgroup(genesis, "metarig_heel_tail.L")
+                delVgroup(genesis, "metarig_heel02_head.L")
+                delVgroup(genesis, "metarig_heel02_tail.L")
+                delVgroup(genesis, "metarig_hand_tail.L")
+                delVgroup(genesis, "metarig_thumbtip.L")
+                delVgroup(genesis, "metarig_indextip.L")
+                delVgroup(genesis, "metarig_midtip.L")
+                delVgroup(genesis, "metarig_ringtip.L")
+                delVgroup(genesis, "metarig_pinkytip.L")
+
+                #face rig
+                faceRig = createFaceRig(True)
+                #print(faceRig.name)
+                faceRigSetParents(faceRig, True)
+                copyMeshPos(faceRig, genesis, "DEF-eye.L", "head", "metarig_eye_head.L")
+                copyMeshPos(faceRig, genesis, "DEF-eye.R", "head", "metarig_eye_head.R")
+                copyMeshPos(faceRig, genesis, "DEF-eye.L", "tail", "metarig_eye_tail.L")
+                copyMeshPos(faceRig, genesis, "DEF-eye.R", "tail", "metarig_eye_tail.R")
+                copyMeshPos(faceRig, genesis, "IK-eye.L", "head", "metarig_eye_head.L")
+                copyMeshPos(faceRig, genesis, "IK-eye.R", "head", "metarig_eye_head.R")
+                copyMeshPos(faceRig, genesis, "IK-eye.L", "tail", "metarig_eye_tail.L")
+                copyMeshPos(faceRig, genesis, "IK-eye.R", "tail", "metarig_eye_tail.R")
+
+                copyBonePos(faceRig, genesisRig, "DEF-tongue.01", "head", "tongue01")
+                copyBonePos(faceRig, genesisRig, "DEF-tongue.02", "head", "tongue02")
+                copyBonePos(faceRig, genesisRig, "DEF-tongue.03", "head", "tongue03")
+                copyBonePos(faceRig, genesisRig, "DEF-tongue.04", "head", "tongue04")
+                copyBonePos(faceRig, genesisRig, "DEF-tongue.04", "tail", "tongue04")
+                faceRigFinishingTouches(faceRig)
+
+                delVgroup(genesis, "metarig_eye_head.L")
+                delVgroup(genesis, "metarig_eye_head.R")
+                delVgroup(genesis, "metarig_eye_tail.L")
+                delVgroup(genesis, "metarig_eye_tail.R")
+
+                bpy.ops.view3d.snap_cursor_to_center()
+                bpy.context.scene.objects.active = metarig
+                bpy.ops.pose.rigify_generate()
+                rigifyRig = bpy.context.active_object
+                rigifyRig.name = genesis.name + "-rig"
+                #fix neck issue
+                bpy.ops.object.khalibloo_rigify_neck_fix()
+                parentWGTs()
+
+                joinFaceRig(faceRig, rigifyRig, True)
+                bpy.ops.object.select_all(action='DESELECT')
+                bpy.context.scene.objects.active = genesis
+                genesis.select = True
+        return {'FINISHED'}
 
 class GenesisRigifyVgroups(bpy.types.Operator):
     """Mixes and renames the deformation vertex groups of a Genesis figure and/or selected Genesis item(s) to conform with Rigify. Backups are made before mixing, so no vertex groups are lost."""
@@ -1538,9 +1723,10 @@ class GenesisRigifyVgroups(bpy.types.Operator):
         objBackup = bpy.context.active_object
         global rigifyRig
 
+
         for obj in selectionList:
             bpy.context.scene.objects.active = bpy.data.objects[obj.name]
-            if (len(obj.vertex_groups.keys()) > 0):
+            if (len(obj.vertex_groups.keys())>0):
                 mixVgroups(obj, "lThighBend", "lThighTwist")
                 mixVgroups(obj, "lToe", "lBigToe")
                 mixVgroups(obj, "lToe", "lSmallToe1")
@@ -1659,18 +1845,18 @@ class GenesisRigifyVgroups(bpy.types.Operator):
                 mixVgroups(obj, "neckLower", "neckUpper")
                 mixVgroups(obj, "chest", "lPectoral")
                 mixVgroups(obj, "chest", "rPectoral")
-                mixVgroups(obj, "chestLower", "chestUpper")  # g3
-                mixVgroups(obj, "chestLower", "lPectoral")  # g3
-                mixVgroups(obj, "chestLower", "rPectoral")  # g3
+                mixVgroups(obj, "chestLower", "chestUpper") #g3
+                mixVgroups(obj, "chestLower", "lPectoral") #g3
+                mixVgroups(obj, "chestLower", "rPectoral") #g3
                 mixVgroups(obj, "abdomenLower", "abdomenUpper")
 
                 renameVgroups(obj, "head", "DEF-head")
                 renameVgroups(obj, "neck", "DEF-neck")
-                renameVgroups(obj, "neckLower", "DEF-neck")  # g3
+                renameVgroups(obj, "neckLower", "DEF-neck") #g3
                 renameVgroups(obj, "chest", "DEF-chest")
-                renameVgroups(obj, "chestLower", "DEF-chest")  # g3
+                renameVgroups(obj, "chestLower", "DEF-chest") #g3
                 renameVgroups(obj, "abdomen2", "DEF-spine")
-                renameVgroups(obj, "abdomenLower", "DEF-spine")  # g3
+                renameVgroups(obj, "abdomenLower", "DEF-spine") #g3
                 renameVgroups(obj, "pelvis", "DEF-hips")
                 renameVgroups(obj, "tongueBase", "DEF-tonguebase")
                 renameVgroups(obj, "tongue01", "DEF-tongue.01")
@@ -1680,21 +1866,21 @@ class GenesisRigifyVgroups(bpy.types.Operator):
                 renameVgroups(obj, "tongue05", "DEF-tongue.05")
                 renameVgroups(obj, "tongueTip", "DEF-tonguetip")
 
-                # LEFT
+                #LEFT
                 renameVgroups(obj, "lEye", "DEF-eye.L")
                 renameVgroups(obj, "lThigh", "DEF-thigh.01.L")
-                renameVgroups(obj, "lThighBend", "DEF-thigh.01.L")  # g3
+                renameVgroups(obj, "lThighBend", "DEF-thigh.01.L") #g3
                 renameVgroups(obj, "lShin", "DEF-shin.01.L")
                 renameVgroups(obj, "lFoot", "DEF-foot.L")
                 renameVgroups(obj, "lToe", "DEF-toe.L")
                 renameVgroups(obj, "lCollar", "DEF-shoulder.L")
                 renameVgroups(obj, "lShldr", "DEF-upper_arm.01.L")
-                renameVgroups(obj, "lShldrBend", "DEF-upper_arm.01.L")  # g3
+                renameVgroups(obj, "lShldrBend", "DEF-upper_arm.01.L") #g3
                 renameVgroups(obj, "lForeArm", "DEF-forearm.01.L")
-                renameVgroups(obj, "lForearmBend", "DEF-forearm.01.L")  # g3
+                renameVgroups(obj, "lForearmBend", "DEF-forearm.01.L") #g3
                 renameVgroups(obj, "lHand", "DEF-hand.L")
                 if("lCarpal3" in obj.vertex_groups.keys() or "lCarpal4" in obj.vertex_groups.keys()):
-                    # it's a g3
+                    #it's a g3
                     renameVgroups(obj, "lCarpal1", "DEF-palm.01.L")
                     renameVgroups(obj, "lCarpal2", "DEF-palm.02.L")
                     renameVgroups(obj, "lCarpal3", "DEF-palm.03.L")
@@ -1718,21 +1904,21 @@ class GenesisRigifyVgroups(bpy.types.Operator):
                 renameVgroups(obj, "lPinky2", "DEF-f_pinky.02.L")
                 renameVgroups(obj, "lPinky3", "DEF-f_pinky.03.L")
 
-                # RIGHT
+                #RIGHT
                 renameVgroups(obj, "rEye", "DEF-eye.R")
                 renameVgroups(obj, "rThigh", "DEF-thigh.01.R")
-                renameVgroups(obj, "rThighBend", "DEF-thigh.01.R")  # g3
+                renameVgroups(obj, "rThighBend", "DEF-thigh.01.R") #g3
                 renameVgroups(obj, "rShin", "DEF-shin.01.R")
                 renameVgroups(obj, "rFoot", "DEF-foot.R")
                 renameVgroups(obj, "rToe", "DEF-toe.R")
                 renameVgroups(obj, "rCollar", "DEF-shoulder.R")
                 renameVgroups(obj, "rShldr", "DEF-upper_arm.01.R")
-                renameVgroups(obj, "rShldrBend", "DEF-upper_arm.01.R")  # g3
+                renameVgroups(obj, "rShldrBend", "DEF-upper_arm.01.R") #g3
                 renameVgroups(obj, "rForeArm", "DEF-forearm.01.R")
-                renameVgroups(obj, "rForearmBend", "DEF-forearm.01.R")  # g3
+                renameVgroups(obj, "rForearmBend", "DEF-forearm.01.R") #g3
                 renameVgroups(obj, "rHand", "DEF-hand.R")
                 if("rCarpal3" in obj.vertex_groups.keys() or "rCarpal4" in obj.vertex_groups.keys()):
-                    # it's a g3
+                    #it's a g3
                     renameVgroups(obj, "rCarpal1", "DEF-palm.01.R")
                     renameVgroups(obj, "rCarpal2", "DEF-palm.02.R")
                     renameVgroups(obj, "rCarpal3", "DEF-palm.03.R")
@@ -1756,7 +1942,7 @@ class GenesisRigifyVgroups(bpy.types.Operator):
                 renameVgroups(obj, "rPinky2", "DEF-f_pinky.02.R")
                 renameVgroups(obj, "rPinky3", "DEF-f_pinky.03.R")
 
-                # apply parent's transforms
+                #apply parent's transforms
                 if (obj.parent):
                     obj.parent.hide = False
                     bpy.context.scene.layers[findLayer(obj.parent)] = True
@@ -1774,7 +1960,6 @@ class GenesisRigifyVgroups(bpy.types.Operator):
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
 
-
 class GenesisUnrigifyVgroups(bpy.types.Operator):
     """Renames the vertex groups of a rigified Genesis figure and/or selected Genesis item(s) to their original names"""
     bl_idname = "object.khalibloo_genesis_unrigify_vgroups"
@@ -1789,9 +1974,10 @@ class GenesisUnrigifyVgroups(bpy.types.Operator):
         objBackup = bpy.context.active_object
         global genesisRig
 
+
         for obj in selectionList:
             bpy.context.scene.objects.active = bpy.data.objects[obj.name]
-            if (len(obj.vertex_groups.keys()) > 0):
+            if (len(obj.vertex_groups.keys())>0):
 
                 renameVgroups(obj, "DEF-head", "head")
                 renameVgroups(obj, "DEF-neck", "neck")
@@ -1805,7 +1991,7 @@ class GenesisUnrigifyVgroups(bpy.types.Operator):
                 renameVgroups(obj, "DEF-tongue.04", "tongue04")
                 renameVgroups(obj, "DEF-tongue.05", "tongue05")
                 renameVgroups(obj, "DEF-tonguetip", "tongueTip")
-                # LEFT
+                #LEFT
                 renameVgroups(obj, "DEF-eye.L", "lEye")
                 renameVgroups(obj, "DEF-thigh.01.L", "lThigh")
                 renameVgroups(obj, "DEF-shin.01.L", "lShin")
@@ -1833,7 +2019,7 @@ class GenesisUnrigifyVgroups(bpy.types.Operator):
                 renameVgroups(obj, "DEF-f_pinky.02.L", "lPinky2")
                 renameVgroups(obj, "DEF-f_pinky.03.L", "lPinky3")
 
-                # RIGHT
+                #RIGHT
                 renameVgroups(obj, "DEF-eye.R", "rEye")
                 renameVgroups(obj, "DEF-thigh.01.R", "rThigh")
                 renameVgroups(obj, "DEF-shin.01.R", "rShin")
@@ -1861,7 +2047,7 @@ class GenesisUnrigifyVgroups(bpy.types.Operator):
                 renameVgroups(obj, "DEF-f_pinky.02.R", "rPinky2")
                 renameVgroups(obj, "DEF-f_pinky.03.R", "rPinky3")
 
-                # apply parent's transforms
+                #apply parent's transforms
                 bpy.context.scene.objects.active = obj.parent
                 obj.parent.select = True
                 bpy.ops.object.mode_set(mode='OBJECT')
@@ -1871,15 +2057,16 @@ class GenesisUnrigifyVgroups(bpy.types.Operator):
                     obj.parent = genesisRig
                     setupArmatureModifier(obj, genesisRig)
 
+
         bpy.context.scene.objects.active = objBackup
         return {'FINISHED'}
-
 
 class GenesisMaterialSetup(bpy.types.Operator):
     """Fixes the necessary settings on each of the materials and textures of the active Genesis figure.
     Note:for this to work, the materials must be using their default names."""
     bl_idname = "object.khalibloo_genesis_material_setup"
     bl_label = "Setup Materials"
+
 
     @classmethod
     def poll(cls, context):
@@ -1891,10 +2078,12 @@ class GenesisMaterialSetup(bpy.types.Operator):
         affect_textures = bpy.context.scene.khalibloo_affect_textures
         merge_mats = bpy.context.scene.khalibloo_merge_mats
 
+
         if (merge_mats):
             mergeMats(obj, originalMatList)
 
-        # daz_3_SkinFoot
+
+        #daz_3_SkinFoot
         guessName = "daz_3_SkinFoot"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -1918,7 +2107,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_6_Eyelash
+
+        #daz_6_Eyelash
         guessName = "daz_6_Eyelash"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -1935,7 +2125,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 mat.texture_slots[0].use_rgb_to_intensity = True
             check = None
 
-        # daz_5_Sclera
+
+        #daz_5_Sclera
         guessName = "daz_5_Sclera"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -1953,7 +2144,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
             mat.specular_intensity = 0
             check = None
 
-        # daz_5_Pupil
+
+        #daz_5_Pupil
         guessName = "daz_5_Pupil"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -1971,7 +2163,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
             mat.specular_intensity = 0
             check = None
 
-        # daz_5_Iris
+
+        #daz_5_Iris
         guessName = "daz_5_Iris"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -1980,7 +2173,7 @@ class GenesisMaterialSetup(bpy.types.Operator):
 
         if (check is not None):
             mat = obj.material_slots[check].material
-            # print(mat.name)
+            #print(mat.name)
             name = "Irises"
             mat.name = name
             mat.diffuse_intensity = 1
@@ -1990,7 +2183,7 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_5_Cornea if it's a Genesis 2 figure
+        #daz_5_Cornea if it's a Genesis 2 figure
         guessName = "Cornea"
         check = checkForMatName(obj, guessName)
         if (check is not None):
@@ -2008,7 +2201,7 @@ class GenesisMaterialSetup(bpy.types.Operator):
             check = None
 
         if (len(obj.data.vertices.items()) == 19296):
-            # daz_5_Cornea ONLY if it's a Genesis figure
+            #daz_5_Cornea ONLY if it's a Genesis figure
             guessName = "daz_5_Cornea"
             check = checkForMatName(obj, guessName)
             if (check is None):
@@ -2028,7 +2221,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 mat.alpha = 0
                 check = None
 
-        # EyeReflection
+
+        #EyeReflection
         guessName = "EyeReflection"
         check = checkForMatName(obj, guessName)
         if (check is not None):
@@ -2044,7 +2238,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
             mat.alpha = 0
             check = None
 
-        # daz_4_Tongue
+
+        #daz_4_Tongue
         guessName = "daz_4_Tongue"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2065,7 +2260,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_4_Teeth
+
+        #daz_4_Teeth
         guessName = "daz_4_Teeth"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2086,7 +2282,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_4_InnerMouth
+
+        #daz_4_InnerMouth
         guessName = "daz_4_InnerMouth"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2105,7 +2302,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_4_Gums
+
+        #daz_4_Gums
         guessName = "daz_4_Gums"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2126,7 +2324,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_3_SkinArm
+
+        #daz_3_SkinArm
         guessName = "daz_3_SkinArm"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2147,7 +2346,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_2_SkinTorso
+
+        #daz_2_SkinTorso
         guessName = "daz_2_SkinTorso"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2166,7 +2366,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_2_Nipple
+
+        #daz_2_Nipple
         guessName = "daz_2_Nipple"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2187,7 +2388,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_2_SkinNeck
+
+        #daz_2_SkinNeck
         guessName = "daz_2_SkinNeck"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2208,7 +2410,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_3_SkinForearm
+
+        #daz_3_SkinForearm
         guessName = "daz_3_SkinForearm"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2229,7 +2432,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_3_SkinLeg
+
+        #daz_3_SkinLeg
         guessName = "daz_3_SkinLeg"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2250,7 +2454,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_2_SkinHip
+
+        #daz_2_SkinHip
         guessName = "daz_2_SkinHip"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2271,7 +2476,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_2_SkinHead
+
+        #daz_2_SkinHead
         guessName = "daz_2_SkinHead"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2292,7 +2498,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_3_SkinHand
+
+        #daz_3_SkinHand
         guessName = "daz_3_SkinHand"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2313,7 +2520,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_7_Tear
+
+        #daz_7_Tear
         guessName = "daz_7_Tear"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2333,7 +2541,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
             mat.alpha = 0
             check = None
 
-        # daz_1_Nostril
+
+        #daz_1_Nostril
         guessName = "daz_1_Nostril"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2354,7 +2563,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_1_Lip
+
+        #daz_1_Lip
         guessName = "daz_1_Lip"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2376,7 +2586,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_5_Lacrimal
+
+        #daz_5_Lacrimal
         guessName = "daz_5_Lacrimal"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2394,7 +2605,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
             mat.specular_intensity = 0
             check = None
 
-        # daz_1_SkinFace
+
+        #daz_1_SkinFace
         guessName = "daz_1_SkinFace"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2413,7 +2625,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # Ears
+
+        #Ears
         guessName = "Ears"
         check = checkForMatName(obj, guessName)
         if (check is not None):
@@ -2430,7 +2643,8 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_3_Fingernail
+
+        #daz_3_Fingernail
         guessName = "daz_3_Fingernail"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2451,7 +2665,9 @@ class GenesisMaterialSetup(bpy.types.Operator):
                 setupBumpTex(mat, name)
             check = None
 
-        # daz_3_Toenail
+
+
+        #daz_3_Toenail
         guessName = "daz_3_Toenail"
         check = checkForMatName(obj, guessName)
         if (check is None):
@@ -2474,7 +2690,6 @@ class GenesisMaterialSetup(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class RigifyNeckFix(bpy.types.Operator):
     """Fixes a rare condition where the rigify rig's neck bone is a lot larger than it should be"""
     bl_idname = "object.khalibloo_rigify_neck_fix"
@@ -2483,6 +2698,8 @@ class RigifyNeckFix(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((context.active_object is not None) and (context.active_object.type == 'ARMATURE'))
+
+
 
     def execute(self, context):
         rig = context.active_object
@@ -2509,7 +2726,6 @@ class RigifyNeckFix(bpy.types.Operator):
 
         return{'FINISHED'}
 
-
 class GenesisImportMorphs(bpy.types.Operator):
     """Imports all Genesis morphs(.obj) in the path specified as shape keys of the active Genesis figure"""
     bl_idname = "object.khalibloo_import_genesis_morphs"
@@ -2518,6 +2734,7 @@ class GenesisImportMorphs(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return ((len(context.selected_objects) > 0) and (context.active_object is not None) and (context.active_object.type == 'MESH'))
+
 
     def execute(self, context):
         import os
@@ -2530,11 +2747,11 @@ class GenesisImportMorphs(bpy.types.Operator):
             if (extension == ".obj"):
                 try:
                     bpy.ops.import_scene.obj(filepath=filepath, filter_glob="*.obj;*.mtl",
-                                             use_edges=True, use_smooth_groups=True,
-                                             use_split_objects=False, use_split_groups=False,
-                                             use_groups_as_vgroups=False, use_image_search=False,
-                                             split_mode='OFF', global_clamp_size=0,
-                                             axis_forward='-Y', axis_up='Z')
+                                use_edges=True, use_smooth_groups=True,
+                                use_split_objects=False, use_split_groups=False,
+                                use_groups_as_vgroups=False, use_image_search=False,
+                                split_mode='OFF', global_clamp_size=0,
+                                axis_forward='-Y', axis_up='Z')
                 except AttributeError:
                     self.report({'ERROR'}, "Missing Addon: 'Import-Export: Wavefront OBJ format'")
                     return {'CANCELLED'}

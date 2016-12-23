@@ -19,7 +19,7 @@ bl_info = {
     "name": "Batch Operations / Manager",
     "description": "Modifiers, Materials, Groups management / batch operations",
     "author": "dairin0d, moth3r",
-    "version": (0, 6, 4),
+    "version": (0, 6, 6),
     "blender": (2, 7, 0),
     "location": "View3D > Batch category in Tools panel",
     "warning": "",
@@ -159,26 +159,21 @@ apply to current selection or some vertex group(s)
 
 #============================================================================#
 
-
 @addon.Operator(idname="object.batch_properties_copy", space_type='PROPERTIES', label="Batch Properties Copy")
 def Batch_Properties_Copy(self, context):
     properties_context = context.space_data.context
     Category = addon.preferences.copy_paste_contexts.get(properties_context)
-    if Category is None:
-        return
+    if Category is None: return
     pin_id = context.space_data.pin_id
     object_name = (pin_id.name if isinstance(pin_id, bpy.types.Object) else "")
     getattr(bpy.ops.object, "batch_{}_copy".format(Category.category_name))(object_name=object_name)
-
 
 @addon.Operator(idname="object.batch_properties_paste", space_type='PROPERTIES', label="Batch Properties Paste")
 def Batch_Properties_Copy(self, context):
     properties_context = context.space_data.context
     Category = addon.preferences.copy_paste_contexts.get(properties_context)
-    if Category is None:
-        return
+    if Category is None: return
     getattr(bpy.ops.object, "batch_{}_paste".format(Category.category_name))()
-
 
 @addon.Preferences.Include
 class ThisAddonPreferences:
@@ -187,11 +182,11 @@ class ThisAddonPreferences:
     use_panel_right = False | prop("Show in N-panel", name="N (right panel)")
     default_select_state = True | prop("Default row selection state", name="Rows selected by default")
     use_rename_popup = True | prop("Use a separate dialog for batch renaming", name="Use popup dialog for renaming")
-
+    
     show_operations_as_list = False | prop("Show all in one line or each in a separate row")
-
+    
     sync_lock = False
-
+    
     def sync_names(self):
         cls = self.__class__
         names = []
@@ -200,14 +195,14 @@ class ThisAddonPreferences:
             if options.synchronized:
                 names.append(Category.Category_Name_Plural)
         return "/".join(names)
-
+    
     def sync_copy(self, active_obj):
         cls = self.__class__
         for Category in cls.categories:
             options = getattr(self, Category.category_name_plural)
             if options.synchronized:
                 Category.BatchOperations.copy(active_obj, Category.excluded)
-
+    
     def sync_paste(self, context, paste_mode):
         cls = self.__class__
         for Category in cls.categories:
@@ -216,24 +211,21 @@ class ThisAddonPreferences:
                 Category.BatchOperations.paste(options.iterate_objects(context), paste_mode)
                 category = getattr(addon.external, Category.category_name_plural)
                 category.tag_refresh()
-
+    
     def sync_add(self, active_options, active_category_name_plural):
-        if not active_options.synchronized:
-            return False
+        if not active_options.synchronized: return False
         cls = self.__class__
-        if cls.sync_lock:
-            return False
+        if cls.sync_lock: return False
         cls.sync_lock = True
-
+        
         src_options = None
         for Category in cls.categories:
-            if (Category.category_name_plural == active_category_name_plural):
-                continue
+            if (Category.category_name_plural == active_category_name_plural): continue
             options = getattr(self, Category.category_name_plural)
             if options.synchronized:
                 src_options = options
                 break
-
+        
         if src_options:
             active_options.synchronize_selection = src_options.synchronize_selection
             active_options.prioritize_selection = src_options.prioritize_selection
@@ -241,21 +233,18 @@ class ThisAddonPreferences:
             active_options.paste_mode = src_options.paste_mode
             active_options.search_in = src_options.search_in
             active_options.aggregate_mode = src_options.aggregate_mode
-
+        
         cls.sync_lock = False
         return True
-
+    
     def sync_update(self, active_options, active_category_name_plural):
-        if not active_options.synchronized:
-            return False
+        if not active_options.synchronized: return False
         cls = self.__class__
-        if cls.sync_lock:
-            return False
+        if cls.sync_lock: return False
         cls.sync_lock = True
-
+        
         for Category in cls.categories:
-            if (Category.category_name_plural == active_category_name_plural):
-                continue
+            if (Category.category_name_plural == active_category_name_plural): continue
             options = getattr(self, Category.category_name_plural)
             if options.synchronized:
                 options.synchronize_selection = active_options.synchronize_selection
@@ -264,42 +253,40 @@ class ThisAddonPreferences:
                 options.paste_mode = active_options.paste_mode
                 options.search_in = active_options.search_in
                 options.aggregate_mode = active_options.aggregate_mode
-
+        
         cls.sync_lock = False
         return True
-
+    
     def draw(self, context):
         layout = NestedLayout(self.layout)
-
+        
         with layout.row()(alignment='LEFT'):
             layout.prop(self, "refresh_interval")
             layout.prop(self, "use_panel_left")
             layout.prop(self, "use_panel_right")
-
+        
         with layout.row()(alignment='LEFT'):
             layout.prop(self, "default_select_state")
             layout.prop(self, "use_rename_popup")
-
+        
         with layout.row()(alignment='LEFT'):
             with layout.column():
                 for Category in self.categories:
                     category = getattr(self, Category.category_name_plural)
-                    layout.label(text=Category.Category_Name_Plural + ":", icon=Category.category_icon)
+                    layout.label(text=Category.Category_Name_Plural+":", icon=Category.category_icon)
             with layout.column():
                 for Category in self.categories:
                     category = getattr(self, Category.category_name_plural)
                     layout.prop_menu_enum(category, "quick_access", text="Quick access")
 
-
 def register():
     addon.register()
-
+    
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc:
         km = kc.keymaps.new(name="Window")
         kmi = km.keymap_items.new("object.batch_properties_copy", 'C', 'PRESS', ctrl=True)
         kmi = km.keymap_items.new("object.batch_properties_paste", 'V', 'PRESS', ctrl=True)
-
 
 def unregister():
     # Note: if we remove from non-addon keyconfigs, the keymap registration
@@ -307,5 +294,5 @@ def unregister():
     kc = bpy.context.window_manager.keyconfigs.addon
     KeyMapUtils.remove("object.batch_properties_copy", place=kc)
     KeyMapUtils.remove("object.batch_properties_paste", place=kc)
-
+    
     addon.unregister()

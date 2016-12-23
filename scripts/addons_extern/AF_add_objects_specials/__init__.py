@@ -39,7 +39,6 @@ if "bpy" in locals():
     importlib.reload(circle_array)
     importlib.reload(crear_cuerda)
     importlib.reload(dupli_spin)
-    importlib.reload(aggregate_mesh)
     importlib.reload(unfold_transition)
     importlib.reload(copy2)
     importlib.reload(MakeStruts)
@@ -53,7 +52,6 @@ else:
     from . import circle_array
     from . import crear_cuerda
     from . import dupli_spin
-    from . import aggregate_mesh
     from . import unfold_transition
     from . import copy2
     from . import MakeStruts
@@ -107,8 +105,6 @@ class INFO_MT_array_mods_add(bpy.types.Menu):
                         text="Circle Array", icon='MOD_ARRAY')
         layout.operator("object.procedural_dupli_spin",
                         text="Dupli Spin", icon='MOD_ARRAY')
-        layout.operator("object.agregar",
-                        text="Aggregate Mesh", icon='MOD_ARRAY')
         layout.operator("mesh.copy2",
                         text="Copy To Vert/Edge", icon='MOD_ARRAY')
 
@@ -137,7 +133,6 @@ def menu(self, context):
     layout = self.layout
     layout.operator_context = 'INVOKE_REGION_WIN'
     self.layout.separator()
-    layout.label(text="Add Factory")
     self.layout.menu("INFO_MT_array_mods", icon="MOD_ARRAY")
     self.layout.menu("INFO_MT_quick_tools", icon="MOD_BUILD")
 

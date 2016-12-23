@@ -38,20 +38,20 @@ def check_loops(loops, bm_mod):
         # loop needs to have at least 3 vertices
         if len(loop) < 3:
             continue
-        # loop needs at least 1 vertex in the original, non-mirrored mesh
-        # if mapping:
+        ## loop needs at least 1 vertex in the original, non-mirrored mesh
+        #if mapping:
             #all_virtual = True
-            # for vert in loop:
-            # if mapping[vert] > -1:
-            #all_virtual = False
-            # break
-            # if all_virtual:
-            # continue
+            #for vert in loop:
+                #if mapping[vert] > -1:
+                    #all_virtual = False
+                    #break
+            #if all_virtual:
+                #continue
         # vertices can not all be at the same location
         stacked = True
         for i in range(len(loop) - 1):
-            if (bm_mod.verts[loop[i]].co -
-                    bm_mod.verts[loop[i + 1]].co).length > 1e-6:
+            if (bm_mod.verts[loop[i]].co - \
+            bm_mod.verts[loop[i+1]].co).length > 1e-6:
                 stacked = False
                 break
         if stacked:
@@ -64,8 +64,8 @@ def check_loops(loops, bm_mod):
 
 # input: bmesh, output: dict with the edge-key as key and face-index as value
 def dict_edge_faces(bm):
-    edge_faces = dict([[edgekey(edge), []] for edge in bm.edges if
-                       not edge.hide])
+    edge_faces = dict([[edgekey(edge), []] for edge in bm.edges if \
+        not edge.hide])
     for face in bm.faces:
         if face.hide:
             continue
@@ -80,8 +80,8 @@ def dict_face_faces(bm, edge_faces=False):
     if not edge_faces:
         edge_faces = dict_edge_faces(bm)
 
-    connected_faces = dict([[face.index, []] for face in bm.faces if
-                            not face.hide])
+    connected_faces = dict([[face.index, []] for face in bm.faces if \
+        not face.hide])
     for face in bm.faces:
         if face.hide:
             continue
@@ -125,9 +125,9 @@ def dict_vert_verts(edge_keys):
     for ek in edge_keys:
         for i in range(2):
             if ek[i] in vert_verts:
-                vert_verts[ek[i]].append(ek[1 - i])
+                vert_verts[ek[i]].append(ek[1-i])
             else:
-                vert_verts[ek[i]] = [ek[1 - i]]
+                vert_verts[ek[i]] = [ek[1-i]]
 
     return(vert_verts)
 
@@ -139,16 +139,16 @@ def edgekey(edge):
 
 # returns the edgekeys of a bmesh face
 def face_edgekeys(face):
-    return([tuple(sorted([edge.verts[0].index, edge.verts[1].index])) for
-            edge in face.edges])
+    return([tuple(sorted([edge.verts[0].index, edge.verts[1].index])) for \
+        edge in face.edges])
 
 
 # calculate input loops
 # method is modified
 def get_connected_input(bm):
     # calculate selected loops
-    edge_keys = [edgekey(edge) for edge in bm.edges if
-                 edge.select and not edge.hide]
+    edge_keys = [edgekey(edge) for edge in bm.edges if \
+        edge.select and not edge.hide]
     loops = get_connected_selections(edge_keys)
 
     return(loops)
@@ -223,3 +223,4 @@ def get_connected_selections(edge_keys):
         loops.append(loop)
 
     return(loops)
+

@@ -4,7 +4,7 @@ bl_info = {
     "version": (1, 0, 0),
     "blender": (2, 76, 0),
     "location": "View3D > Add > Mesh",
-    "description": "Procedurally generate 3D spaceships from a random seed.",
+    "description": "Procedurally generate 3D spaceships from a random seed",
     "wiki_url": "https://github.com/a1studmuffin/SpaceshipGenerator/blob/master/README.md",
     "tracker_url": "https://github.com/a1studmuffin/SpaceshipGenerator/issues",
     "category": "Add Mesh"
@@ -54,8 +54,7 @@ class GenerateSpaceship(Operator):
         return {'FINISHED'}
 
 def menu_func(self, context):
-    self.layout.operator(GenerateSpaceship.bl_idname, text="Spaceship")
-
+    self.layout.operator("mesh.generate_spaceship", text="Spaceship")
 def register():
     bpy.utils.register_module(__name__)
     bpy.types.INFO_MT_mesh_add.append(menu_func)
