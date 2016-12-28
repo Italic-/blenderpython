@@ -20,6 +20,9 @@
 
 import bpy
 
+bl_info = {'name': 'Scale Master Flex',
+           'category': 'Object'}
+
 var2 = bpy.context.scene.unit_settings.scale_length
 objects = bpy.context.selected_objects
 bpy.context.scene.objects.active = objects[0]
@@ -86,7 +89,7 @@ for ob in objects:
 #Clear parenting of lattice children but keep lattice modifier active
 for ob in latticechildren:
     bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
-    
+
 #Resize all selected objects based on the scene's unit scale
 bpy.ops.transform.resize(value = (1.0*var2,1.0*var2,1.0*var2))
 
