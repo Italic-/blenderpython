@@ -70,7 +70,6 @@ if "bpy" in locals():
 	importlib.reload(VIEW3D_MT_select_pose)
 	importlib.reload(VIEW3D_MT_uv_map)
 	importlib.reload(VIEW3D_PT_imapaint_tools_missing)
-	importlib.reload(VIEW3D_PT_layers)
 	importlib.reload(VIEW3D_PT_slots_projectpaint)
 	importlib.reload(VIEW3D_PT_tools_imagepaint_external)
 	importlib.reload(VIEW3D_PT_transform_orientations)
@@ -116,7 +115,6 @@ else:
 	from . import VIEW3D_MT_select_pose
 	from . import VIEW3D_MT_uv_map
 	from . import VIEW3D_PT_imapaint_tools_missing
-	from . import VIEW3D_PT_layers
 	from . import VIEW3D_PT_slots_projectpaint
 	from . import VIEW3D_PT_tools_imagepaint_external
 	from . import VIEW3D_PT_transform_orientations
@@ -294,7 +292,6 @@ def register():
 	bpy.types.VIEW3D_MT_uv_map.append(VIEW3D_MT_uv_map.menu)
 
 	bpy.types.VIEW3D_PT_imapaint_tools_missing.append(VIEW3D_PT_imapaint_tools_missing.menu)
-	bpy.types.VIEW3D_PT_layers.append(VIEW3D_PT_layers.menu)
 	bpy.types.VIEW3D_PT_slots_projectpaint.append(VIEW3D_PT_slots_projectpaint.menu)
 	bpy.types.VIEW3D_PT_tools_imagepaint_external.append(VIEW3D_PT_tools_imagepaint_external.menu)
 	bpy.types.VIEW3D_PT_transform_orientations.append(VIEW3D_PT_transform_orientations.menu)
@@ -374,7 +371,6 @@ def unregister():
 	bpy.types.VIEW3D_MT_uv_map.remove(VIEW3D_MT_uv_map.menu)
 
 	bpy.types.VIEW3D_PT_imapaint_tools_missing.remove(VIEW3D_PT_imapaint_tools_missing.menu)
-	bpy.types.VIEW3D_PT_layers.remove(VIEW3D_PT_layers.menu)
 	bpy.types.VIEW3D_PT_slots_projectpaint.remove(VIEW3D_PT_slots_projectpaint.menu)
 	bpy.types.VIEW3D_PT_tools_imagepaint_external.remove(VIEW3D_PT_tools_imagepaint_external.menu)
 	bpy.types.VIEW3D_PT_transform_orientations.remove(VIEW3D_PT_transform_orientations.menu)

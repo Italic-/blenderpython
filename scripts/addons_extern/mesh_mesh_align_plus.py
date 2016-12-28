@@ -5727,15 +5727,21 @@ class QuickAlignPointsGUI(bpy.types.Panel):
             "maplus.quickscalematchedgewholemesh",
             text="Whole Mesh"
         )
-
+class SpecialsMenuItems(bpy.types.Menu):
+    bl_idname = "VIEW3D_MT_align_plus_specials"
+    bl_label = "Mesh Align Plus"
+    bl_description = "Add Mesh Align Plus items"
+    
+    def draw(self, context):
+        self.layout.separator()
+        self.layout.label('Add Mesh Align Plus items')
+        self.layout.operator('maplus.specialsaddpointfromactiveglobal')
+        self.layout.operator('maplus.specialsaddlinefromactiveglobal')
+        self.layout.operator('maplus.specialsaddplanefromactiveglobal')
+        self.layout.separator()
 
 def specials_menu_items(self, context):
-    self.layout.separator()
-    self.layout.label('Add Mesh Align Plus items')
-    self.layout.operator('maplus.specialsaddpointfromactiveglobal')
-    self.layout.operator('maplus.specialsaddlinefromactiveglobal')
-    self.layout.operator('maplus.specialsaddplanefromactiveglobal')
-    self.layout.separator()
+    self.layout.menu(SpecialsMenuItems.bl_idname, icon="PLUGIN")
 
 
 def register():

@@ -74,17 +74,24 @@ class ExampleAddonPreferences(bpy.types.AddonPreferences):
         layout.label(text="NOTE: any changes to smart join in the edit mode will be reverted after expanding")
         layout.label(text="You can Apply the join in the Relationships tab, but you won't be able to expand it any more")
 
+class SpecialsJoinItems(bpy.types.Menu):
+    bl_idname = "VIEW3D_MT_smart_join_specials"
+    bl_label = "Smart Join"
+    bl_description = "Add Smart Join Menu items"
+    
+    def draw(self, context):
+        self.layout.separator()
+        layout = self.layout
+        layout.operator('sjoin.join')
+        layout.operator('sjoin.join_add')
+        layout.operator('sjoin.separate')
+        layout.operator('sjoin.update_rec')
+        layout.separator()
+        layout.operator('sjoin.expand')
+        layout.operator('sjoin.collapse')
 
 def special_menu_func(self, context):
-    self.layout.separator()
-    layout = self.layout
-    layout.operator('sjoin.join')
-    layout.operator('sjoin.join_add')
-    layout.operator('sjoin.separate')
-    layout.operator('sjoin.update_rec')
-    layout.separator()
-    layout.operator('sjoin.expand')
-    layout.operator('sjoin.collapse')
+    self.layout.menu(SpecialsJoinItems.bl_idname, icon="PLUGIN")
 
 
 def unregister():

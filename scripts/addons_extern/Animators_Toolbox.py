@@ -154,10 +154,11 @@ class ToggleAutoIK(bpy.types.Operator):
     bl_idname = "bone.toggleautoik"
     bl_label = "Armature Auto IK"
 
+
     def execute(self, context):
         for obj in bpy.data.active_object:
             if obj.type == 'ARMATURE':
-                obj.use_auto_ik = not obj.use_auto_ik
+                bpy.context.object.data.use_auto_ik = True
         return{'FINISHED'}
 
 # FEATURE: Advanced Boomsmash version 011 classes
@@ -395,9 +396,10 @@ def draw_animatorstoolbox_panel(context, layout):
     row.operator("bone.toggleselectability", text="Select Armature Only")
     row.prop(obj, "show_x_ray", text="X Ray")
     #--Auto IK
-    col = layout.column(align=True)
-    row = col.row()
-    row.prop(context.active_object.data, "use_auto_ik", text="Auto IK")
+    if obj and obj.type == 'ARMATURE' and obj.mode in {'POSE'}:
+        col = layout.column(align=True)
+        row = col.row()
+        row.prop(context.active_object.data, "use_auto_ik", text="Auto IK")
     # row.prop(obj, "bone.toggleautoik", text="Auto IK")
 
 #--Reset Transforms

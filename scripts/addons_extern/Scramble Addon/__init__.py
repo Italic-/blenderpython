@@ -95,7 +95,6 @@ if "bpy" in locals():
     imp.reload(VIEW3D_MT_view_align)
     imp.reload(VIEW3D_MT_view_align_selected)
     imp.reload(VIEW3D_PT_imapaint_tools_missing)
-    imp.reload(VIEW3D_PT_layers)
     imp.reload(VIEW3D_PT_slots_projectpaint)
     imp.reload(VIEW3D_PT_tools_imagepaint_external)
     imp.reload(VIEW3D_PT_transform_orientations)
@@ -186,7 +185,6 @@ else:
     from . import VIEW3D_MT_view_align
     from . import VIEW3D_MT_view_align_selected
     from . import VIEW3D_PT_imapaint_tools_missing
-    from . import VIEW3D_PT_layers
     from . import VIEW3D_PT_slots_projectpaint
     from . import VIEW3D_PT_tools_imagepaint_external
     from . import VIEW3D_PT_transform_orientations

@@ -247,56 +247,17 @@ class View3DPanel():
     bl_category = 'Animation'
 
 
-class VIEW3D_PT_tools_bone_selection_sets(View3DPanel, bpy.types.Panel):
-    bl_context = "posemode"
-    bl_label = "Bone selection sets"
 
-    def draw(self, context):
-        layout = self.layout
-
-        obj = context.object
-
-        #~ row = layout.row()
-        #~ row.label(text="Hello world!", icon='WORLD_DATA')
-
-        row = layout.row()
-        row.template_list(obj.bone_selection_sets, "sets", obj.bone_selection_sets, "index", rows=5)
-
-        col = row.column()
-        sub = col.column(align=True)
-        sub.operator("object.bone_selection_sets_add", icon='ZOOMIN', text="")
-        sub.operator("object.bone_selection_sets_remove", icon='ZOOMOUT', text="")
-
-        row = layout.row()
-        #~ if len(obj.bone_selection_sets.sets) <= 0:
-        #~ obj.bone_selection_sets.sets.add()
-        #~ obj.bone_selection_sets.sets[ len(obj.bone_selection_sets.sets)-1 ].name = "group1"
-        try:
-            row.prop(obj.bone_selection_sets.sets[obj.bone_selection_sets.index], "name")
-        except:
-            pass
-
-        row = layout.row()
-        #~ col = row.column()
-
-        row.prop(obj.bone_selection_sets, "use_replace")
-        row.operator('object.deselect_all_bones')
-
-        row = layout.row()
-        row.operator('object.bone_selection_set_assign')
-        row.operator('object.bone_selection_set_remove')
-
-        row = layout.row()
-        row.operator('object.bone_selection_set_select')
 
 
 def register():
-    pass
+
+    bpy.utils.register_module(__name__)
 
 
 def unregister():
-    pass
 
+    bpy.utils.unregister_module(__name__)
 
 if __name__ == "__main__":
     register()

@@ -236,42 +236,6 @@ class OBJECT_PT_transform(ObjectButtonsPanel, Panel):
         # ===== END PARENT ===== #
 
 
-class OBJECT_PT_groups(ObjectButtonsPanel, Panel):
-    bl_label = "Groups"
-
-    def draw(self, context):
-        layout = NestedLayout(self.layout, self.bl_idname)
-
-        ob = context.object
-
-        with layout.row(True):
-            if bpy.data.groups:
-                layout.operator("object.group_link", text="Add to Group")
-            else:
-                layout.operator("object.group_add", text="Add to Group")
-            layout.operator("object.group_add", text="", icon='ZOOMIN')
-
-        # object.dupli_offset_from_cursor operator is implemented as
-        # ob.users_group[group].dupli_offset = scene.cursor_location
-        for index, group in enumerate(ob.users_group):
-            with layout.column(True):
-                layout.context_pointer_set("group", group)
-
-                with layout.box():
-                    with layout.row():
-                        layout.prop(group, "name", text="")
-                        layout.operator("object.group_remove", text="", icon='X', emboss=False)
-
-                with layout.box():
-                    with layout.split():
-                        with layout.column():
-                            with layout.column()(scale_y=0.8):
-                                layout.label("Dupli Visibility:")
-                            with layout.column()(scale_y=0.6):
-                                layout.prop(group, "layers", text="")
-                            layout.operator("object.dupli_offset_from_cursor", text="From Cursor").group = index
-                        with layout.column():
-                            layout.prop(group, "dupli_offset", text="")
 
 
 class OBJECT_PT_duplication(ObjectButtonsPanel, Panel):

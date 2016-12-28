@@ -110,5 +110,4 @@ def menu(self, context):
 
 	self.layout.separator()
 	self.layout.menu(ShortcutMenu.bl_idname, icon="LINE_DATA")
-	self.layout.menu(PieMenu.bl_idname, icon="COLOR")
 

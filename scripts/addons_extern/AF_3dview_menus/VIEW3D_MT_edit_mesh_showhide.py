@@ -69,7 +69,8 @@ class HideParts(bpy.types.Operator):
 		isSelecteds = []
 		for vert in context.active_object.data.vertices:
 			isSelecteds.append(vert.select)
-		bpy.ops.mesh.select_linked(limit=False)
+		bpy.ops.mesh.select_linked(delimit=set())
+
 		bpy.ops.mesh.hide(unselected=self.unselected)
 		bpy.ops.mesh.select_all(action='DESELECT')
 		return {'FINISHED'}
