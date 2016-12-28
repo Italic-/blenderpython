@@ -1,0 +1,3 @@
+[submodule "scripts/addons_extern/animation_nodes"]
+	path = scripts/addons_extern/animation_nodes
+	url = git@github.com:JacquesLucke/animation_nodes.git
