@@ -276,6 +276,7 @@ Name | Author
 Item Panel & Batch Naming | proxe
 Librarian | Greg Zaal (pixaal)
 Manage Image Paths | Greg Zaal (pixaal)
+Scale Master Flex | Chris Plush ([CGMasters](https://www.youtube.com/watch?v=X_dJYAMCGYw))
 
 
 ### System ###
