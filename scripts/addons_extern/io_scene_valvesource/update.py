@@ -1,4 +1,4 @@
-﻿#  Copyright (c) 2014 Tom Edwards contact@steamreview.org
+#  Copyright (c) 2014 Tom Edwards contact@steamreview.org
 #
 # ##### BEGIN GPL LICENSE BLOCK #####
 #

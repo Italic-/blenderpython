@@ -1,4 +1,4 @@
-﻿#  Copyright (c) 2014 Tom Edwards contact@steamreview.org
+#  Copyright (c) 2014 Tom Edwards contact@steamreview.org
 #
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
@@ -316,7 +316,13 @@ class SmdExporter(bpy.types.Operator, Logger):
 			basis = id
 			for meta in [ob for ob in bpy.data.objects if ob.type == 'META']:
 				ns = meta.name.rsplit(".")
-				if len(ns) == 1 or ns[0] != basis_ns[0]: continue
+
+				if ns[0] != basis_ns[0]:
+					continue
+				if len(ns) == 1:
+					basis = meta
+					break
+
 				try:
 					if int(ns[1]) < int(basis_ns[1]):
 						basis = meta
@@ -334,7 +340,7 @@ class SmdExporter(bpy.types.Operator, Logger):
 
 		if type(id) == Group:
 			have_baked_metaballs = False
-			vertex_colours = hasVertexColours(id)
+			group_vertex_maps = valvesource_vertex_maps(id)
 			for i, ob in enumerate([ob for ob in id.objects if ob.vs.export and ob in p_cache.validObs]):
 				bpy.context.window_manager.progress_update(i / len(id.objects))
 				if ob.type == 'META':
@@ -343,10 +349,10 @@ class SmdExporter(bpy.types.Operator, Logger):
 					else: baked_metaballs.append(ob)
 						
 				bake = self.bakeObj(ob)
-				if vertex_colours and not hasVertexColours(bake.object):
-					vertex_colour_data = bake.object.data.vertex_colors.new(vertex_paint_colour_name).data
-					for i in range(len(vertex_colour_data)):
-						vertex_colour_data[i].color = Color([1,1,1])
+				for vertex_map_name in group_vertex_maps:
+					if not vertex_map_name in bake.object.data.vertex_colors:
+						vertex_map = bake.object.data.vertex_colors.new(vertex_map_name)
+						vertex_map.data.foreach_set("color",[1.0] * len(vertex_colour_data) * 3)
 
 				if bake:
 					bake_results.append(bake)
@@ -523,7 +529,7 @@ class SmdExporter(bpy.types.Operator, Logger):
 				self.warning(get_id("exporter_err_arm_nonuniform",True).format(self.armature_src.name))
 			if not self.armature:
 				self.armature = self.bakeObj(self.armature_src).object
-			self.exportable_bones = list([pbone for pbone in self.armature.pose.bones if (isinstance(id, bpy.types.Object) and id.type == 'ARMATURE') or pbone.bone.use_deform or pbone.name in [_bake.envelope for _bake in bake_results]])
+			self.exportable_bones = list([pbone for pbone in self.armature.pose.bones if (isinstance(id, bpy.types.Object) and id.type == 'ARMATURE') or pbone.bone.use_deform])
 			skipped_bones = len(self.armature.pose.bones) - len(self.exportable_bones)
 			if skipped_bones:
 				print("- Skipping {} non-deforming bones".format(skipped_bones))
@@ -1062,7 +1068,7 @@ class SmdExporter(bpy.types.Operator, Logger):
 				weights = self.getWeightmap(bake)
 				
 				ob_weight_str = None
-				if type(bake.envelope) == str:
+				if type(bake.envelope) == str and bake.envelope in self.bone_ids:
 					ob_weight_str = " 1 {} 1".format(self.bone_ids[bake.envelope])
 				elif not weights:
 					ob_weight_str = " 0"
@@ -1430,7 +1436,7 @@ skeleton
 			DmeDag["shape"] = DmeMesh
 			
 			bone_child = isinstance(bake.envelope, str)
-			if bone_child:
+			if bone_child and bake.envelope in bone_elements:
 				bone_elements[bake.envelope]["children"].append(DmeDag)
 				
 				# Blender's bone transforms are inconsistent with object transforms:
@@ -1570,23 +1576,22 @@ skeleton
 			bench.report("insert")
 
 			# Hammer data
-			for keyword, data_name in vertex_paint_data:
-				kw = keywords.get(keyword)
-				if not kw:
+			for map_name in vertex_maps:
+				attribute_name = keywords.get(map_name)
+				vert_map = ob.data.vertex_colors.get(map_name)
+
+				if not attribute_name or not vert_map:
 					continue
+				
+				colours = []
+				for loopColour in vert_map.data:
+					colour = list(loopColour.color)
+					colour.append(0) # make a W component
+					colours.append(datamodel.Vector4(colour))
 
-				vert_colours = ob.data.vertex_colors.get(data_name)
-				if vert_colours:
-					colours = []
-
-					for loopColour in vert_colours.data:
-						colour = list(loopColour.color)
-						colour.append(0) # make a W component
-						colours.append(datamodel.Vector4(colour))
-
-					vertex_data[kw] = datamodel.make_array(colours,datamodel.Vector4)
-					vertex_data[kw + "Indices"] = datamodel.make_array(range(len(vert_colours.data)),int)
-					format.append(kw)
+				vertex_data[attribute_name] = datamodel.make_array(colours,datamodel.Vector4)
+				vertex_data[attribute_name + "Indices"] = datamodel.make_array(range(len(colours)),int)
+				format.append(attribute_name)
 
 			face_sets = collections.OrderedDict()
 			bad_face_mats = 0
