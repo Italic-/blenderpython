@@ -18,13 +18,11 @@ import collections
 
 SLICE_ALL = slice(None)
 
-
 class OrderedSet(collections.MutableSet):
     """
     An OrderedSet is a custom MutableSet that remembers its order, so that
     every entry has an index that can be looked up.
     """
-
     def __init__(self, iterable=None):
         self.items = []
         self.map = {}
@@ -58,14 +56,14 @@ class OrderedSet(collections.MutableSet):
             return OrderedSet([self.items[i] for i in index])
         else:
             raise TypeError("Don't know how to index an OrderedSet by %r" %
-                            index)
+                    index)
 
     def copy(self):
         return OrderedSet(self)
 
     def __getstate__(self):
         return list(self)
-
+    
     def __setstate__(self, state):
         self.__init__(state)
 
@@ -84,7 +82,7 @@ class OrderedSet(collections.MutableSet):
             self.items.append(key)
         return self.map[key]
     append = add
-
+    
     def index(self, key):
         """
         Get the index of a given entry, raising an IndexError if it's not
@@ -117,3 +115,4 @@ class OrderedSet(collections.MutableSet):
         if isinstance(other, OrderedSet):
             return len(self) == len(other) and self.items == other.items
         return set(self) == set(other)
+
