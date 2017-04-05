@@ -20,18 +20,14 @@
 bl_info = {
     "name": "Capsule",
     "author": "Crocadillian (BA) / Takanu (GitHub), special thanks to Acidhawk and Asahd <3",
-    "version": (0, 999, 4),
+    "version": (1, 0, 7),
     "blender": (2, 7, 7),
-    "location": "3D View > Object Mode > Tools > GEX",
+    "location": "3D View > Object Mode > Tools > Capsule",
     "wiki_url": "https://github.com/Takanu/Capsule",
     "description": "Provides tools for batch exporting objects from Blender using FBX.",
     "tracker_url": "",
     "category": "Import-Export"
 }
-
-global ignorePresets
-ignorePresets = False
-print(ignorePresets)
 
 # Start importing all the addon files
 # The init file just gets things started, no code needs to be placed here.
@@ -40,8 +36,10 @@ from . import definitions
 from . import properties
 from . import user_interface
 from . import export_operators
+from . import export_menu
 from . import ui_operators
 from . import update
+from . import test_ops
 from bpy.props import IntProperty, FloatProperty, BoolProperty, StringProperty, PointerProperty, CollectionProperty, EnumProperty
 from bpy.types import AddonPreferences, PropertyGroup
 from bpy.app.handlers import persistent
@@ -49,8 +47,6 @@ from bpy.app.handlers import persistent
 print("Checking modules...")
 
 if "bpy" in locals():
-    global ignorePresets
-    ignorePresets = True
     import imp
     print("------------------Reloading Plugin------------------")
     if "definitions" in locals():
@@ -61,10 +57,14 @@ if "bpy" in locals():
         imp.reload(user_interface)
     if "export_operators" in locals():
         imp.reload(export_operators)
+    if "export_menu" in locals():
+        imp.reload(export_menu)
     if "ui_operators" in locals():
         imp.reload(ui_operators)
     if "update" in locals():
         imp.reload(update)
+    if "test_ops" in locals():
+        imp.reload(test_ops)
 
 print("Importing modules...")
 
@@ -209,6 +209,13 @@ class CAP_ExportPass(PropertyGroup):
         name="Pass Name",
         description="The name of the selected pass."
         )
+
+    enable = BoolProperty(
+        name="Enable Pass",
+        description="Lets you enable or disable the pass for use when exporting objects.",
+        default=True
+    )
+
     file_suffix = StringProperty(
         name="File Suffix",
         description="An optional string that if used, will be appended to all the names of files produced through this pass."
@@ -516,6 +523,7 @@ class CAP_AddonPreferences(AddonPreferences):
     )
 
     # Storage for the Global Presets, and it's enum UI list.
+    sort_presets = CollectionProperty(type=CAP_ExportPreset)
     saved_presets = CollectionProperty(type=CAP_ExportPreset)
     saved_presets_index = IntProperty()
 
@@ -700,8 +708,7 @@ class CAP_AddonPreferences(AddonPreferences):
                     export_1.separator()
 
                     export_1.prop(currentExp, "bake_space_transform")
-                    #
-                    export_1.prop(currentExp, "reset_rotation")
+                    #export_1.prop(currentExp, "reset_rotation")
 
                     export_1.separator()
 
@@ -940,11 +947,11 @@ class CAP_AddonPreferences(AddonPreferences):
 
         if addon_prefs.options_dropdown is False:
             optionsUI.prop(addon_prefs, "options_dropdown", text="", icon='TRIA_RIGHT', emboss=False)
-            optionsUI.label("Plugin Options")
+            optionsUI.label("Extra Settings")
 
         else:
             optionsUI.prop(addon_prefs, "options_dropdown", text="", icon='TRIA_DOWN', emboss=False)
-            optionsUI.label("Plugin Options")
+            optionsUI.label("Extra Settings")
             options_main = options_box.row(align=True)
             options_main.separator()
 
@@ -970,6 +977,7 @@ class CAP_AddonPreferences(AddonPreferences):
 
             options_main.separator()
 
+# Builds the default empty datablocks for the file
 @persistent
 def CreateDefaultData(scene):
 
@@ -993,13 +1001,14 @@ def CreateDefaultData(scene):
     defaultDatablock.hide_select = True
     defaultDatablock.CAPExp.is_storage_object = True
 
+
+# ....not sure
 @persistent
 def CheckSelectedObject(scene):
 
     user_preferences = bpy.context.user_preferences
     addon_prefs = user_preferences.addons[__name__].preferences
     #print("SCENE UPDATE")
-
 
     if bpy.context.active_object is not None:
         if bpy.context.active_object.name != addon_prefs.prev_selected_object:
@@ -1013,9 +1022,10 @@ def CheckSelectedObject(scene):
         addon_prefs.prev_selected_count = len(bpy.context.selected_objects)
 
 
+addon_keymaps = []
+
 def register():
-    print("Registering Stuff")
-    global ignorePresets
+    print("Registering Properties")
     bpy.utils.register_module(__name__)
 
     bpy.types.Scene.CAPScn = PointerProperty(type=properties.CAP_Scene_Preferences)
@@ -1025,18 +1035,25 @@ def register():
     bpy.types.Object.CAPStm = PointerProperty(type=properties.CAP_Object_StateMachine)
     bpy.types.Object.CAPExp = PointerProperty(type=CAP_ExportPresets)
 
-    print(ignorePresets)
-    if ignorePresets == False:
-        ui_operators.CreatePresets()
-        ignorePresets = True
+    ui_operators.CreatePresets()
 
     bpy.app.handlers.load_pre.append(CreateDefaultData)
     bpy.app.handlers.scene_update_post.append(CheckSelectedObject)
 
+    # Register keymaps
+    wm = bpy.context.window_manager
+    if wm.keyconfigs.addon:
+        # Object Mode
+        km = wm.keyconfigs.addon.keymaps.new(name='Object Mode')
+        kmi = km.keymap_items.new('wm.call_menu_pie', 'E', 'PRESS')
+        kmi.properties.name = "pie.capsule_main"
+#        kmi.active = True
+        addon_keymaps.append(kmi)
+
+
 def unregister():
     print("Unregistering Stuff")
-    global ignorePresets
-    ignorePresets = False
+    ui_operators.DeletePresets()
 
     bpy.app.handlers.load_pre.remove(CreateDefaultData)
     bpy.app.handlers.scene_update_post.remove(CheckSelectedObject)
@@ -1049,6 +1066,15 @@ def unregister():
     del bpy.types.Object.CAPStm
 
     bpy.utils.unregister_module(__name__)
+
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs.addon
+    if kc:
+        km = kc.keymaps['Object Mode']
+        for kmi in km.keymap_items:
+            if kmi.idname == 'wm.call_menu_pie':
+                if kmi.properties.name == "pie.capsule_main":
+                    km.keymap_items.remove(kmi)
 
 
 # Only if i ever wanted to run the script in the text editor, which I don't

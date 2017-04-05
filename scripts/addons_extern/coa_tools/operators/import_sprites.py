@@ -47,14 +47,7 @@ class ImportSprite(bpy.types.Operator):
     parent = StringProperty(name="Parent Object",default="None")
     
     
-    def create_mesh(self,context,name="Sprite",width=100,height=100,pos=Vector((0,0,0))):
-        me = bpy.data.meshes.new(name)
-        me.show_double_sided = True
-        obj = bpy.data.objects.new(name,me)
-        context.scene.objects.link(obj)
-        context.scene.objects.active = obj
-        obj.select = True
-        
+    def create_verts(self,width,height,pos,me,tag_hide=False):
         bpy.ops.object.mode_set(mode="EDIT")
         bm = bmesh.from_edit_mesh(me)
         vert1 = bm.verts.new(Vector((0,0,-height))*self.scale)
@@ -63,9 +56,41 @@ class ImportSprite(bpy.types.Operator):
         vert4 = bm.verts.new(Vector((0,0,0))*self.scale)
         
         bm.faces.new([vert1,vert2,vert3,vert4])
+                
+        bmesh.update_edit_mesh(me)
+        
+        if tag_hide:
+            for vert in bm.verts:
+                vert.hide = True    
+                
+            for edge in bm.edges:
+                edge.hide = True    
         
         bmesh.update_edit_mesh(me)
         bpy.ops.object.mode_set(mode="OBJECT")
+    
+    def create_mesh(self,context,name="Sprite",width=100,height=100,pos=Vector((0,0,0))):
+        me = bpy.data.meshes.new(name)
+        me.show_double_sided = True
+        obj = bpy.data.objects.new(name,me)
+        context.scene.objects.link(obj)
+        context.scene.objects.active = obj
+        obj.select = True
+        
+        self.create_verts(width,height,pos,me,tag_hide=False)
+        v_group = obj.vertex_groups.new("coa_base_sprite")
+        v_group.add([0,1,2,3],1.0,"REPLACE")
+        v_group.lock_weight = True
+        mod = obj.modifiers.new("coa_base_sprite","MASK")
+        mod.vertex_group = "coa_base_sprite"
+        mod.invert_vertex_group = True
+        mod.show_in_editmode = True
+        mod.show_render = False
+        mod.show_viewport = False
+        mod.show_on_cage = True
+        obj.coa_hide_base_sprite = False
+        
+        
         obj.data.uv_textures.new("UVMap")
         set_uv_default_coords(context,obj)
         
@@ -213,3 +238,93 @@ class ImportSprites(bpy.types.Operator, ImportHelper):
             bpy.ops.view3d.view_persportho()
         bpy.ops.ed.undo_push(message="Sprite Import")                   
         return{'FINISHED'}
+    
+
+    
+class ReImportSprite(bpy.types.Operator, ImportHelper):
+    bl_idname = "import.coa_reimport_sprite"
+    bl_label = "Reimport Sprite"
+    bl_description="Reimports sprites"
+    
+    #files = CollectionProperty(type=bpy.types.PropertyGroup)
+    
+    filepath = StringProperty(
+        default="test"
+         )
+    
+    filter_image = BoolProperty(default=True,options={'HIDDEN','SKIP_SAVE'})
+    filter_folder = BoolProperty(default=True,options={'HIDDEN','SKIP_SAVE'})
+    
+    tiles_x = IntProperty(default=1,min=1)
+    tiles_y = IntProperty(default=1,min=1)
+    name = StringProperty(default="")
+    
+    
+    def move_verts(self,obj,ratio_x,ratio_y):
+        bpy.ops.object.mode_set(mode="EDIT")
+        bpy.ops.mesh.reveal()
+        bpy.ops.object.mode_set(mode="OBJECT")
+        
+        data = obj.data.vertices
+        if obj.data.shape_keys != None:
+            data = obj.data.shape_keys.key_blocks[0].data
+        
+        for vert in data:
+            co_x = vert.co[0] * ratio_x
+            co_y = vert.co[2] * ratio_y
+            vert.co = Vector((co_x,0,co_y))
+            
+        obj.coa_sprite_dimension = Vector((get_local_dimension(obj)[0],0,get_local_dimension(obj)[1]))
+        obj.coa_tiles_x = self.tiles_x
+        obj.coa_tiles_y = self.tiles_y    
+    
+    def draw(self,context):
+        obj = context.active_object
+        if self.name in bpy.data.objects:
+            obj = bpy.data.objects[self.name]
+        
+        layout = self.layout
+        col = layout.column()
+        if obj.coa_type == "MESH":
+            col.prop(self,"tiles_x",text="Tiles X")
+            col.prop(self,"tiles_y",text="Tiles Y")
+    
+    def execute(self, context):
+        
+        
+        
+        sprite_found = False
+        for image in bpy.data.images:
+            if os.path.exists(bpy.path.abspath(image.filepath)) and os.path.exists(self.filepath):
+                if os.path.samefile(bpy.path.abspath(image.filepath),self.filepath):
+                    sprite_found = True
+                    img = image
+                    img.reload()
+                    break
+        if not sprite_found:
+            img = bpy.data.images.load(self.filepath)
+        
+        
+        scale = get_addon_prefs(context).sprite_import_export_scale
+        active_obj = bpy.data.objects[context.active_object.name]
+        obj = context.active_object
+        if self.name != "" and self.name in bpy.data.objects:
+            obj = bpy.data.objects[self.name]
+            bpy.context.scene.objects.active = obj
+        mat = obj.active_material
+        tex = mat.texture_slots[0].texture
+        tex.image = img
+        tiles_x = int(obj.coa_tiles_x)
+        tiles_y = int(obj.coa_tiles_y)
+        
+        obj.coa_tiles_x = 1
+        obj.coa_tiles_y = 1
+        
+        img_dimension = img.size
+        sprite_dimension = Vector(obj.coa_sprite_dimension) * (1/scale)
+        ratio_x = img_dimension[0] / sprite_dimension[0]
+        ratio_y = img_dimension[1] / sprite_dimension[2]
+        self.move_verts(obj,ratio_x,ratio_y)
+        
+        bpy.context.scene.objects.active = active_obj
+        return {'FINISHED'}

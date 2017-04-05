@@ -28,7 +28,7 @@ bl_info = {
     "warning": "This addon is still in development.",
     "wiki_url": "https://github.com/ndee85/coa_tools/wiki",
     "tracker_url": "https://github.com/ndee85/coa_tools/issues",
-    "category": "Tools" }
+    "category": "Ndee Tools" }
 
 
 import bpy
@@ -45,6 +45,7 @@ modules = developer_utils.setup_addon_modules(__path__, __name__)
 
 from . ui import *
 from . ui import preview_collections
+from . operators.pie_menu import preview_collections_pie
 from . functions import *
 
 # register
@@ -96,8 +97,10 @@ def register():
     my_icons_dir = os.path.join(os.path.dirname(__file__),"icons")
     pcoll.load("donate_icon", os.path.join(my_icons_dir,"donate_icon.png"),'IMAGE')
     pcoll.load("twitter_icon", os.path.join(my_icons_dir,"twitter_icon.png"),'IMAGE')
+    pcoll.load("db_icon", os.path.join(my_icons_dir,"db_icon.png"),'IMAGE')
     
     preview_collections["main"] = pcoll
+    preview_collections_pie["main"] = pcoll
     
     
     try: bpy.utils.register_module(__name__)
@@ -107,6 +110,8 @@ def register():
     
     bpy.types.Object.coa_anim_collections = bpy.props.CollectionProperty(type=AnimationCollections)
     bpy.types.Object.coa_uv_default_state = bpy.props.CollectionProperty(type=UVData)
+    bpy.types.Object.coa_slot = bpy.props.CollectionProperty(type=SlotData)
+    
     bpy.types.Scene.coa_ticker = bpy.props.IntProperty()
     bpy.types.WindowManager.coa_update_uv = bpy.props.BoolProperty(default=False)
     kc = bpy.context.window_manager.keyconfigs.addon
@@ -137,8 +142,6 @@ def unregister():
     bpy.app.handlers.load_post.remove(coa_startup)
     
     unregister_keymaps()
-    
-
          
 @persistent
 def update_sprites(dummy):
@@ -158,6 +161,9 @@ def update_sprites(dummy):
             if obj.coa_sprite_frame != obj.coa_sprite_frame_last:
                 update_uv(bpy.context,obj)
                 obj.coa_sprite_frame_last = obj.coa_sprite_frame
+            if obj.coa_slot_index != obj.coa_slot_index_last:
+                change_slot_mesh_data(context,obj)
+                obj.coa_slot_index_last = obj.coa_slot_index
             if obj.coa_alpha != obj.coa_alpha_last:
                 set_alpha(obj,bpy.context,obj.coa_alpha)
                 obj.coa_alpha_last = obj.coa_alpha
@@ -177,7 +183,7 @@ def update_sprites(dummy):
         sprite_object = get_sprite_object(context.active_object)
         if sprite_object != None and sprite_object.coa_animation_loop:
             if context.scene.frame_current > context.scene.frame_end:
-                context.scene.frame_current = 0
+                context.scene.frame_current = context.scene.frame_start
 
 
 ticker = 0
@@ -197,7 +203,10 @@ def scene_update(dummy):
                 if "coa_sprite" in obj and obj.animation_data != None and obj.type == "MESH":
                     if obj.coa_sprite_frame != obj.coa_sprite_frame_last:
                         update_uv(bpy.context,obj)
-                        obj.coa_sprite_frame_last = obj.coa_sprite_frame 
+                        obj.coa_sprite_frame_last = obj.coa_sprite_frame
+                    if obj.coa_slot_index != obj.coa_slot_index_last:
+                        change_slot_mesh_data(context,obj)
+                        obj.coa_slot_index_last = obj.coa_slot_index
                     if ticker%5 == 0:
                         if obj.coa_alpha != obj.coa_alpha_last:
                             set_alpha(obj,bpy.context,obj.coa_alpha)
@@ -205,7 +214,7 @@ def scene_update(dummy):
                 
     if hasattr(bpy.context,"active_object"):
         obj = bpy.context.active_object
-        if obj != None and not obj.coa_sprite_updated:
+        if obj != None and not obj.coa_sprite_updated and "coa_sprite" in obj:
             for thumb in preview_collections["coa_thumbs"]:
                 preview_collections["coa_thumbs"][thumb].reload()
             obj.coa_sprite_updated = True
@@ -233,9 +242,9 @@ def coa_startup(dummy):
             if "sprite" in obj:
                 obj["coa_sprite"] = True
                 del obj["sprite"]
-            obj.coa_sprite_updated = False
-            obj.coa_tiles_changed = True
             if "coa_sprite" in obj:
+                obj.coa_sprite_updated = False
+                obj.coa_tiles_changed = True
                 set_uv_default_coords(bpy.context,obj)
 
 

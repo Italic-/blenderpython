@@ -417,6 +417,8 @@ class CAP_Clear_List(Operator):
                 grp.in_export_list = False
             scn.group_list.clear()
 
+        scn.enable_sel_active = False
+        scn.enable_list_active = False
 
         return {'FINISHED'}
 
@@ -451,6 +453,8 @@ class CAP_Refresh_List(Operator):
                         entry.prev_name = group.name
                         entry.enable_export = group.CAPGrp.enable_export
 
+        scn.enable_sel_active = False
+        scn.enable_list_active = False
 
         return {'FINISHED'}
 
@@ -734,6 +738,10 @@ class CAP_Delete_Presets(Operator):
         # Obtain the selected preset
         addon_prefs.saved_presets.remove(addon_prefs.saved_presets_index)
 
+        # Decrement the list selection
+        if addon_prefs.saved_presets_index > 0:
+            addon_prefs.saved_presets_index -= 1
+
         return {'FINISHED'}
 
 class CAP_Store_Presets(Operator):
@@ -768,16 +776,20 @@ class CAP_Store_Presets(Operator):
         return {'FINISHED'}
 
 def DeletePresets():
+    print(">>>>>>>>>> Deleting presets...")
     user_preferences = bpy.context.user_preferences
     addon_prefs = user_preferences.addons[__package__].preferences
     exp = addon_prefs.saved_presets
     presetsToKeep = []
 
     i = len(exp) - 1
+    print("i = ", i)
 
     while i != -1:
         item = exp[i]
+        print("item = ", item)
         if item.x_global_user_deletable is False:
+            print("Removing default exp...", exp[i])
             exp.remove(i)
         i -= 1
 
@@ -789,11 +801,49 @@ def CreatePresets():
     user_preferences = bpy.context.user_preferences
     addon_prefs = user_preferences.addons[__package__].preferences
     exp = addon_prefs.saved_presets
-    print("Adding presets")
+    sort = addon_prefs.sort_presets
+    print(">>>>>>>>>> Adding presets...")
 
+    # Erase the previous sort entries (delayed)
+    print("Clearing sort presets")
+    x = 0
+    lenX = len(sort)
+    while x < lenX:
+        print("Deleting sort preset...", sort[0])
+        sort.remove(0)
+        x += 1
+
+    # Copy all the currently-saved presets to a temporary sort preset location.
+    i = 0
+    lenI = len(exp)
+    print("lenI = ", lenI)
+    print("Saving Presets...")
+    print(exp)
+    while i < lenI:
+        if exp[0].x_global_user_deletable is True:
+            print("Copying user-defined preset...", exp[0])
+            newPreset = sort.add()
+            CopyPreset(exp[0], newPreset)
+
+        print("Deleting preset...", exp[0])
+        exp.remove(0)
+        i += 1
+
+    # Create the new presets
     CreatePresetBasicExport(exp)
     CreatePresetUE4Standard(exp)
     CreatePresetUnity5Standard(exp)
+
+    # Add the copied presets back
+    i = 0
+    lenI = len(sort)
+    print(sort)
+    while i < lenI:
+        print("Adding back preset...", sort[0])
+        newPreset = exp.add()
+        CopyPreset(sort[0], newPreset)
+        sort.remove(0)
+        i += 1
 
 def CreatePresetBasicExport(exp):
     # -------------------------------------------------------------------------
@@ -894,7 +944,7 @@ def CreatePresetUE4Standard(exp):
         newPassTag = passOne.tags.add()
         newPassTag.name = tag.name
         newPassTag.index = len(export.tags) - 1
-        newPassTag.use_tag = True
+        #newPassTag.use_tag = True
 
     passTwo = export.passes.add()
     passTwo.name = "Game-Ready Pass"
@@ -911,8 +961,8 @@ def CreatePresetUE4Standard(exp):
         newPassTag.name = tag.name
         newPassTag.index = len(export.tags) - 1
 
-        if i != 0:
-            newPassTag.use_tag = True
+        #if i != 0:
+            #newPassTag.use_tag = True
 
         i += 1
 
@@ -926,7 +976,7 @@ def CreatePresetUnity5Standard(exp):
     export.axis_forward = "Z"
     export.axis_up = "Y"
     export.global_scale = 1.0
-    export.apply_unit_scale = True
+    export.apply_unit_scale = False
     export.export_types = {'MESH', 'ARMATURE'}
 
     export.bake_anim_use_all_bones = True
@@ -980,7 +1030,7 @@ def CreatePresetUnity5Standard(exp):
         newPassTag = passOne.tags.add()
         newPassTag.name = tag.name
         newPassTag.index = len(export.tags) - 1
-        newPassTag.use_tag = True
+        #newPassTag.use_tag = True
 
 def CopyPreset(old_preset, new_preset):
 
@@ -996,6 +1046,7 @@ def CopyPreset(old_preset, new_preset):
         new_pass = new_preset.passes.add()
 
         new_pass.name = old_pass.name
+        new_pass.enable = old_pass.enable
         new_pass.file_suffix = old_pass.file_suffix
         new_pass.sub_directory = old_pass.sub_directory
 
@@ -1032,6 +1083,8 @@ def CopyPreset(old_preset, new_preset):
 
     new_preset.global_scale = old_preset.global_scale
     new_preset.bake_space_transform = old_preset.bake_space_transform
+    new_preset.reset_rotation = old_preset.reset_rotation
+
     new_preset.axis_up = old_preset.axis_up
     new_preset.axis_forward = old_preset.axis_forward
     new_preset.apply_unit_scale = old_preset.apply_unit_scale
