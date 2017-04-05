@@ -10,3 +10,9 @@
 [submodule "scripts/addons_extern/commotion"]
 	path = scripts/addons_extern/commotion
 	url = git@github.com:mrachinskiy/commotion.git
+[submodule "scripts/addons_extern/namer"]
+	path = scripts/addons_extern/namer
+	url = git@github.com:proxeIO/namer.git
+[submodule "scripts/addons_extern/name-panel"]
+	path = scripts/addons_extern/name-panel
+	url = git@github.com:proxeIO/name-panel.git
