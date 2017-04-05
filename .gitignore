@@ -8,3 +8,5 @@ __pycache__
 /scripts/presets/interface_theme/ubuntu_ambiance.xml
 archive
 /archive/*
+*.swp*
+*~*
