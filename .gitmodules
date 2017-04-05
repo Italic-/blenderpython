@@ -4,3 +4,9 @@
 [submodule "scripts/addons_extern/CrowdMaster"]
 	path = scripts/addons_extern/CrowdMaster
 	url = git@github.com:johnroper100/CrowdMaster.git
+[submodule "scripts/addons_extern/BlenRig"]
+	path = scripts/addons_extern/BlenRig
+	url = git@gitlab.com:jpbouza/BlenRig.git
+[submodule "scripts/addons_extern/commotion"]
+	path = scripts/addons_extern/commotion
+	url = git@github.com:mrachinskiy/commotion.git
