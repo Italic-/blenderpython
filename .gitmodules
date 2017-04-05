@@ -1,3 +1,6 @@
 [submodule "scripts/addons_extern/animation_nodes"]
 	path = scripts/addons_extern/animation_nodes
 	url = git@github.com:JacquesLucke/animation_nodes.git
+[submodule "scripts/addons_extern/CrowdMaster"]
+	path = scripts/addons_extern/CrowdMaster
+	url = git@github.com:johnroper100/CrowdMaster.git
