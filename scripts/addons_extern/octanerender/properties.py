@@ -18,7 +18,6 @@
 
 # This script by Lionel Zamouth
 
-import render_octanerender
 from bl_ui import properties_texture
 from bl_ui import properties_data_lamp
 from bl_ui import properties_particle

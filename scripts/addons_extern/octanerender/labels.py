@@ -18,7 +18,7 @@
 
 # This script by Lionel Zamouth
 
-import render_octanerender
+from . import props
 
 # 'label':['Official Text','Unsupported Text']
 labels = {
@@ -41,7 +41,7 @@ labels = {
 
 def getLabel(name):
     if name in labels:
-        if render_octanerender.Supported:
+        if props.Supported:
             return labels[name][0]
         else:
             return labels[name][1]

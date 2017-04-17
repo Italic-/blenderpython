@@ -23,7 +23,7 @@ import bpy
 import math
 import mathutils
 import datetime
-import render_octanerender
+from . import props
 from .utils import *
 
 # Build list of objects to export
@@ -183,7 +183,7 @@ def write_mtl(mtlFile, mtl_dict, scene, copy_images):
         dst_file = 'SEQ-' + fixName(root) + ext
         src_path = os.path.join(src_dir, src_file)
         dst_path = os.path.join(dst_dir, dst_file)
-        render_octanerender.delayed_copies += ((src_path, dst_path),)
+        props.delayed_copies += ((src_path, dst_path),)
         # copy_file(src_path,dst_path)
         return dst_file
 

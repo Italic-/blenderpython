@@ -24,6 +24,7 @@ import time
 import datetime
 import mathutils
 import bpy
+from . import props
 from . import settings
 from .utils import *
 from .export import *
@@ -215,7 +216,7 @@ def appendCommandArgs(scene, args, outimage):
         log('GPUs to use: %s' % (octane_render.GPU_use_list))
 
     # Setting stuff if pulling image
-    if octanerender.pullImage:
+    if props.pullImage:
         # Set the exit after rendering flag (for animation or pulling back image)
         args.append('-e')
         args.append('-q')
@@ -266,11 +267,11 @@ class OctaneRenderEngine(bpy.types.RenderEngine):
         basePath = absPath(octane_render.path)
         if not os.path.isdir(basePath) or hasSpace(basePath):
             error('Project directory is invalid or contains spaces "%s" ("%s")' % (octane_render.path, basePath))
-        octanerender.dst_dir = basePath
+        props.dst_dir = basePath
 
         # Set and check image output path
         animPath = absPath(octane_render.image_output)
-        if octanerender.pullImage is True:
+        if props.pullImage is True:
             if (not os.path.isdir(animPath)) or hasSpace(animPath):
                 error('Image output directory is invalid or contains spaces "%s" ("%s")' % (octane_render.path, animPath))
 

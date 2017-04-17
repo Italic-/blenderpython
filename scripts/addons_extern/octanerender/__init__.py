@@ -32,32 +32,11 @@ bl_info = {
     "tracker_url": "",
     "support": 'COMMUNITY',
     "category": "Render"}
-Version = 'v1.51'
-Supported = False
-
-
-Verbose = True
-Status_Display = False
-Status_Text = ""
-Status_Severity = 0
-replace_project = False
-
-cameraUpdateOnly = False
-launchOctane = False
-flyMode = False
-bucketMode = False
-pullImage = False
-maxSamples = 0
-frameStart = 1
-frameStop = 1
-frameCurrent = 1
-frameStep = 1
-delayed_copies = []
-dst_dir = ""
 
 # To support reload properly, try to access a package var, if it's there, reload everything
 if "octane_data" in locals():
     import imp
+    imp.reload(props)
     imp.reload(scripting)
     imp.reload(settings)
     imp.reload(utils)
@@ -73,6 +52,7 @@ if "octane_data" in locals():
     imp.reload(engine)
 
 else:
+    from . import props
     from . import scripting
     from . import settings
     from . import utils
@@ -93,6 +73,7 @@ octane_data = True
 def reload():
     print("Octanerender: forced reload")
     import imp
+    from . import props
     from . import scripting
     from . import settings
     from . import utils
@@ -105,6 +86,7 @@ def reload():
     from . import instances
     from . import export
     from . import engine
+    imp.reload(props)
     imp.reload(scripting)
     imp.reload(settings)
     imp.reload(utils)

@@ -20,7 +20,6 @@
 
 import bpy
 import os
-import render_octanerender
 from .labels import getLabel
 from bpy.props import PointerProperty, StringProperty, BoolProperty, EnumProperty, IntProperty, CollectionProperty, FloatProperty
 

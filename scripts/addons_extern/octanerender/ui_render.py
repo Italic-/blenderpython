@@ -19,6 +19,7 @@
 # This script by Lionel Zamouth
 
 import bpy
+from . import props
 from . import settings
 from .utils import *
 from .labels import getLabel
@@ -46,7 +47,7 @@ class OctaneRenderButtonsPanel():
 
 
 class RENDER_OCT_render_settings(OctaneRenderButtonsPanel, bpy.types.Panel):
-    bl_label = "Octane Community Plugin " + render_octanerender.Version
+    bl_label = "Octane Community Plugin " + props.Version
     COMPAT_ENGINES = {'OCT_RENDER'}
 
     @classmethod

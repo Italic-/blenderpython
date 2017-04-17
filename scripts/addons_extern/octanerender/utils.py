@@ -22,7 +22,7 @@ import os
 import bpy
 import datetime
 import unicodedata
-import render_octanerender
+import props
 
 
 def active_node_mat(mat):
@@ -51,21 +51,21 @@ def elapsed_long(start):
 
 
 def notify_user(there):
-    if render_octanerender.Status_Severity == 0:
-        there.report({'INFO'}, render_octanerender.Status_Text)
-    if render_octanerender.Status_Severity == 1:
-        there.report({'WARNING'}, render_octanerender.Status_Text)
-    if render_octanerender.Status_Severity == 2:
-        there.report({'ERROR'}, render_octanerender.Status_Text)
+    if props.Status_Severity == 0:
+        there.report({'INFO'}, props.Status_Text)
+    if props.Status_Severity == 1:
+        there.report({'WARNING'}, props.Status_Text)
+    if props.Status_Severity == 2:
+        there.report({'ERROR'}, props.Status_Text)
 
 
 def update_status(severity, status):
     # 0 = Info
     # 1 = Warning
     # 2 = Error
-    render_octanerender.Status_Severity = severity
-    render_octanerender.Status_Text = status
-    render_octanerender.Status_Display = True
+    props.Status_Severity = severity
+    props.Status_Text = status
+    props.Status_Display = True
     if severity == 0:
         log('Status set to Info: ' + status)
     elif severity == 1:
@@ -74,13 +74,13 @@ def update_status(severity, status):
         log('Status set to Error: ' + status)
     else:
         # to avoid preset of error log into console
-        render_octanerender.Status_Severity = 2
+        props.Status_Severity = 2
 
 
 def log(log):
-    if render_octanerender.Verbose:
-        # print ('Octane plug-in ' + render_octanerender.Version + ' on %d.%d.%d' % tuple(bpy.app.version) + '.' + (bpy.app.build_revision) + ' : ' + (log))
-        print('Octane plug-in ' + render_octanerender.Version + ' on %d.%d.%d' % tuple(bpy.app.version) + ' : ' + (log))
+    if props.Verbose:
+        # print ('Octane plug-in ' + props.Version + ' on %d.%d.%d' % tuple(bpy.app.version) + '.' + (bpy.app.build_revision) + ' : ' + (log))
+        print('Octane plug-in ' + props.Version + ' on %d.%d.%d' % tuple(bpy.app.version) + ' : ' + (log))
 
 
 def error(error):
