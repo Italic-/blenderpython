@@ -22,7 +22,7 @@ import os
 import bpy
 import datetime
 import unicodedata
-import props
+from . import props
 
 
 def active_node_mat(mat):

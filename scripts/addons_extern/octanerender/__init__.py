@@ -16,13 +16,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# @author Lionel Zamouth, Matej Moderc (1.5+ version maintenance)
+# @author Lionel Zamouth, Matej Moderc, italic (1.5+ version maintenance)
 # This directory is a Python package.
 
 bl_info = {
     "name": "OctaneRender Community Plugin",
-    "author": "Lionel Zamouth, Matej Moderc",
-    "version": (1, 5, 1),
+    "author": "Lionel Zamouth, Matej Moderc, italic",
+    "version": (1, 5, 2),
     "blender": (2, 6, 2),
     "api": 45110,
     "location": "Info Header - Engine dropdown",
