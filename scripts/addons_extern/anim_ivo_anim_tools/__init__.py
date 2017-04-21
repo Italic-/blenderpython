@@ -36,42 +36,27 @@ bl_info = {
     "category": "Animation"}
 
 
-if "bpy" in locals():
+if "bpy" in globals():
     import imp
     imp.reload(ivo_anim_tools)
     imp.reload(ivo_jogwheel)
-    #~ imp.reload(menu)
     imp.reload(ivo_selection_sets)
 else:
     from . import ivo_anim_tools
     from . import ivo_jogwheel
-    #~ from . import menu
-    from . import ivo_selection_sets  # menu
-
-import bpy
-import bpy_types
-
-
-#~ import space_info
+    from . import ivo_selection_sets
 
 
 def register():
-
-    bpy.utils.register_module(__name__)
-    #~ if bpy.app.build_platform.find("Windows") != -1:
-    #~ ivo_anim_tools.register()
-    #~ ivo_jogwheel.register()
-    #~ ivo_selection_sets.register()
-    #~ menu.register()
+    ivo_anim_tools.register()
+    ivo_jogwheel.register()
+    ivo_selection_sets.register()
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
-    #~ ivo_anim_tools.unregister()
-    #~ ivo_jogwheel.unregister()
-    #~ menu.register()
-    #~ ivo_selection_sets.unregister()
-    pass
+    ivo_jogwheel.unregister()
+    ivo_selection_sets.unregister()
+    ivo_anim_tools.unregister()
 
 if __name__ == "__main__":
     register()

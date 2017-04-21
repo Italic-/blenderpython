@@ -23,45 +23,11 @@
 #
 
 import bpy
-from bpy.props import *
-
-
-class bone_selection_set_entry(bpy.types.PropertyGroup):
-
-    @classmethod
-    def register(bone_selection_set_entry):
-
-        from bpy.props import PointerProperty, StringProperty, BoolProperty, EnumProperty, IntProperty, CollectionProperty
-
-        bone_selection_set_entry.bone_name = StringProperty(name="Name", description="", maxlen=40, default="")
-
-
-class bone_selection_set(bpy.types.PropertyGroup):
-
-    @classmethod
-    def register(bone_selection_set):
-
-        from bpy.props import PointerProperty, StringProperty, BoolProperty, EnumProperty, IntProperty, CollectionProperty
-
-        bone_selection_set.name = StringProperty(name="Name", description="", maxlen=40, default="")
-        #~ bone_selection_set.list = CollectionProperty(type=StringProperty, name="entry", description="")
-        bone_selection_set.list = CollectionProperty(type=bone_selection_set_entry, name="entries", description="")
-        #~ bone_selection_set.list = []
-
-
-class c_bone_selection_sets(bpy.types.PropertyGroup):
-
-    @classmethod
-    def register(c_bone_selection_sets):
-
-        from bpy.props import PointerProperty, StringProperty, BoolProperty, EnumProperty, IntProperty, CollectionProperty
-
-        c_bone_selection_sets.index = IntProperty(name="Index", description="", default=0, min=-1, max=65535)
-        c_bone_selection_sets.sets = CollectionProperty(type=bone_selection_set, name="List", description="List of bones for quicker selecting")
-        c_bone_selection_sets.use_replace = BoolProperty(name="Replace selection", description="", default=True)
-
-        bpy.types.Object.bone_selection_sets = PointerProperty(type=c_bone_selection_sets, name="Selection Sets", description="List of bones for quicker selecting")
-#~ bpy.types.Scene.network_render = PointerProperty(type=NetRenderSettings, name="Network Render", description="Network Render Settings")
+from bpy.types import PropertyGroup, Operator, Panel
+from bpy.props import (
+    BoolProperty, CollectionProperty, IntProperty,
+    PointerProperty, StringProperty
+)
 
 
 def deselect_all_posebones_here():
@@ -74,27 +40,28 @@ def select_posebone_here(bone):
 
     ob = bpy.context.active_object
 
-    if type(bone) == bpy.types.PoseBone:
+    if isinstance(bone, bpy.types.PoseBone):
         bone = bone.bone  # get bone instead of posebone
-    elif type(bone) == type(str()):  # string type
+    elif isinstance(bone, str):  # string type
         try:
             bone = ob.data.bones[bone]
         except:
             return
 
-    #~ deselect_all_posebones()
     bone.select = True
     ob.data.bones.active = bone
 
 
-class bone_selection_sets_add(bpy.types.Operator):
+class bone_selection_sets_add(Operator):
+
     '''Add selection set'''
+
     bl_idname = "object.bone_selection_sets_add"
     bl_label = "Add"
 
     @classmethod
     def poll(cls, context):
-        return context.active_object != None
+        return context.active_object is not None
 
     def execute(self, context):
         ob = context.active_object
@@ -109,14 +76,16 @@ class bone_selection_sets_add(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class bone_selection_sets_remove(bpy.types.Operator):
+class bone_selection_sets_remove(Operator):
+
     '''Remove selection set'''
+
     bl_idname = "object.bone_selection_sets_remove"
     bl_label = "Add"
 
     @classmethod
     def poll(cls, context):
-        return context.active_object != None
+        return context.active_object is not None
 
     def execute(self, context):
         ob = context.active_object
@@ -131,14 +100,16 @@ class bone_selection_sets_remove(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class bone_selection_set_assign(bpy.types.Operator):
+class bone_selection_set_assign(Operator):
+
     '''Assign bones to active selection set'''
-    bl_idname = "object.bone_selection_set_assign"  # this is important since its how bpy.ops.export.some_data is constructed
+
+    bl_idname = "object.bone_selection_set_assign"
     bl_label = "Assign"
 
     @classmethod
     def poll(cls, context):
-        return context.active_object != None
+        return context.active_object is not None
 
     def execute(self, context):
         ob = context.active_object
@@ -154,14 +125,16 @@ class bone_selection_set_assign(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class bone_selection_set_remove(bpy.types.Operator):
+class bone_selection_set_remove(Operator):
+
     '''Remove bones from active selection set'''
+
     bl_idname = "object.bone_selection_set_remove"
     bl_label = "Remove"
 
     @classmethod
     def poll(cls, context):
-        return context.active_object != None
+        return context.active_object is not None
 
     def execute(self, context):
 
@@ -177,28 +150,23 @@ class bone_selection_set_remove(bpy.types.Operator):
                 remove_list = []
                 for i in range(len(set.list)):
                     if set.list[i].bone_name == name:
-                        #~ remove_list.append(i)
+                        # remove_list.append(i)
                         set.list.remove(i)
                         break
-
-                #~ for i in range( len(remove_list) ):
-                    #~ set.list.remove(i)
-
-                #~ set.list.add()
-                #~ entry = set.list[ len(set.list)-1 ]
-                #~ entry.bone_name = n.name
 
         return {'FINISHED'}
 
 
-class bone_selection_set_select(bpy.types.Operator):
+class bone_selection_set_select(Operator):
+
     '''Select bones from active selection set'''
+
     bl_idname = "object.bone_selection_set_select"
     bl_label = "Select"
 
     @classmethod
     def poll(cls, context):
-        return context.active_object != None
+        return context.active_object is not None
 
     def execute(self, context):
         ob = context.active_object
@@ -219,14 +187,16 @@ class bone_selection_set_select(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class deselect_all_bones(bpy.types.Operator):
+class deselect_all_bones(Operator):
+
     '''Deselect all bones'''
+
     bl_idname = "object.deselect_all_bones"
     bl_label = "Deselect all bones"
 
     @classmethod
     def poll(cls, context):
-        return context.object != None
+        return context.object is not None
 
     def execute(self, context):
         ob = context.active_object
@@ -241,13 +211,19 @@ class deselect_all_bones(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class View3DPanel():
+class VIEW3D_PT_tools_bone_selection_sets(Panel):
+
+    """
+    Traceback (most recent call last):
+        File "/home/italic/src/blender-git/scripts/addons_extern/anim_ivo_anim_tools/ivo_selection_sets.py", line 240, in draw
+            row.template_list("Selection Sets", "sets", obj.bone_selection_sets, "index", obj.active_selection_set, rows=5)
+                                                                                          ^~~~~~~~~~~~~~~~~~~~~~~~
+            TypeError: UILayout.template_list(): error with argument 5, "active_dataptr" -  Function.active_dataptr expected a AnyType type, not int
+    """
+
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = 'Animation'
-
-
-class VIEW3D_PT_tools_bone_selection_sets(View3DPanel, bpy.types.Panel):
     bl_context = "posemode"
     bl_label = "Bone selection sets"
 
@@ -256,11 +232,8 @@ class VIEW3D_PT_tools_bone_selection_sets(View3DPanel, bpy.types.Panel):
 
         obj = context.object
 
-        #~ row = layout.row()
-        #~ row.label(text="Hello world!", icon='WORLD_DATA')
-
         row = layout.row()
-        row.template_list(obj.bone_selection_sets, "sets", obj.bone_selection_sets, "index", rows=5)
+        row.template_list("Selection Sets", "sets", obj.bone_selection_sets, "index", obj.active_selection_set, rows=5)
 
         col = row.column()
         sub = col.column(align=True)
@@ -268,17 +241,12 @@ class VIEW3D_PT_tools_bone_selection_sets(View3DPanel, bpy.types.Panel):
         sub.operator("object.bone_selection_sets_remove", icon='ZOOMOUT', text="")
 
         row = layout.row()
-        #~ if len(obj.bone_selection_sets.sets) <= 0:
-        #~ obj.bone_selection_sets.sets.add()
-        #~ obj.bone_selection_sets.sets[ len(obj.bone_selection_sets.sets)-1 ].name = "group1"
         try:
             row.prop(obj.bone_selection_sets.sets[obj.bone_selection_sets.index], "name")
         except:
             pass
 
         row = layout.row()
-        #~ col = row.column()
-
         row.prop(obj.bone_selection_sets, "use_replace")
         row.operator('object.deselect_all_bones')
 
@@ -290,13 +258,84 @@ class VIEW3D_PT_tools_bone_selection_sets(View3DPanel, bpy.types.Panel):
         row.operator('object.bone_selection_set_select')
 
 
+class bone_selection_set_entry(PropertyGroup):
+
+    @classmethod
+    def register(cls):
+        cls.bone_name = StringProperty(name="Name", description="", maxlen=40, default="")
+
+    @classmethod
+    def unregister(cls):
+        del cls.bone_name
+
+
+class bone_selection_set(PropertyGroup):
+
+    @classmethod
+    def register(cls):
+        cls.name = StringProperty(name="Name", description="", maxlen=40, default="")
+        cls.list = CollectionProperty(type=cls, name="entries", description="")
+
+    @classmethod
+    def unregister(cls):
+        del cls.name
+        del cls.list
+
+
+class c_bone_selection_sets(PropertyGroup):
+
+    @classmethod
+    def register(cls):
+        bpy.types.Object.bone_selection_sets = PointerProperty(
+            name="Selection Sets",
+            description="List of bones for quicker selecting",
+            type=cls
+        )
+        cls.index = IntProperty(
+            name="Index",
+            description="",
+            default=0,
+            min=-1, max=65535
+        )
+        cls.sets = CollectionProperty(
+            type=bone_selection_set,
+            name="List",
+            description="List of bones for quicker selecting"
+        )
+        cls.use_replace = BoolProperty(
+            name="Replace selection",
+            description="",
+            default=True
+        )
+
+    @classmethod
+    def unregister(cls):
+        del bpy.types.Object.bone_selection_sets
+
+
+classes = (
+    bone_selection_set_entry,
+    bone_selection_set,
+    c_bone_selection_sets,
+    bone_selection_sets_add,
+    bone_selection_sets_remove,
+    bone_selection_set_assign,
+    bone_selection_set_remove,
+    bone_selection_set_select,
+    deselect_all_bones,
+    VIEW3D_PT_tools_bone_selection_sets
+)
+
+
 def register():
-    pass
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
 
 def unregister():
-    pass
+    for cls in classes[::-1]:
+        bpy.utils.unregister_class(cls)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     register()

@@ -23,11 +23,14 @@
 #
 
 import bpy
-from bpy.props import *
+from bpy.props import IntProperty
+from bpy.types import Operator
 
 
-class timeline_jogwheel_modal(bpy.types.Operator):
+class timeline_jogwheel_modal(Operator):
+
     '''Modal jogwheel for the timeline'''
+
     bl_idname = "scene.timeline_jogwheel_modal"
     bl_label = "Modal timeslider"
 
@@ -59,14 +62,20 @@ class timeline_jogwheel_modal(bpy.types.Operator):
             return {'CANCELLED'}
 
 
+classes = (
+    timeline_jogwheel_modal,
+)
+
+
 def register():
-    pass
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
 
 def unregister():
-    pass
+    for cls in classes[::-1]:
+        bpy.utils.unregister_class(cls)
 
 
 if __name__ == "__main__":
-    pass
-    #~ bpy.ops.object.timeline_jogwheel_modal()
+    register()
