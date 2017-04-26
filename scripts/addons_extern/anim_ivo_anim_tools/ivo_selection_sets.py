@@ -144,7 +144,6 @@ class bone_selection_set_remove(Operator):
 
         for n in ob.data.bones:
             if n.select:
-
                 name = n.name
 
                 remove_list = []
@@ -213,13 +212,7 @@ class deselect_all_bones(Operator):
 
 class VIEW3D_PT_tools_bone_selection_sets(Panel):
 
-    """
-    Traceback (most recent call last):
-        File "/home/italic/src/blender-git/scripts/addons_extern/anim_ivo_anim_tools/ivo_selection_sets.py", line 240, in draw
-            row.template_list("Selection Sets", "sets", obj.bone_selection_sets, "index", obj.active_selection_set, rows=5)
-                                                                                          ^~~~~~~~~~~~~~~~~~~~~~~~
-            TypeError: UILayout.template_list(): error with argument 5, "active_dataptr" -  Function.active_dataptr expected a AnyType type, not int
-    """
+    """"""
 
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
@@ -233,6 +226,8 @@ class VIEW3D_PT_tools_bone_selection_sets(Panel):
         obj = context.object
 
         row = layout.row()
+        # XXX: Improper data access. See API docs for details on
+        # template_list() args.
         row.template_list("Selection Sets", "sets", obj.bone_selection_sets, "index", obj.active_selection_set, rows=5)
 
         col = row.column()

@@ -21,14 +21,15 @@
 #  http://ivogrigull.com
 #  http://character-rigger.com
 #
+#  Modifications by italic
+#
 
 bl_info = {
     "name": "Ivo Animation Toolbox",
-    "author": "Ivo Grigull (Loolarge)",
-    "version": (0, 1),
-    "blender": (2, 5, 7),
-    "api": 34470,
-    "location": "Toolbar in pose mode",
+    "author": "Ivo Grigull (Loolarge), modifications by italic",
+    "version": (0, 2),
+    "blender": (2, 7, 5),
+    "location": "Toolbar -> Animation",
     "description": "Collection of animation helper tools",
     "warning": "",
     "wiki_url": "",
@@ -40,23 +41,23 @@ if "bpy" in globals():
     import imp
     imp.reload(ivo_anim_tools)
     imp.reload(ivo_jogwheel)
-    imp.reload(ivo_selection_sets)
+    # imp.reload(ivo_selection_sets)
 else:
     from . import ivo_anim_tools
     from . import ivo_jogwheel
-    from . import ivo_selection_sets
+    # from . import ivo_selection_sets
 
 
 def register():
     ivo_anim_tools.register()
     ivo_jogwheel.register()
-    ivo_selection_sets.register()
+    # ivo_selection_sets.register()
 
 
 def unregister():
     ivo_jogwheel.unregister()
-    ivo_selection_sets.unregister()
     ivo_anim_tools.unregister()
+    # ivo_selection_sets.unregister()
 
 if __name__ == "__main__":
     register()
