@@ -16,6 +16,3 @@
 [submodule "scripts/addons_extern/name-panel"]
 	path = scripts/addons_extern/name-panel
 	url = git@github.com:proxeIO/name-panel.git
-[submodule "scripts/addons_extern/lock_cursor3d"]
-	path = scripts/addons_extern/lock_cursor3d
-	url = git@github.com:chromoly/lock_cursor3d.git
