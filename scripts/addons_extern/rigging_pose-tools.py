@@ -1,7 +1,12 @@
+# Fixes by italic
+
+import bpy
+
+
 bl_info = {
     "name": "PoseTools",
     "author": "Patrick W. Crawford <support@theduckcow.com>",
-    "version": (1, 2),
+    "version": (1, 3),
     "blender": (2, 75, 0),
     "location": "Armature > Pose Library",
     "description": "Allows dynamic mixing between poses in library and clipboard",
@@ -9,8 +14,6 @@ bl_info = {
     "wiki_url": "https://github.com/TheDuckCow/pose-tools",
     "category": "Rigging"}
 
-
-import bpy
 
 v = False  # v for verbose
 
@@ -95,7 +98,9 @@ def mixToPose(ob, pose, value):
 #######
 # The tool for mixing poses
 class mixCurrentPose(bpy.types.Operator):
+
     """Mix-apply the selected library pose on to the current pose"""
+
     bl_idname = "poselib.mixcurrpose"
     bl_label = "Mix current pose"
 
@@ -133,13 +138,15 @@ class mixCurrentPose(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return (context.object and context.object.type == 'ARMATURE' and context.object.mode == 'POSE')
-   # in the above, remove the last one once I get it working in object mode too (apply to all bones..)
+    # in the above, remove the last one once I get it working in object mode too (apply to all bones..)
 
 
 #######
 # The tool for mixing poses
 class mixedPosePaste(bpy.types.Operator):
+
     """Mix-paste the stored pose on to the current pose"""
+
     bl_idname = "poselib.mixedposepaste"
     bl_label = "Mix current pose with copied pose"
     bl_options = {'REGISTER', 'UNDO'}
@@ -169,18 +176,21 @@ class mixedPosePaste(bpy.types.Operator):
 #######
 # UI for new tools next to the built in pose-lib tools, under the pose library of armature properties tab
 def pose_tools_panel(self, context):
-    layout = self.layout
-    col = layout.split(align=True)
-    p = col.operator("poselib.mixcurrpose", text="Apply mixed pose")
-    p.influence = context.scene.posemixinfluence
-    p.pose_index = context.object.pose_library.pose_markers.active_index
-    col.prop(context.scene, "posemixinfluence", slider=True, text="Mix Influence")
+    if hasattr(context.object.pose_library, 'pose_markers'):
+        layout = self.layout
+        col = layout.split(align=True)
+        p = col.operator("poselib.mixcurrpose", text="Apply mixed pose")
+        p.influence = context.scene.posemixinfluence
+        p.pose_index = context.object.pose_library.pose_markers.active_index
+        col.prop(context.scene, "posemixinfluence", slider=True, text="Mix Influence")
 
 
 #######
 # Panel for placing in the shift-A add object menu
 class poselibToolshelf(bpy.types.Panel):
+
     """Theory Animation Panel"""
+
     bl_label = "Pose Library Tools"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'

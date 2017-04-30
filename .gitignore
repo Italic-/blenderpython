@@ -1,4 +1,4 @@
-__pycache__
+*__pycache__*
 /scripts/addons_extern/luxrender/pylux.pyd
 
 /scripts/presets/interface_theme/back_to_black.xml
@@ -8,3 +8,6 @@ __pycache__
 /scripts/presets/interface_theme/ubuntu_ambiance.xml
 archive
 /archive/*
+*.swp*
+*~*
+*.ropeproject*
