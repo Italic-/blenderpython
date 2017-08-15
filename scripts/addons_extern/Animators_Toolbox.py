@@ -276,18 +276,22 @@ class AnimatorsToolBox(bpy.types.Panel):
         draw_animatorstoolbox_panel(context, layout)
 
 
+classes = [
+    AnimatorsToolboxFrameJump,
+    ToggleSelectability,
+    ClearAllTransforms,
+    ToggleOpensubdiv,
+    OpensubdivOn,
+    OpensubdivOff,
+    ToggleXray,
+    AnimatorsToolBox,
+    animatorstoolboxData
+]
+
 def register():
-    # This command is supposed to register EVERYTHING, are you kidding me that it's that easy?
-    bpy.utils.register_module(__name__)
-    #bpy.utils.register_class(AnimatorsToolboxFrameJump)
-    #bpy.utils.register_class(ToggleSelectability)
-    #bpy.utils.register_class(ClearAllTransforms)
-    #bpy.utils.register_class(AnimatorsToolBox)
-    #bpy.utils.register_class(ToggleOpensubdiv)
-    #bpy.utils.register_class(OpensubdivOff)
-    #bpy.utils.register_class(OpensubdivOn)
-    #bpy.utils.register_class(ToggleXray)
-#---
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
     km = kc.keymaps.new(name="Frames")
@@ -301,23 +305,11 @@ def register():
     KEYMAPS.append((km, kmi))
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
-    #bpy.utils.unregister_class(AnimatorsToolboxFrameJump)
-    #bpy.utils.unregister_class(ToggleSelectability)
-    #bpy.utils.unregister_class(ClearAllTransforms)
-    #bpy.utils.unregister_class(AnimatorsToolBox)
-    #bpy.utils.unregister_class(ToggleOpensubdiv)
-    #bpy.utils.unregister_class(OpensubdivOff)
-    #bpy.utils.unregister_class(OpensubdivOn)
-    #bpy.utils.unregister_class(ToggleXray)
-#---Boomsmash
-    del bpy.types.Scene.boom_props
-    del bpy.types.WindowManager.boom_props
-#---
+    for cls in classes[::-1]:
+        bpy.utils.unregister_class(cls)
     for km, kmi in KEYMAPS:
         km.keymap_items.remove(kmi)
     KEYMAPS.clear()
 
-# The End
 if __name__ == "__main__":
     register()
