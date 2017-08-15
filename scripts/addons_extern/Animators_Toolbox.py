@@ -7,6 +7,7 @@
 # Removed tools that are better left to hotkeys.
 # Will add preferences of hotkeys later.
 #     "support": "TESTING",
+
 bl_info = {
     "name": "Animator's Toolbox",
     "description": "A set of tools specifically for animators.",
@@ -19,11 +20,14 @@ bl_info = {
     "tracker_url": "https://github.com/thedaemon/Blender-Scripts/issues",
     "category": "Animation"
     }
+
 import os.path
 import bpy
 from bpy.props import *
 from bpy.types import Operator
+
 KEYMAPS = list()
+
 
 # FEATURE: Jump forward/backward every N frames. Currently hardcoded variable.
 # the frame jump amount needs to be in preferences along with hotkey selector (viewer?)
@@ -40,6 +44,7 @@ class AnimatorsToolboxFrameJump(bpy.types.Operator):
         else:
             scene.frame_current = scene.frame_current - framedelta
         return {"FINISHED"}
+
 
 # FEATURE: A toggle to keep the animator from selecting something other
 # than the Armature.
@@ -71,6 +76,8 @@ class ToggleSelectability(bpy.types.Operator):
                 for ob in bpy.context.selected_objects:
                     ob.hide_select = not ob.hide_select
         return{'FINISHED'}
+
+
 # Useless because blender already has this freaking command but I programmed
 # it anyways. I may use it for specific axis template.
 class ClearAllTransforms(bpy.types.Operator):
@@ -84,6 +91,8 @@ class ClearAllTransforms(bpy.types.Operator):
                 bpy.ops.pose.loc_clear()
                 bpy.ops.pose.scale_clear()
         return{'FINISHED'}
+
+
 # FEATURE: A toggle for OpenSubdiv on all objects in scene with a Subdivision
 # Surface Modifier.
 class ToggleOpensubdiv(bpy.types.Operator):
@@ -102,6 +111,8 @@ class ToggleOpensubdiv(bpy.types.Operator):
                 if mm.use_opensubdiv == False:
                     mm.use_opensubdiv = True
         return{'FINISHED'}
+
+
 # Feature: Turns OpenSubdiv on for all meshes with Subdivision Surface
 # Modifiers for improved viewport performance.
 class OpensubdivOn(bpy.types.Operator):
@@ -112,6 +123,8 @@ class OpensubdivOn(bpy.types.Operator):
                    for m in o.modifiers if m.type=='SUBSURF'):
             mm.use_opensubdiv = True
         return{'FINISHED'}
+
+
 # Feature: Turns OpenSubdiv on for all meshes with Subdivision Surface
 # Modifiers for improved viewport performance.
 class OpensubdivOff(bpy.types.Operator):
@@ -122,6 +135,8 @@ class OpensubdivOff(bpy.types.Operator):
                    for m in o.modifiers if m.type=='SUBSURF'):
             mm.use_opensubdiv = False
         return{'FINISHED'}
+
+
 # FEATURE: Simple X-Ray toggle for Armature
 class ToggleXray(bpy.types.Operator):
     """Toggles X-Ray mode for bones"""
@@ -132,8 +147,10 @@ class ToggleXray(bpy.types.Operator):
             if object.type == 'ARMATURE':
                 object.show_x_ray = not object.show_x_ray
         return{'FINISHED'}
+
+
 # FEATURE: Simple Auto-IK toggle for Armature
-#context.active_object.data, "use_auto_ik", text="Auto IK")
+# context.active_object.data, "use_auto_ik", text="Auto IK")
 class ToggleAutoIK(bpy.types.Operator):
     """Toggles Auto IK mode for bones"""
     bl_idname = "bone.toggleautoik"
@@ -143,19 +160,21 @@ class ToggleAutoIK(bpy.types.Operator):
             if object.type == 'ARMATURE':
                 object.use_auto_ik = not object.use_auto_ik
         return{'FINISHED'}
+
+
 # FEATURE: Advanced Boomsmash version 011 classes
 class BoomProps(bpy.types.PropertyGroup):
     global_toggle = BoolProperty(
         name = 'Global',
         description = 'Same boomsmash settings for all scenes in file.',
         default = False)
-    #twm.image_settings = bpy.types.ImageFormatSettings(
-    #                        bpy.context.scene.render.image_settings)
+    # twm.image_settings = bpy.types.ImageFormatSettings(
+    #                         bpy.context.scene.render.image_settings)
 
-    #scene_cam = BoolProperty(
-    #    name = 'Active Camera',
-    #    description = 'Always renders from the active camera
-    #                   that's set in the Scene properties')
+    # scene_cam = BoolProperty(
+    #     name = 'Active Camera',
+    #     description = 'Always renders from the active camera
+    #                    that's set in the Scene properties')
     incremental = BoolProperty(
         name = 'Incremental',
         description = 'Save incremental boomsmashes.',
@@ -191,8 +210,6 @@ class BoomProps(bpy.types.PropertyGroup):
         default = 50,
         min = 0,
         max = 100)
-    #DEBUG
-    #pu.db
     dirname = StringProperty(
         name = '',
         description = 'Folder where your boomsmash will be stored',
@@ -203,6 +220,8 @@ class BoomProps(bpy.types.PropertyGroup):
         description = 'Filename where your boomsmash will be stored',
         default = 'Boomsmash',
         subtype = 'FILE_NAME')
+
+
 # BOOMSMASH
 class setDirname(bpy.types.Operator):
     bl_idname = 'bs.setdirname'
@@ -213,6 +232,8 @@ class setDirname(bpy.types.Operator):
         cs = context.scene
         cs.boom_props.dirname = os.path.dirname(bpy.data.filepath)
         return {'FINISHED'}
+
+
 # BOOMSMASH
 class setFilename(bpy.types.Operator):
     bl_idname = 'bs.setfilename'
@@ -225,6 +246,8 @@ class setFilename(bpy.types.Operator):
                       os.path.splitext(bpy.data.filepath)[0])
         cs.boom_props.filename = blend_name + '_' + bpy.context.scene.name
         return {'FINISHED'}
+
+
 # BOOMSMASH
 class DoBoom(bpy.types.Operator):
     bl_idname = 'bs.doboom'
@@ -280,22 +303,28 @@ class DoBoom(bpy.types.Operator):
         #if boom_props.scene_cam and view_pers is not 'CAMERA':
         #    bpy.ops.view3d.viewnumpad(type = 'CAMERA')
         return {'FINISHED'}
+
+
 class QuickMotionPath(bpy.types.Operator):
-	"""Create motion path by preview range"""
-	bl_label = "Calculate"
-	bl_idname = "cenda.motion_pats"
-	def execute(self, context ):
-		if(bpy.context.scene.use_preview_range):
-			startFrame = bpy.context.scene.frame_preview_start
-			endFrame = bpy.context.scene.frame_preview_end
-		else:
-			startFrame = bpy.context.scene.frame_start
-			endFrame = bpy.context.scene.frame_end
-		bpy.ops.pose.paths_calculate(start_frame=startFrame, end_frame=endFrame, bake_location='TAILS')		
-		return{'FINISHED'}        
+    """Create motion path by preview range"""
+    bl_label = "Calculate"
+    bl_idname = "cenda.motion_pats"
+    def execute(self, context ):
+        if(bpy.context.scene.use_preview_range):
+            startFrame = bpy.context.scene.frame_preview_start
+            endFrame = bpy.context.scene.frame_preview_end
+        else:
+            startFrame = bpy.context.scene.frame_start
+            endFrame = bpy.context.scene.frame_end
+        bpy.ops.pose.paths_calculate(start_frame=startFrame, end_frame=endFrame, bake_location='TAILS')
+        return{'FINISHED'}
+
+
 ## UI --
 from bpy.types import PropertyGroup, Panel
 from bpy.props import *
+
+
 class animatorstoolboxData(PropertyGroup):
     bl_idname = 'animatorstoolboxDataUI'
     """
@@ -318,19 +347,21 @@ class animatorstoolboxData(PropertyGroup):
         default = 50,
         min = 0,
         max = 100)
-def draw_animatorstoolbox_panel(context, layout):    
+
+
+def draw_animatorstoolbox_panel(context, layout):
     scene = context.scene
     screen = context.screen
     render = scene.render
     cscene = scene.cycles
-    object = context.object    
+    object = context.object
     toolsettings = context.tool_settings
     userpref = context.user_preferences
     edit = userpref.edit
     #
     col = layout.column(align=True)
     row = col.row(align=True)
-    box = row.box()    
+    box = row.box()
     box.operator("pose.transforms_clear", text="Reset All")
     box.operator("show_x_ray", text="X-Ray")
     box.operator("bone.toggleselectability", text="Select Armature Only")
@@ -353,7 +384,7 @@ def draw_animatorstoolbox_panel(context, layout):
     row = col.row(align=True)
     row.operator("pose.relax", text="Relax")
     row.operator("pose.breakdown", text="Tween")
-    row.operator("pose.push", text="Push")    
+    row.operator("pose.push", text="Push")
     #row.prop(scene, 'breakdowner_percentage', slider=True )
     #--Motion Path
     pchan = context.active_pose_bone
@@ -366,7 +397,7 @@ def draw_animatorstoolbox_panel(context, layout):
         row.operator("pose.paths_clear", text="", icon='X')
     else:
         #col.operator("pose.paths_calculate", text="Calculate")
-        col.operator("cenda.motion_pats", icon = 'ANIM_DATA')        
+        col.operator("cenda.motion_pats", icon = 'ANIM_DATA')
     col = layout.column(align=True)
     row = col.row(align=True)
     row.operator("opensubdiv.on", text="OpenSubdiv")
@@ -389,6 +420,8 @@ def draw_animatorstoolbox_panel(context, layout):
     row.prop(edit, "keyframe_new_handle_type", text="", icon_only=False)
     row = col.row()
     row.prop(toolsettings, "keyframe_type", text="", icon_only=False)
+
+
 class AnimatorsToolBox(bpy.types.Panel):
     """Creates a custom Animator Panel in the 3D View"""
     bl_label = "Animator's Toolbox"
@@ -407,7 +440,9 @@ class AnimatorsToolBox(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         draw_animatorstoolbox_panel(context, layout)
-# BOOMSMASH        
+
+
+# BOOMSMASH
 class BoomsmashPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
@@ -417,6 +452,8 @@ class BoomsmashPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         draw_boomsmash_panel(context, layout)
+
+
 def draw_boomsmash_panel(context, layout):
     #layout.row().prop(self, "boomsmash_panel", expand=True)
     col = layout.column(align = True)
@@ -466,6 +503,8 @@ def draw_boomsmash_panel(context, layout):
     subcol.prop(boom_props, 'autoplay')
     subcol.prop(boom_props, 'unsimplify')
     col.separator()
+
+
 def register():
     bpy.utils.register_module(__name__)
 #---Boomsmash
@@ -492,6 +531,8 @@ def register():
     KEYMAPS.append((km, kmi))
 #---New Preferences Tab Apply after Blender Restart FIX
 #--update_panel(None, bpy.context)
+
+
 def unregister():
     bpy.utils.unregister_module(__name__)
 #---Boomsmash
