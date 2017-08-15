@@ -106,7 +106,7 @@ class ToggleOpensubdiv(bpy.types.Operator):
 class OpensubdivOn(bpy.types.Operator):
     bl_idname = "opensubdiv.on"
     bl_label = "OpenSubdiv On"
-    
+
     def execute(self,context):
         for mm in (m for o in bpy.context.scene.objects for m in o.modifiers if m.type=='SUBSURF'):
             mm.use_opensubdiv = True
@@ -116,7 +116,7 @@ class OpensubdivOn(bpy.types.Operator):
 class OpensubdivOff(bpy.types.Operator):
     bl_idname = "opensubdiv.off"
     bl_label = "OpenSubdiv Off"
-    
+
     def execute(self,context):
         for mm in (m for o in bpy.context.scene.objects for m in o.modifiers if m.type=='SUBSURF'):
             mm.use_opensubdiv = False
@@ -134,8 +134,8 @@ class ToggleXray(bpy.types.Operator):
                 obj.show_x_ray = not obj.show_x_ray
         return{'FINISHED'}
 
-        
-# FEATURE: Advanced Boomsmash version 011 classes        
+
+# FEATURE: Advanced Boomsmash version 011 classes
 class BoomProps(bpy.types.PropertyGroup):
 
     global_toggle = BoolProperty(
@@ -158,40 +158,40 @@ class BoomProps(bpy.types.PropertyGroup):
     use_stamp = BoolProperty(
         name = 'Stamp',
         description = 'Turn on stamp (uses settings from render properties).',
-        default = False)    
-        
+        default = False)
+
     transparent = BoolProperty(
         name = 'Transparent',
         description = 'Make background transparent (only for formats that support alpha, i.e.: .png).',
         default = False)
-        
+
     autoplay = BoolProperty(
         name = 'Autoplay',
         description = 'Automatically play boomsmash after making it.',
-        default = False)              
-        
+        default = False)
+
     unsimplify = BoolProperty(
         name = 'Unsimplify',
         description = "Boomsmash with the subdivision surface levels at it's render settings.",
         default = False)
-        
+
     onlyrender = BoolProperty(
         name = 'Only Render',
         description = 'Only have renderable objects visible during boomsmash.',
         default = False)
-        
+
     frame_skip = IntProperty(
         name = 'Skip Frames',
         description = 'Number of frames to skip',
         default = 0,
-        min = 0)        
+        min = 0)
 
     resolution_percentage = IntProperty(
         name = 'Resolution Percentage',
         description = 'define a percentage of the Render Resolution to make your boomsmash',
         default = 50,
         min = 0,
-        max = 100)        
+        max = 100)
 
     #DEBUG
     #pu.db
@@ -200,37 +200,37 @@ class BoomProps(bpy.types.PropertyGroup):
         name = '',
         description = 'Folder where your boomsmash will be stored',
         default = bpy.app.tempdir,
-        subtype = 'DIR_PATH')  
+        subtype = 'DIR_PATH')
 
     filename = StringProperty(
         name = '',
         description = 'Filename where your boomsmash will be stored',
         default = 'Boomsmash',
-        subtype = 'FILE_NAME')          
+        subtype = 'FILE_NAME')
 # BOOMSMASH
 class setDirname(bpy.types.Operator):
     bl_idname = 'bs.setdirname'
     bl_label = 'BoomsmashDirname'
     bl_description = 'boomsmash use blendfile directory'
     bl_options = {'REGISTER', 'INTERNAL'}
-    
+
     def execute(self, context):
         cs = context.scene
         cs.boom_props.dirname = os.path.dirname(bpy.data.filepath)
-        return {'FINISHED'} 
+        return {'FINISHED'}
 # BOOMSMASH
 class setFilename(bpy.types.Operator):
     bl_idname = 'bs.setfilename'
     bl_label = 'BoomsmashFilename'
     bl_description = 'boomsmash use blendfile name _ scene name'
     bl_options = {'REGISTER', 'INTERNAL'}
-    
+
     def execute(self, context):
         cs = context.scene
         blend_name = os.path.basename(
                       os.path.splitext(bpy.data.filepath)[0])
         cs.boom_props.filename = blend_name + '_' + bpy.context.scene.name
-        return {'FINISHED'} 
+        return {'FINISHED'}
 # BOOMSMASH
 class DoBoom(bpy.types.Operator):
     bl_idname = 'bs.doboom'
@@ -238,7 +238,7 @@ class DoBoom(bpy.types.Operator):
     bl_description = 'Start boomsmash, use, enjoy, think about donate ;)'
     bl_options = {'REGISTER'}
 
-    def execute(self, context): 
+    def execute(self, context):
         cs = context.scene
         wm = context.window_manager
         rd = context.scene.render
@@ -253,7 +253,7 @@ class DoBoom(bpy.types.Operator):
         #guardo settings
         old_use_stamp = rd.use_stamp
         old_onlyrender = sd.show_only_render
-        old_simplify = rd.use_simplify 
+        old_simplify = rd.use_simplify
         old_filepath = rd.filepath
         old_alpha_mode = rd.alpha_mode
         #old_image_settings = rd.image_settings
@@ -286,7 +286,7 @@ class DoBoom(bpy.types.Operator):
         rd.resolution_percentage = old_resolution_percentage
         context.scene.frame_step = old_frame_step
         #if boom_props.scene_cam and view_pers is not 'CAMERA':
-        #    bpy.ops.view3d.viewnumpad(type = 'CAMERA')    
+        #    bpy.ops.view3d.viewnumpad(type = 'CAMERA')
         return {'FINISHED'}
 
 
@@ -336,7 +336,7 @@ def draw_animatorstoolbox_panel(context, layout):
     row.prop_search(scene.keying_sets_all, "active", scene, "keying_sets_all", text="")
     row.operator("screen.animation_play", text="", icon='PLAY')
     row.operator("screen.keyframe_jump", text="", icon='PREV_KEYFRAME').next = False
-    row.operator("screen.keyframe_jump", text="", icon='NEXT_KEYFRAME').next = True    
+    row.operator("screen.keyframe_jump", text="", icon='NEXT_KEYFRAME').next = True
 #--Pose Tools
     col = layout.column(align=True)
     col.label(text="Pose:")
@@ -352,7 +352,7 @@ def draw_animatorstoolbox_panel(context, layout):
     col = layout.column(align=True)
     row = col.row()
     row.prop(context.active_object.data, "use_auto_ik", text="Auto IK")
-    row.prop(obj, "show_x_ray", text="X Ray")       
+    row.prop(obj, "show_x_ray", text="X Ray")
 #--Reset Transforms
     col = layout.column(align=True)
     col.label(text="Reset Transforms:")
@@ -393,7 +393,7 @@ def draw_animatorstoolbox_panel(context, layout):
     col.prop(cscene, "use_camera_cull")
     subsub = col.column()
     subsub.active = cscene.use_camera_cull
-    subsub.prop(cscene, "camera_cull_margin")        
+    subsub.prop(cscene, "camera_cull_margin")
 #--Motion Path
     pchan = context.active_pose_bone
     mpath = pchan.motion_path if pchan else None
@@ -437,7 +437,7 @@ class AnimatorsToolBox(bpy.types.Panel):
 def draw_boomsmash_panel(context, layout):
     col = layout.column(align = True)
     cs = context.scene
-    wm = context.window_manager 
+    wm = context.window_manager
     rd = context.scene.render
     if wm.boom_props.global_toggle:
         boom_props = wm.boom_props
@@ -480,7 +480,7 @@ def draw_boomsmash_panel(context, layout):
     row = col.row()
     row.prop(cs.boom_props, 'filename')
     row.operator('bs.setfilename', text = '', icon = 'FILE_BLEND')
-    
+
 
 def register():
     # This command is supposed to register EVERYTHING, are you kidding me that it's that easy?
@@ -498,8 +498,8 @@ def register():
             type = BoomProps, name = 'BoomSmash Properties', description = '')
 
     bpy.types.WindowManager.boom_props = PointerProperty(
-            type = BoomProps, name = 'BoomSmash Global Properties', description = '')    
-#---    
+            type = BoomProps, name = 'BoomSmash Global Properties', description = '')
+#---
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
     km = kc.keymaps.new(name="Frames")
