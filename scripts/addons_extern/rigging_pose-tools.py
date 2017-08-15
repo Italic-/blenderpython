@@ -199,7 +199,7 @@ class poselibToolshelf(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return (context.object.mode in ['POSE', 'OBJECT'])
+        return (context.object and context.object.mode in ['POSE', 'OBJECT'])
 
     def draw(self, context):
 
