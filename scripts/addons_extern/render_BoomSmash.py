@@ -1,183 +1,256 @@
 bl_info = {
-    "name": "Advanced Boomsmash",
-    "author": "Luciano Muñoz & Cristián Hasbún",
-    "version": (0, 1),
-    "blender": (2, 7, 1),
-    "location": "View3D > Tools > Animation > Boomsmash",
-    "description": "Have quick access for opengl previews without the need to change your render settings",
-    "warning": "Beta",
-    "category": "Render"}
+    'name': 'Advanced Boomsmash',
+    'author': 'Luciano Muñoz & Cristian Hasbun',
+    'version': (0, 11),
+    'blender': (2, 7, 1),
+    'location': 'View3D > Tools > Animation > Boomsmash',
+    'description': 'Have quick access for opengl previews without the need to change your render settings',
+    'warning': "It's very first beta! The addon is in progress!",
+    'category': 'Animation'}
+
+import os.path
 
 import bpy
 from bpy.props import *
-# import pudb
-# _MODULE_SOURCE_CODE = "BoomSmash_mockup007_b.py"
+
+#DEBUGGER
+#import pudb
+#_MODULE_SOURCE_CODE = bpy.data.texts[__file__.split('/')[-1]].as_string()
+#_MODULE_SOURCE_CODE = bpy.data.texts[os.path.basename(__file__)].as_string()
 
 
 class BoomProps(bpy.types.PropertyGroup):
 
-    # twm.image_settings = bpy.types.ImageFormatSettings(
+    global_toggle = BoolProperty(
+        name = 'Global',
+        description = 'Same boomsmash settings for all scenes in file.',
+        default = False)
+
+    #twm.image_settings = bpy.types.ImageFormatSettings(
     #                        bpy.context.scene.render.image_settings)
 
-    incremental = BoolProperty(
-        name="Incremental",
-        description="Save incremental boomsmashes.")
+    #scene_cam = BoolProperty(
+    #    name = 'Active Camera',
+    #    description = 'Always renders from the active camera that's set in the Scene properties')
 
-    # scene_cam = BoolProperty(
-    #    name="Active Camera",
-    #    description="Always renders from the active camera that's set in the Scene properties")
+    incremental = BoolProperty(
+        name = 'Incremental',
+        description = 'Save incremental boomsmashes.',
+        default = False)
 
     use_stamp = BoolProperty(
-        name="Stamp",
-        description="Turn on stamp (uses settings from render properties).",
-        default=0)
-
+        name = 'Stamp',
+        description = 'Turn on stamp (uses settings from render properties).',
+        default = False)    
+        
     transparent = BoolProperty(
-        name="Transparent",
-        description="Make background transparent (only for formats that support alpha, i.e.: .png).",
-        default=0)
-
+        name = 'Transparent',
+        description = 'Make background transparent (only for formats that support alpha, i.e.: .png).',
+        default = False)
+        
     autoplay = BoolProperty(
-        name="Autoplay",
-        description="Automatically play boomsmash after making it.",
-        default=0)
-
+        name = 'Autoplay',
+        description = 'Automatically play boomsmash after making it.',
+        default = False)              
+        
     unsimplify = BoolProperty(
-        name="Unsimplify",
-        description="Boomsmash with the subdivision surface levels at it's render settings.",
-        default=0)
-
+        name = 'Unsimplify',
+        description = "Boomsmash with the subdivision surface levels at it's render settings.",
+        default = False)
+        
     onlyrender = BoolProperty(
-        name="Only Render",
-        description="Only have renderable objects visible during boomsmash.",
-        default=0)
-
+        name = 'Only Render',
+        description = 'Only have renderable objects visible during boomsmash.',
+        default = False)
+        
     frame_skip = IntProperty(
-        name="Skip Frames",
-        description="Number of frames to skip",
-        default=0,
-        min=0)
+        name = 'Skip Frames',
+        description = 'Number of frames to skip',
+        default = 0,
+        min = 0)        
 
     resolution_percentage = IntProperty(
-        name="Resolution Percentage",
-        description="define a percentage of the Render Resolution to make your boomsmash",
-        default=50,
-        min=0,
-        max=100)
+        name = 'Resolution Percentage',
+        description = 'define a percentage of the Render Resolution to make your boomsmash',
+        default = 50,
+        min = 0,
+        max = 100)        
 
-    filepath = StringProperty(
-        name="File Path",
-        description="Folder where your boomsmash will be stored",
-        default="insert name here",  # "//BoomSmash/" + bpy.context.scene.name + "####",
-        subtype='FILE_PATH')
+    #DEBUG
+    #pu.db
 
+    dirname = StringProperty(
+        name = '',
+        description = 'Folder where your boomsmash will be stored',
+        default = bpy.app.tempdir,
+        subtype = 'DIR_PATH')  
+
+    filename = StringProperty(
+        name = '',
+        description = 'Filename where your boomsmash will be stored',
+        default = 'Boomsmash',
+        subtype = 'FILE_NAME')  
+
+
+class setDirname(bpy.types.Operator):
+    bl_idname = 'bs.setdirname'
+    bl_label = 'BoomsmashDirname'
+    bl_description = 'boomsmash use blendfile directory'
+    bl_options = {'REGISTER', 'INTERNAL'}
+    
+    def execute(self, context):
+        cs = context.scene
+        cs.boom_props.dirname = os.path.dirname(bpy.data.filepath)
+        return {'FINISHED'} 
+            
+
+class setFilename(bpy.types.Operator):
+    bl_idname = 'bs.setfilename'
+    bl_label = 'BoomsmashFilename'
+    bl_description = 'boomsmash use blendfile name _ scene name'
+    bl_options = {'REGISTER', 'INTERNAL'}
+    
+    def execute(self, context):
+        cs = context.scene
+        blend_name = os.path.basename(
+                      os.path.splitext(bpy.data.filepath)[0])
+        cs.boom_props.filename = blend_name + '_' + bpy.context.scene.name
+        return {'FINISHED'} 
+    
 
 class DoBoom(bpy.types.Operator):
-    bl_idname = "bs.doboom"
-    bl_label = "Boomsmash"
+    bl_idname = 'bs.doboom'
+    bl_label = 'Boomsmash'
+    bl_description = 'Start boomsmash, use, enjoy, think about donate ;)'
     bl_options = {'REGISTER'}
 
-    def execute(self, context):
+    def execute(self, context): 
+        cs = context.scene
+        wm = context.window_manager
         rd = context.scene.render
         sd = context.space_data
-        bp = context.scene.boom_props
 
-        # guardo settings
+        if wm.boom_props.global_toggle:
+            boom_props = wm.boom_props
+        else:
+            boom_props = cs.boom_props
+
+        #pu.db
+
+        #guardo settings
         old_use_stamp = rd.use_stamp
         old_onlyrender = sd.show_only_render
-        old_simplify = rd.use_simplify
+        old_simplify = rd.use_simplify 
         old_filepath = rd.filepath
         old_alpha_mode = rd.alpha_mode
-        # old_image_settings = rd.image_settings
+        #old_image_settings = rd.image_settings
         old_resolution_percentage = rd.resolution_percentage
-        old_frame_step = context.scene.frame_step
+        old_frame_step = cs.frame_step
 
-        # afecto settings originales
-        rd.use_stamp = bp.use_stamp
-        sd.show_only_render = bp.onlyrender
-        if bp.unsimplify:
+        #afecto settings originales
+        rd.use_stamp = boom_props.use_stamp
+        sd.show_only_render = boom_props.onlyrender
+        if boom_props.unsimplify:
             rd.use_simplify = False
-        rd.filepath = bp.filepath
-        rd.alpha_mode = 'TRANSPARENT' if bp.transparent else 'SKY'
+        rd.filepath = cs.boom_props.dirname + cs.boom_props.filename
+        rd.alpha_mode = 'TRANSPARENT' if boom_props.transparent else 'SKY'
 
-        # rd.image_settings = bp.image_settings
-        rd.resolution_percentage = bp.resolution_percentage
-        context.scene.frame_step = bp.frame_skip + 1
-        # view_pers = context.area.spaces[0].region_3d.view_perspective
-        # if bp.scene_cam and view_pers is not 'CAMERA':
-        #    bpy.ops.view3d.viewnumpad(type='CAMERA')
+        #rd.image_settings = boom_props.image_settings
+        rd.resolution_percentage = boom_props.resolution_percentage
+        cs.frame_step = boom_props.frame_skip + 1
+        #view_pers = context.area.spaces[0].region_3d.view_perspective
+        #if boom_props.scene_cam and view_pers is not 'CAMERA':
+        #    bpy.ops.view3d.viewnumpad(type = 'CAMERA')
 
-        # ejecuto
-        bpy.ops.render.opengl(animation=True)
-        if bp.autoplay:
+        #ejecuto
+        bpy.ops.render.opengl(animation = True)
+        if boom_props.autoplay:
             bpy.ops.render.play_rendered_anim()
-
-        # devuelvo settings
+ 
+        #devuelvo settings
         rd.use_stamp = old_use_stamp
         sd.show_only_render = old_onlyrender
         rd.use_simplify = old_simplify
         rd.filepath = old_filepath
         rd.alpha_mode = old_alpha_mode
-        # rd.image_settings = old_image_settings
+        #rd.image_settings = old_image_settings
         rd.resolution_percentage = old_resolution_percentage
         context.scene.frame_step = old_frame_step
-        # if bp.scene_cam and view_pers is not 'CAMERA':
-        #    bpy.ops.view3d.viewnumpad(type='CAMERA')
+        #if boom_props.scene_cam and view_pers is not 'CAMERA':
+        #    bpy.ops.view3d.viewnumpad(type = 'CAMERA')    
 
-        return {'FINISHED'}
-
+        return {'FINISHED'}  
+    
+    #def cancel(self, context):
+    #    print('cancelado...')
+    #    return {'CANCELLED'}  
 
 def draw_boomsmash_panel(context, layout):
-    col = layout.column(align=True)
+    col = layout.column(align = True)
+    cs = context.scene
+    wm = context.window_manager 
     rd = context.scene.render
-    bp = context.scene.boom_props
 
+    if wm.boom_props.global_toggle:
+        boom_props = wm.boom_props
+    else:
+        boom_props = cs.boom_props
+    
     split = col.split()
     subcol = split.column()
-    # subcol.prop(bp, "incremental")
-    subcol.prop(bp, "use_stamp")
-    subcol.prop(bp, "onlyrender")
-    # subcol.prop(bp, "scene_cam")
+    #subcol.prop(boom_props, 'incremental')
+    subcol.prop(boom_props, 'use_stamp')
+    subcol.prop(boom_props, 'onlyrender')
+    #subcol.prop(boom_props, 'scene_cam')
 
     subcol = split.column()
-    subcol.prop(bp, "transparent")
-    subcol.prop(bp, "autoplay")
-    subcol.prop(bp, "unsimplify")
-
+    subcol.prop(boom_props, 'transparent')
+    subcol.prop(boom_props, 'autoplay')
+    subcol.prop(boom_props, 'unsimplify')
+    
     col.separator()
-    col.label(text="Use preview range:")
+    col.label(text = 'Use preview range:')
     sub = col.split()
-    subrow = sub.row(align=True)
-    subrow.prop(context.scene, "use_preview_range", text="")
-    subrow.prop(context.scene, "frame_preview_start", text="Start")
-    subrow.prop(bp, "frame_skip", text="Skip")
-    subrow.prop(context.scene, "frame_preview_end", text="End")
+    subrow = sub.row(align = True)
+    subrow.prop(context.scene, 'use_preview_range', text = '')
+    subrow.prop(context.scene, 'frame_preview_start', text = 'Start')
+    subrow.prop(boom_props, 'frame_skip', text = 'Skip')
+    subrow.prop(context.scene, 'frame_preview_end', text = 'End')
     col.separator()
-
-    final_res_x = (rd.resolution_x * bp.resolution_percentage) / 100
-    final_res_y = (rd.resolution_y * bp.resolution_percentage) / 100
-    col.label(text="Final Resolution: {} x {}".format(str(final_res_x)[:-2], str(final_res_y)[:-2]))
-    col.prop(bp, "resolution_percentage", slider=True)
-
+    
+    final_res_x = (rd.resolution_x * boom_props.resolution_percentage) / 100
+    final_res_y = (rd.resolution_y * boom_props.resolution_percentage) / 100
+    col.label(text = 'Final Resolution: {} x {}'.format(str(final_res_x)[:-2], str(final_res_y)[:-2]))
+    col.prop(boom_props, 'resolution_percentage', slider = True )
+    
     col.separator()
+    
+    #col.label(text = 'Output Format:')
+    #col.template_image_settings(wm.image_settings, color_management = False)
 
-    # col.label(text="Output Format:")
-    # col.template_image_settings(wm.image_settings, color_management=False)
-
+    col.label(text = 'boomsmash folder:')
+    row = col.row()
+    row.prop(cs.boom_props, 'dirname')
+    row.operator('bs.setdirname', text = '', icon = 'FILE_FOLDER')
     col.separator()
-    col.prop(bp, "filepath")
-
+    col.label(text = 'boomsmash filename:')
+    row = col.row()
+    row.prop(cs.boom_props, 'filename')
+    row.operator('bs.setfilename', text = '', icon = 'FILE_BLEND')
+    
 
 class VIEW3D_PT_tools_animation_boomsmash(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
-    bl_category = "Animation"
-    bl_context = "objectmode"
-    bl_label = " "
-
+    bl_category = 'Animation'
+    bl_context = 'objectmode'
+    bl_label = ' '
+    
     def draw_header(self, context):
-        DoBTN = self.layout.operator("bs.doboom", text="BoomSmash", icon='RENDER_ANIMATION')
-        # DoBTN.animation = True
+        DoBTN = self.layout
+        DoBTN.operator('bs.doboom', text = 'BoomSmash', icon = 'RENDER_ANIMATION')
+        DoBTN.prop(context.window_manager.boom_props, 'global_toggle')
+        #DoBTN.animation = True
 
     def draw(self, context):
         layout = self.layout
@@ -187,32 +260,39 @@ class VIEW3D_PT_tools_animation_boomsmash(bpy.types.Panel):
 class VIEW3D_PT_tools_pose_animation_boomsmash(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
-    bl_category = "Tools"
-    bl_context = "posemode"
-    bl_label = " "
-
+    bl_category = 'Tools'
+    bl_context = 'posemode'
+    bl_label = ' '
+  
     def draw_header(self, context):
-        DoBTN = self.layout.operator("bs.doboom", text="BoomSmash", icon='RENDER_ANIMATION')
+        DoBTN = self.layout
+        DoBTN.operator('bs.doboom', text = 'BoomSmash', icon = 'RENDER_ANIMATION')
+        DoBTN.prop(context.window_manager.boom_props, 'global_toggle')
 
     def draw(self, context):
         layout = self.layout
         draw_boomsmash_panel(context, layout)
-
-
+        
+        
 def register():
     bpy.utils.register_module(__name__)
 
     bpy.types.Scene.boom_props = PointerProperty(
-        type=BoomProps, name="BoomSmash Properties", description="")
+            type = BoomProps, name = 'BoomSmash Properties', description = '')
+
+    bpy.types.WindowManager.boom_props = PointerProperty(
+            type = BoomProps, name = 'BoomSmash Global Properties', description = '')
 
 
 def unregister():
     bpy.utils.unregister_module(__name__)
-
     del bpy.types.Scene.boom_props
+    del bpy.types.WindowManager.boom_props
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     register()
-    # unregister()
+    #unregister()
     print('hecho...')
+
+
