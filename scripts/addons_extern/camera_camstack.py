@@ -357,7 +357,7 @@ class CamStack_prop_group(PropertyGroup):
 classes = (
     VIEW3D_OT_camstack_new,
     VIEW3D_OT_camstack_generator,
-    VIEW3D_PT_camstack,
+    VIEW3D_OT_camstack_split,
     VIEW3D_PT_camstack,
     CamStack_prop_group
 )
