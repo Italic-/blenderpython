@@ -354,16 +354,26 @@ class CamStack_prop_group(PropertyGroup):
         precision=2
     )
 
+classes = (
+    VIEW3D_OT_camstack_new,
+    VIEW3D_OT_camstack_generator,
+    VIEW3D_PT_camstack,
+    VIEW3D_PT_camstack,
+    CamStack_prop_group
+)
+
 
 def register():
-    bpy.utils.register_module(__name__)
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
     bpy.types.Scene.camstack_props = PointerProperty(
         type=CamStack_prop_group, name='CamStack Properties', description='')
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
+    for cls in classes[::-1]:
+        bpy.utils.unregister_class(cls)
 
     del bpy.types.Scene.camstack_props
 
