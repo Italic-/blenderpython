@@ -322,10 +322,6 @@ class VIEW3D_PT_camstack(Panel):
     bl_region_type = 'TOOLS'
     bl_category = 'Tools'
 
-    @classmethod
-    def poll(cls, context):
-        return True
-
     def draw(self, context):
         csp = context.scene.camstack_props
 
