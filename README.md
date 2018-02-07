@@ -3,6 +3,16 @@ blenderpython
 
 My collection of Blender Addons
 
+Note from italic
+--
+This branch is an archive of meta's work. Because older versions of blender will continue to exist,
+I will keep this branch around for sake of history. While most addons should work with older versions
+of blender (provided no newer API features are exploited), older versions are available through git's
+history.
+
+Feel free to fork and continue, or follow my current branch (ita_tools) which is more aligned with my
+own interest in tools and workflow.
+
 [Prebuilt collection for Windows x86_64 (Blender 2.78a)]
 --
 
@@ -25,8 +35,7 @@ Intallation
 * Copy/paste the config & scripts folder from blenderpython zip into \blender-2.78a-windows64\2.78
 * This will overwrite only the files I have updated!
 * Alternativly you can download the repo & pick what you need, but some addons,  especially properties shelf addons rely upon:
-* https://github.com/meta-androcto/blenderpython/tree/master/scripts/addons_extern/AF_view3d_mod
-* https://github.com/meta-androcto/blenderpython/tree/master/scripts/addons_extern/AF_view3d_mod
+* https://github.com/Italic-/blenderpython/tree/meta/scripts/addons_extern/AF_view3d_mod
 * Some blender modules files have been changed, that said I have the toolshelf tabs & properties shelf tabs written as addons.
 * Many addons have been modified to fit into the new Tabs order I constructed.
 * Addons are kept reasonably up-to-date. Check the author's source for the most recent updates.
