@@ -1,34 +1,33 @@
 """
-    CamStack is used to create a hierarchy of cameras for the express purpose of creating handheld camera motion.
+CamStack is used to create a hierarchy of cameras for the express purpose of creating handheld camera motion.
 
-    New: Create a new stack at scene origin based on parameters given in the CamStack panel.
-    Generate: Create a stack based on selected camera(s) and their data. Safe to use with existing animation.
-    Split (for use with an existing stack): Make current camera single-user and
-    link all child cameras to the split camera.
+New: Create a new stack at scene origin based on parameters given in the CamStack panel.
+Generate: Create a stack based on selected camera(s) and their data. Safe to use with existing animation.
+Split (for use with an existing stack): Make current camera single-user and
+link all child cameras to the split camera.
 
-    Normal animation goes on camera objects. _main is the standard layout pass for
-    basic moves and composition. _handheld1 is the first layer of lower-frequency
-    handheld motion. _handheld2 is the second layer. _shake1 is the first layer of
-    high-frequency shake (vibrations, turbulence, etc.). _shake2 is the second layer.
-    Second layers are not always necessary, but provide an easy way to add animation
-    non-destructively. Look through each camera to see its effect on the shot.
+Normal animation goes on camera objects. _main is the standard layout pass for
+basic moves and composition. _handheld1 is the first layer of lower-frequency
+handheld motion. _handheld2 is the second layer. _shake1 is the first layer of
+high-frequency shake (vibrations, turbulence, etc.). _shake2 is the second layer.
+Second layers are not always necessary, but provide an easy way to add animation
+non-destructively. Look through each camera to see its effect on the shot.
 
-    Focal length and focus are on the camera data. When linked, all changes
-    in this data will propagate to the other cameras. Split cameras to enable
-    further tweaking of these parameters.
+Focal length and focus are on the camera data. When linked, all changes
+in this data will propagate to the other cameras. Split cameras to enable
+further tweaking of these parameters.
 
-    _global_move_control is used to reposition or scale the stack to fit a scene
-    after animation has been made. For example, the animator spends a week on
-    a shot, then set dressing or the plate change the scene.
-    Transform _global_move_control to reposition the cameras
-    while maintaining camera animation.
+_global_move_control is used to reposition or scale the stack to fit a scene
+after animation has been made. For example, the animator spends a week on
+a shot, then set dressing or the plate change the scene.
+Transform _global_move_control to reposition the cameras
+while maintaining camera animation.
 
-    Based on my original Maya script here: https://github.com/Italic-/maya-scripts/blob/master/py/cameraStack.py
+Based on my original Maya script here: https://github.com/Italic-/maya-scripts/blob/master/py/cameraStack.py
 
-    This script is licensed under the Apache 2.0 license.
-    See details of this license here:
-    https://www.apache.org/licenses/LICENSE-2.0
-
+This script is licensed under the Apache 2.0 license.
+See details of this license here:
+https://www.apache.org/licenses/LICENSE-2.0
 """
 
 bl_info = {
@@ -122,13 +121,6 @@ class VIEW3D_OT_camstack_new(Operator):
     bl_idname = 'camstack.new'
     bl_label = 'New'
     bl_options = {'REGISTER', 'UNDO'}
-
-    def draw(self, context):
-        csp = context.camstack_props
-        layout = self.layout
-        col = layout.column()
-        col.prop(csp, 'cam_name')
-        col.prop(csp, 'focal_len')
 
     def execute(self, context):
         log = logging.getLogger(__name__ + ".newLogger")
