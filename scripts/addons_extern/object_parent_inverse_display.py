@@ -59,7 +59,7 @@ bl_info = {
 
 
 @persistent
-def init_inverse_components(context):
+def init_inverse_components(scene):
     if bpy.context.object is not None:
         ob = bpy.context.object
         inv_mat = ob.matrix_parent_inverse
