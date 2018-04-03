@@ -12,7 +12,6 @@ Object.parent_inverse_display.rotation_quat     type: mathutils.Quaternion  or (
 Object.parent_inverse_display.scale             type: mathutils.Vector      or (float, float, float)
 
 TODO:
-Proper matrix scales.
 Child-of constraint matrix display.
 
 
