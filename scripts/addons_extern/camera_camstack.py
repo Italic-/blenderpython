@@ -30,6 +30,15 @@ See details of this license here:
 https://www.apache.org/licenses/LICENSE-2.0
 """
 
+import bpy
+import logging
+
+from bpy.types import PropertyGroup, Panel, Operator
+from bpy.props import StringProperty, FloatProperty, PointerProperty
+
+logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
+log = logging.getLogger(__name__)
+
 bl_info = {
     'name': 'CamStack',
     'description': 'Create camera hierarchy (stack) for handheld camera motion.',
@@ -40,15 +49,6 @@ bl_info = {
     'blender': (2, 76, 0),
     'tracker_url': 'https://github.com/meta-androcto/blenderpython/issues'
 }
-
-import bpy
-import logging
-
-from bpy.types import PropertyGroup, Panel, Operator
-from bpy.props import StringProperty, FloatProperty, PointerProperty
-
-logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
-log = logging.getLogger(__name__)
 
 
 def subCam(context, main_cam, cam_name):
@@ -341,6 +341,7 @@ class CamStack_prop_group(PropertyGroup):
         min=0.01,
         precision=2
     )
+
 
 classes = (
     VIEW3D_OT_camstack_new,
