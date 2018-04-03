@@ -30,16 +30,13 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 import bpy
 from bpy.types import (
+    Operator,
     Panel,
     PropertyGroup,
 )
 from bpy.props import (
     FloatVectorProperty,
     PointerProperty,
-)
-from bpy.app.handlers import (
-    persistent,
-    scene_update_post,
 )
 from mathutils import (
     Matrix,
@@ -52,24 +49,10 @@ bl_info = {
     'author': 'italic',
     'description': 'Visualize the parent inverse matrix applied when parenting objects.',
     'category': 'Object',
-    'version': (0, 0, 1),
+    'version': (0, 0, 2),
     'blender': (2, 7, 6),
     'location': 'Object Properties Panel -> Parent Inverse Transform',
 }
-
-
-@persistent
-def init_inverse_components(scene):
-    if bpy.context.object is not None:
-        ob = bpy.context.object
-        inv_mat = ob.matrix_parent_inverse
-        inv_prop = ob.parent_inverse_display
-        loc, rot, sca = inv_mat.decompose()
-
-        inv_prop.location = loc
-        inv_prop.rotation_euler = rot.to_euler(ob.rotation_mode)
-        inv_prop.rotation_quat = rot
-        inv_prop.scale = sca
 
 
 def update_inverse_components(self, context, component):
@@ -93,27 +76,28 @@ def update_inverse_components(self, context, component):
                 self.rotation_quat.y,
                 self.rotation_quat.z
             )).to_matrix().to_4x4()
-        elif ob.rotation_mode in ('XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX'):
-            rot = Euler(
-                (self.rotation_euler.x,
-                 self.rotation_euler.y,
-                 self.rotation_euler.z),
+        elif ob.rotation_mode == "AXIS_ANGLE":
+            rot = rot.to_matrix().to_4x4()
+        else:
+            rot = Euler((
+                self.rotation_euler.x,
+                self.rotation_euler.y,
+                self.rotation_euler.z),
                 ob.rotation_mode
             ).to_matrix().to_4x4()
-        else:
-            rot = rot.to_matrix().to_4x4()
     else:
         rot = rot.to_matrix().to_4x4()
 
-    # TODO: Make work
     if component == "SCA":
-        sca = Matrix.Scale(1.0, 4, (
-            self.scale.x,
-            self.scale.y,
-            self.scale.z
-        ))
+        scaX = Matrix.Scale(self.scale.x, 4, (1.0, 0.0, 0.0))
+        scaY = Matrix.Scale(self.scale.y, 4, (0.0, 1.0, 0.0))
+        scaZ = Matrix.Scale(self.scale.z, 4, (0.0, 0.0, 1.0))
+        sca = scaX * scaY * scaZ
     else:
-        sca = Matrix.Scale(1.0, 4, sca)
+        scaX = Matrix.Scale(sca.x, 4, (1.0, 0.0, 0.0))
+        scaY = Matrix.Scale(sca.y, 4, (0.0, 1.0, 0.0))
+        scaZ = Matrix.Scale(sca.z, 4, (0.0, 0.0, 1.0))
+        sca = scaX * scaY * scaZ
 
     # Produce and update inverse matrix
     ob.matrix_parent_inverse = loc * rot * sca
@@ -131,6 +115,42 @@ def update_inverse_sca(self, context):
     update_inverse_components(self, context, "SCA")
 
 
+class OBJECT_OT_inverse_get(Operator):
+
+    """Get object's parent inverse."""
+
+    bl_idname = "object.inverse_get"
+    bl_label = "Get parent inverse"
+
+    def execute(self, context):
+        ob = context.object
+        inv_mat = ob.matrix_parent_inverse
+        inv_prop = ob.parent_inverse_display
+        loc, rot, sca = inv_mat.decompose()
+
+        inv_prop.location = loc
+        if ob.rotation_mode not in ("QUATERNION", "AXIS_ANGLE"):
+            inv_prop.rotation_euler = rot.to_euler(ob.rotation_mode)
+        inv_prop.rotation_quat = rot
+        inv_prop.scale = sca
+
+        return {'FINISHED'}
+
+
+class OBJECT_OT_inverse_clear(Operator):
+
+    """Clear parent inverse."""
+
+    bl_idname = "object.inverse_clear"
+    bl_label = "Clear parent inverse"
+
+    def execute(self, context):
+        bpy.ops.object.parent_clear(type='CLEAR_INVERSE')
+        bpy.ops.object.inverse_get()
+
+        return {'FINISHED'}
+
+
 class OBJECT_PT_inverse_display(Panel):
 
     bl_label = "Parent Inverse Transform"
@@ -143,6 +163,9 @@ class OBJECT_PT_inverse_display(Panel):
         ob = context.object
         inverse = ob.parent_inverse_display
 
+        col = layout.column()
+        col.operator("object.inverse_get", text="Fetch Inverse")
+        col.operator("object.inverse_clear", text="Clear Inverse (Reset)")
         row = layout.row()
         row.column().prop(inverse, "location")
         if ob.rotation_mode == "QUATERNION":
@@ -202,6 +225,8 @@ class ParentInverseDisplayProps(PropertyGroup):
 classes = (
     ParentInverseDisplayProps,
     OBJECT_PT_inverse_display,
+    OBJECT_OT_inverse_get,
+    OBJECT_OT_inverse_clear,
 )
 
 
@@ -214,7 +239,6 @@ def register():
         name="Parent Inverse Properties",
         description=""
     )
-    scene_update_post.append(init_inverse_components)
 
 
 def unregister():
@@ -222,8 +246,6 @@ def unregister():
 
     for cls in classes[::-1]:
         bpy.utils.unregister_class(cls)
-
-    scene_update_post.remove(init_inverse_components)
 
 
 if __name__ == '__main__':
